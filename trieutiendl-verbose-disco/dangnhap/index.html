@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#102a3e" />
+    <title>Đăng nhập | HP Telecom</title>
+    <meta name="description" content="Đăng nhập vào HP Telecom." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root { color-scheme: light; --ink: #173449; --muted: #536b77; --blue: #006d77; --border: #d9e7e8; }
+      * { box-sizing: border-box; }
+      body {
+        min-width: 320px; min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 32px;
+        background: radial-gradient(ellipse at 13% 8%, rgba(0,191,208,.09), transparent 32%), #f2f7f7;
+        color: var(--ink); font-family: "Manrope", "Segoe UI", sans-serif;
+      }
+      a { color: inherit; }
+      button, input { font: inherit; }
+      .login-shell {
+        width: min(1120px, 100%); min-height: 700px; display: grid; grid-template-columns: 1.03fr .97fr;
+        overflow: hidden; border: 1px solid rgba(19,48,89,.08); border-radius: 26px; background: #fff;
+        box-shadow: 0 28px 80px rgba(28,48,78,.12);
+      }
+      .welcome-panel {
+        position: relative; display: flex; flex-direction: column; justify-content: space-between; min-height: 700px;
+        overflow: hidden; padding: 42px 46px; background: #102a3e; color: white;
+      }
+      .welcome-panel::before, .welcome-panel::after {
+        position: absolute; content: ""; border: 1px solid rgba(0,191,208,.2); border-radius: 50%; pointer-events: none;
+      }
+      .welcome-panel::before { width: 500px; height: 500px; right: -270px; top: 74px; }
+      .welcome-panel::after { width: 360px; height: 360px; right: -200px; top: 144px; }
+      .brand {
+        position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 11px; width: fit-content;
+        color: white; text-decoration: none;
+      }
+      .brand-logo { display: block; width: 214px; max-width: 100%; height: auto; }
+      .welcome-copy { position: relative; z-index: 1; max-width: 440px; margin: 54px 0 62px; }
+      .welcome-copy .overline { margin: 0 0 18px; color: #a3ebed; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+      .welcome-copy h1 { margin: 0; font-size: clamp(38px, 4.5vw, 56px); line-height: 1.08; letter-spacing: -.065em; }
+      .welcome-copy p { max-width: 380px; margin: 22px 0 0; color: #c0cde0; font-size: 15px; line-height: 1.8; }
+      .network-art { position: absolute; right: 26px; bottom: 102px; width: 246px; height: 170px; opacity: .9; }
+      .network-art svg { display: block; width: 100%; height: 100%; }
+      .panel-note { position: relative; z-index: 1; margin: 0; color: #9eb0c9; font-size: 12px; }
+      .form-panel { display: flex; align-items: center; justify-content: center; padding: 56px clamp(34px, 6vw, 76px); }
+      .form-content { width: min(100%, 390px); }
+      .form-content h2 { margin: 0; font-size: 30px; line-height: 1.2; letter-spacing: -.05em; }
+      .form-intro { margin: 10px 0 32px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+      .field { margin-top: 19px; }
+      .field label { display: block; margin-bottom: 8px; color: #26364e; font-size: 13px; font-weight: 700; }
+      .field input {
+        width: 100%; height: 50px; padding: 0 14px; border: 1px solid #d8e0ea; border-radius: 10px;
+        outline: none; background: #fff; color: var(--ink); font-size: 14px;
+        transition: border-color .18s ease, box-shadow .18s ease;
+      }
+      .field input::placeholder { color: #758298; }
+      .field input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(20,87,207,.12); }
+      .password-wrap { position: relative; }
+      .password-wrap input { padding-right: 76px; }
+      .password-toggle {
+        position: absolute; top: 50%; right: 12px; padding: 6px 4px; transform: translateY(-50%);
+        border: 0; background: transparent; color: #53657e; cursor: pointer; font-size: 12px; font-weight: 700;
+      }
+      .password-toggle:hover { color: var(--blue); }
+      .form-options { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 17px 0 23px; font-size: 12px; }
+      .remember { display: inline-flex; align-items: center; gap: 8px; color: #526177; cursor: pointer; }
+      .remember input { width: 15px; height: 15px; margin: 0; accent-color: var(--blue); }
+      .help-link { color: var(--blue); font-weight: 700; text-decoration: none; }
+      .help-link:hover, .footer-links a:hover { text-decoration: underline; }
+      .submit-button {
+        width: 100%; min-height: 50px; border: 0; border-radius: 10px; background: var(--blue); color: white;
+        cursor: pointer; font-size: 14px; font-weight: 800; box-shadow: 0 8px 18px rgba(16,42,62,.14);
+        transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+      }
+      .submit-button:hover { transform: translateY(-1px); background: #005861; box-shadow: 0 11px 22px rgba(16,42,62,.18); }
+      .submit-button:focus-visible, .password-toggle:focus-visible, .help-link:focus-visible, .brand:focus-visible, .footer-links a:focus-visible {
+        outline: 3px solid rgba(0,109,119,.35); outline-offset: 3px;
+      }
+      .demo-notice { min-height: 42px; margin: 14px 0 0; color: #596a82; font-size: 12px; line-height: 1.6; }
+      .demo-notice[data-state="error"] { color: #aa3a35; }
+      .account-prompt { margin: 18px 0 0; color: #596a82; text-align: center; font-size: 13px; }
+      .account-prompt a { color: var(--blue); font-weight: 800; text-decoration: none; }
+      .account-prompt a:hover { text-decoration: underline; }
+      .footer-links { display: flex; justify-content: center; gap: 24px; margin-top: 27px; color: #596a82; font-size: 12px; }
+      .footer-links a { text-decoration: none; }
+      @media (max-width: 760px) {
+        body { display: block; padding: 0; background: #fff; }
+        .login-shell { min-height: 100vh; grid-template-columns: 1fr; border: 0; border-radius: 0; box-shadow: none; }
+        .welcome-panel { min-height: 210px; padding: 24px; }
+        .welcome-copy { margin: 32px 0 0; }
+        .welcome-copy .overline { margin-bottom: 10px; font-size: 10px; }
+        .welcome-copy h1 { max-width: 470px; font-size: 34px; }
+        .welcome-copy p, .network-art, .panel-note { display: none; }
+        .form-panel { align-items: flex-start; padding: 38px 24px 44px; }
+      }
+      @media (max-width: 380px) {
+        .welcome-copy h1 { font-size: 30px; }
+        .form-options { align-items: flex-start; flex-direction: column; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="login-shell">
+      <section class="welcome-panel" aria-label="HP Telecom">
+        <a class="brand" href="/" aria-label="Về trang chủ HP Telecom">
+          <svg class="brand-logo" viewBox="0 0 303 64" role="img" aria-label="HP Telecom — Điều hành hiện trường" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
+              <path d="M30 7a23 23 0 0 0-22 16"/><path d="M7 32a23 23 0 0 0 17 22"/>
+              <path d="M34 55a23 23 0 0 0 18-19"/><path d="M54 27A23 23 0 0 0 38 9"/>
+            </g>
+            <circle cx="21" cy="7" r="3.2" fill="#00bfd0"/><circle cx="53" cy="47" r="3.2" fill="#00bfd0"/>
+            <text x="10" y="39" fill="#ffffff" font-family="Arial, sans-serif" font-size="25" font-weight="800" letter-spacing="-2">HP</text>
+            <text x="76" y="29" fill="#ffffff" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="-.7">HP Telecom</text>
+            <text x="76" y="50" fill="#a3ebed" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="2.1">ĐIỀU HÀNH HIỆN TRƯỜNG</text>
+          </svg>
+        </a>
+        <div class="welcome-copy">
+          <p class="overline">Không gian vận hành</p>
+          <h1>Chào mừng bạn trở lại.</h1>
+          <p>Đăng nhập để tiếp tục công việc và kết nối với đội ngũ của bạn.</p>
+        </div>
+        <div class="network-art" aria-hidden="true">
+          <svg viewBox="0 0 246 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M25 125L83 82L132 113L190 54L225 77M83 82L88 28L158 21L190 54M132 113L145 153L225 130L225 77" stroke="#00bfd0" stroke-opacity=".58" stroke-width="1.5"/>
+            <circle cx="25" cy="125" r="5" fill="#00bfd0"/><circle cx="83" cy="82" r="7" fill="#c9f5f5"/>
+            <circle cx="88" cy="28" r="4" fill="#00bfd0"/><circle cx="132" cy="113" r="5" fill="#00a5af"/>
+            <circle cx="158" cy="21" r="5" fill="#c9f5f5"/><circle cx="190" cy="54" r="8" fill="#00bfd0"/>
+            <circle cx="225" cy="77" r="5" fill="#c9f5f5"/><circle cx="145" cy="153" r="4" fill="#00bfd0"/>
+            <circle cx="225" cy="130" r="5" fill="#00a5af"/>
+          </svg>
+        </div>
+        <p class="panel-note">HP Telecom · Kết nối vận hành mỗi ngày</p>
+      </section>
+
+      <section class="form-panel" aria-labelledby="login-title">
+        <div class="form-content">
+          <h2 id="login-title">Đăng nhập</h2>
+          <p class="form-intro">Nhập thông tin tài khoản HP Telecom của bạn.</p>
+          <form id="login-form">
+            <div class="field">
+              <label for="email">Email hoặc tên đăng nhập</label>
+              <input id="email" name="username" type="text" autocomplete="username" placeholder="Nhập email hoặc tên đăng nhập" required />
+            </div>
+            <div class="field">
+              <label for="password">Mật khẩu</label>
+              <div class="password-wrap">
+                <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required />
+                <button class="password-toggle" id="password-toggle" type="button" aria-label="Hiện mật khẩu" aria-pressed="false">Hiện</button>
+              </div>
+            </div>
+            <div class="form-options">
+              <label class="remember"><input type="checkbox" name="remember" /> Ghi nhớ đăng nhập</label>
+              <a class="help-link" href="https://hptelecom.id.vn/support">Quên mật khẩu?</a>
+            </div>
+            <button class="submit-button" id="submit-button" type="submit">Đăng nhập</button>
+            <p class="demo-notice" id="demo-notice" role="status" aria-live="polite">Bản demo giao diện — chưa kết nối hệ thống xác thực.</p>
+          </form>
+          <p class="account-prompt" id="account-prompt">
+            Chưa có tài khoản?
+            <a href="/dangky/">Tạo tài khoản mới</a>
+          </p>
+          <nav class="footer-links" aria-label="Liên kết hỗ trợ">
+            <a href="https://hptelecom.id.vn/support">Hỗ trợ</a>
+            <a href="/">Trang chủ HP Telecom</a>
+          </nav>
+        </div>
+      </section>
+    </main>
+    <script>
+      const password = document.querySelector("#password");
+      const passwordToggle = document.querySelector("#password-toggle");
+      const loginForm = document.querySelector("#login-form");
+      const demoNotice = document.querySelector("#demo-notice");
+
+      passwordToggle.addEventListener("click", () => {
+        const showing = password.type === "password";
+        password.type = showing ? "text" : "password";
+        passwordToggle.textContent = showing ? "Ẩn" : "Hiện";
+        passwordToggle.setAttribute("aria-label", showing ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+        passwordToggle.setAttribute("aria-pressed", String(showing));
+      });
+
+      loginForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        demoNotice.dataset.state = "error";
+        demoNotice.textContent = "Đây là bản demo. Đăng nhập chưa kết nối; vui lòng liên hệ Hỗ trợ để được trợ giúp.";
+      });
+    </script>
+  </body>
+</html>

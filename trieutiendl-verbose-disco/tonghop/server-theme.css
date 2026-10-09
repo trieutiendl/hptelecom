@@ -1,0 +1,38 @@
+:root {
+  color-scheme: dark;
+  --ink: #e8f5fa;
+  --muted: #a9c6d3;
+  --blue: #24d1df;
+  --line: #387083;
+  --canvas: #071f2b;
+  --surface: #103441;
+  --green: #67d5a0;
+  --amber: #ffd051;
+  --red: #ffb4ad;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body { background: radial-gradient(ellipse at top right,#0e4b60,transparent 65%),var(--canvas); color:var(--ink); font-family:"Segoe UI",Arial,sans-serif; }
+h1,h2,.metric-value,.team-title,.incident-id { color:var(--ink); }
+.sidebar { border-color:#285366; background:#071f2b; }
+.nav a[aria-current="page"] { border:1px solid #52d6df; background:#103b4b; color:#3ddbe5; }
+.nav a:hover { background:#174757; color:#f5fdff; }
+.main-column { color:var(--ink); }
+.topbar { border-color:#285366; background:#071f2b; box-shadow:0 3px 14px rgba(0,0,0,.18); }
+.topbar-title,.top-link,.admin-role,.subtitle,.breadcrumb,.metric-head,.metric-foot,.stat-note,.team-sub,.team-region,.dispatch-count small,.chart-labels,.chart-legend,.activity-time,.activity-text,.notice { color:var(--muted); }
+.avatar,.team-avatar,.metric-symbol,.quick-icon { border-color:#387083; background:#174757; color:#3ddbe5; }
+.metrics,.panel,.quick-link { border-color:#387083; background:#103441; color:var(--ink); box-shadow:none; }
+.panel-head { border-color:#285366; }
+.panel-head h2,.panel-head p,.team-title,.activity-text strong { color:var(--ink); }
+.dispatch-row,.incident-table td { border-color:#285366; }
+.incident-table th { background:#092733; color:#c6e2eb; }
+.incident-table td { color:#e8f5fa; }
+.incident-table tbody tr:hover,.quick-link:hover { border-color:#387083; background:#174757; }
+.incident-id,.text-link { color:#3ddbe5; }
+.priority.low,.incident-status { background:#174757; color:#bfeaf0; }
+.priority.medium,.priority.high,.incident-status.open,.demo-badge { border-color:#8b6b32; background:#533f24; color:#ffe08a; }
+.demo-badge::before { background:#ffd051; }
+.primary-button { border-color:#4aebf6; background:#24d1df; color:#052c39; }
+.primary-button:hover { background:#65e9f0; }
+.notice { border-color:#8b6b32; background:#533f24; color:#ffe08a; }
+:focus-visible { outline:3px solid #ffd051; outline-offset:3px; }

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2f7f7" />
+    <title>Tổng hợp | HP Telecom</title>
+    <meta name="description" content="Tổng quan tình hình vận hành HP Telecom." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #102a3e;
+        --muted: #536b77;
+        --blue: #006d77;
+        --line: #dce6ea;
+        --canvas: #f3f7f8;
+        --green: #16774e;
+        --amber: #9a6500;
+        --red: #a83734;
+      }
+      * { box-sizing: border-box; }
+      body { min-width: 320px; min-height: 100vh; margin: 0; background: var(--canvas); color: var(--ink); font-family: "Manrope", "Segoe UI", sans-serif; }
+      a { color: inherit; text-decoration: none; }
+      button, select { font: inherit; }
+      button, select { cursor: pointer; }
+      .app { min-height: 100vh; }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 5;
+        display: flex;
+        width: 238px;
+        flex-direction: column;
+        padding: 22px 14px;
+        border-right: 1px solid var(--line);
+        background: var(--ink);
+      }
+      .brand { display: block; width: 214px; max-width: 100%; padding: 2px 0 26px; }
+      .brand-logo { display: block; width: 100%; height: auto; }
+      .nav-label { margin: 0 10px 8px; color: #9bb0bd; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+      .nav { display: grid; gap: 4px; }
+      .nav a { display: flex; min-height: 40px; align-items: center; gap: 11px; padding: 0 11px; border-radius: 7px; color: #d2dfe5; font-size: 12px; font-weight: 700; }
+      .nav a:hover { background: #183b51; color: #fff; }
+      .nav a[aria-current="page"] { background: #164653; color: #8ce4e4; }
+      .nav-icon { display: grid; width: 18px; place-items: center; color: currentColor; font-size: 15px; }
+      .sidebar-bottom { margin-top: auto; padding: 14px 10px 4px; border-top: 1px solid #244559; }
+      .connection-state { display: flex; align-items: center; gap: 8px; color: #c6d4dc; font-size: 10px; }
+      .connection-state::before { width: 7px; height: 7px; border-radius: 50%; background: #00bfd0; content: ""; }
+      .version { margin: 8px 0 0; color: #9bb0bd; font-size: 10px; }
+      .main-column { min-height: 100vh; margin-left: 238px; }
+      .topbar { position: sticky; top: 0; z-index: 4; display: flex; min-height: 64px; align-items: center; justify-content: space-between; gap: 20px; padding: 0 clamp(22px, 3vw, 44px); border-bottom: 1px solid var(--line); background: #fff; }
+      .topbar-title { color: #58687d; font-size: 12px; }
+      .top-actions { display: flex; align-items: center; gap: 18px; }
+      .top-link { color: #53647a; font-size: 11px; font-weight: 700; }
+      .admin { display: flex; align-items: center; gap: 9px; padding-left: 16px; border-left: 1px solid var(--line); }
+      .avatar { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: #e3f4f4; color: #006d77; font-size: 10px; font-weight: 800; }
+      .admin-name { display: block; font-size: 11px; font-weight: 800; }
+      .admin-role { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
+      .content { width: min(1480px, 100%); margin: 0 auto; padding: 36px clamp(22px, 3vw, 44px) 52px; }
+      .heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 25px; }
+      .breadcrumb { margin: 0 0 9px; color: var(--muted); font-size: 11px; }
+      h1 { margin: 0; font-size: 30px; letter-spacing: -.045em; }
+      .subtitle { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+      .heading-tools { display: flex; align-items: center; gap: 10px; }
+      .date-filter { height: 38px; padding: 0 30px 0 11px; border: 1px solid #dfe5ed; border-radius: 7px; background: #fff; color: #34445b; font-size: 11px; }
+      .demo-badge { display: inline-flex; min-height: 24px; align-items: center; gap: 7px; padding: 0 9px; border: 1px solid #e5eaf1; border-radius: 999px; background: #fff; color: #58687d; font-size: 10px; font-weight: 700; }
+      .demo-badge::before { width: 6px; height: 6px; border-radius: 50%; background: #d49a31; content: ""; }
+      .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-bottom: 18px; padding: 8px; overflow: hidden; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
+      .metric { position: relative; padding: 17px 20px; }
+      .metric:not(:last-child)::after { position: absolute; top: 16px; right: 0; bottom: 16px; width: 1px; background: var(--line); content: ""; }
+      .metric-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 11px; font-weight: 700; }
+      .metric-symbol { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 8px; background: #e5f5f4; color: #006d77; font-size: 13px; }
+      .metric-value { display: block; margin-top: 8px; font-size: 28px; font-weight: 800; letter-spacing: -.055em; }
+      .metric-foot { margin-top: 5px; color: #78869a; font-size: 11px; }
+      .metric-foot strong { color: var(--green); font-weight: 800; }
+      .content-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(260px, .85fr); gap: 16px; }
+      .panel { min-width: 0; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
+      .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 19px; border-bottom: 1px solid var(--line); }
+      .panel-head h2 { margin: 0; font-size: 14px; letter-spacing: -.02em; }
+      .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+      .text-link { color: var(--blue); font-size: 10px; font-weight: 800; }
+      .chart-legend { display: flex; align-items: center; gap: 14px; color: #64738a; font-size: 9px; }
+      .legend-dot { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: var(--blue); }
+      .legend-dot.gray { background: #b6c4d7; }
+      .chart-area { padding: 16px 17px 11px; }
+      .chart-area svg { display: block; width: 100%; height: auto; overflow: visible; }
+      .chart-labels { display: flex; justify-content: space-between; padding: 7px 2px 0; color: #8390a0; font-size: 9px; }
+      .dispatch-list { display: grid; }
+      .dispatch-row { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #edf0f4; }
+      .dispatch-row:last-child { border-bottom: 0; }
+      .team-avatar { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 8px; background: #e4f4f4; color: #006d77; font-size: 9px; font-weight: 800; }
+      .team-title { display: block; overflow: hidden; color: var(--ink); font-size: 11px; font-weight: 800; text-overflow: ellipsis; }
+      .team-sub { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+      .dispatch-count { text-align: right; }
+      .dispatch-count strong { display: block; font-size: 13px; }
+      .dispatch-count small { color: var(--muted); font-size: 9px; }
+      .lower-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 16px; margin-top: 16px; }
+      .incident-table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+      .incident-table th { height: 40px; padding: 0 15px; background: #f8fafc; color: #68778c; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+      .incident-table td { height: 54px; padding: 8px 15px; border-top: 1px solid #edf0f4; color: #394a61; font-size: 10px; }
+      .incident-id { color: var(--blue); font-weight: 800; }
+      .priority, .incident-status { display: inline-flex; min-height: 20px; align-items: center; padding: 0 7px; border-radius: 999px; font-size: 9px; font-weight: 700; }
+      .priority.high { background: #fff0ee; color: var(--red); }
+      .priority.medium { background: #fff5dd; color: var(--amber); }
+      .priority.low { background: #e4f4f4; color: #315c63; }
+      .incident-status { background: #e4f4f4; color: #315c63; }
+      .incident-status.open { background: #fff5dd; color: #8d630b; }
+      .activity-list { padding: 5px 16px 9px; }
+      .activity { position: relative; display: grid; grid-template-columns: 12px 1fr; gap: 9px; padding: 10px 0; }
+      .activity:not(:last-child)::after { position: absolute; top: 23px; bottom: -8px; left: 4px; width: 1px; background: #e1e7ef; content: ""; }
+      .activity-dot { position: relative; z-index: 1; width: 9px; height: 9px; margin-top: 3px; border: 2px solid #2a64b9; border-radius: 50%; background: #fff; }
+      .activity-text { margin: 0; color: #43536a; font-size: 10px; line-height: 1.5; }
+      .activity-text strong { color: var(--ink); font-weight: 800; }
+      .activity-time { display: block; margin-top: 3px; color: #8591a2; font-size: 9px; }
+      .quick-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+      .quick-link { display: flex; min-height: 64px; align-items: center; gap: 11px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; transition: border-color .16s ease, background .16s ease; }
+      .quick-link:hover { border-color: #b8cbe4; background: #fbfcfe; }
+      .quick-link:focus-visible, .nav a:focus-visible, .top-link:focus-visible { outline: 3px solid rgba(0,109,119,.35); outline-offset: 2px; }
+      .quick-icon { display: grid; width: 32px; height: 32px; flex: 0 0 auto; place-items: center; border-radius: 8px; background: #e4f4f4; color: #006d77; font-size: 14px; }
+      .quick-link strong { display: block; font-size: 10px; }
+      .quick-link small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+      .notice { margin: 16px 0 0; color: #738198; font-size: 10px; line-height: 1.6; }
+      .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
+      @media (max-width: 1080px) {
+        .sidebar { width: 204px; }
+        .main-column { margin-left: 204px; }
+        .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .content-grid, .lower-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 720px) {
+        .sidebar { position: static; width: auto; padding: 12px 14px 0; border-right: 0; }
+        .brand { padding-bottom: 12px; }
+        .nav-label, .sidebar-bottom { display: none; }
+        .nav { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 10px; }
+        .nav a { min-height: 36px; flex: 0 0 auto; padding: 0 10px; font-size: 10px; }
+        .nav-icon { display: none; }
+        .main-column { margin-left: 0; }
+        .topbar { min-height: 52px; padding: 0 16px; }
+        .top-link, .admin > span:last-child { display: none; }
+        .admin { padding-left: 0; border-left: 0; }
+        .content { padding: 24px 16px 40px; }
+        .heading { align-items: flex-start; flex-direction: column; }
+        h1 { font-size: 24px; }
+        .heading-tools { width: 100%; flex-wrap: wrap; }
+        .date-filter { flex: 1; }
+        .metrics { gap: 9px; }
+        .metric { padding: 13px; }
+        .metric-value { font-size: 22px; }
+        .metrics { padding: 4px; }
+        .metric { padding: 13px; }
+        .chart-legend { gap: 9px; font-size: 8px; }
+        .quick-links { grid-template-columns: 1fr; gap: 8px; }
+        .incident-table th, .incident-table td { padding-right: 10px; padding-left: 10px; }
+      }
+      @media (max-width: 390px) {
+        .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .metric { display: block; }
+        .metric:not(:last-child)::after { top: 12px; bottom: 12px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      }
+    </style>
+    <style>
+      .sidebar{overflow:visible}.brand-header{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}.brand-header .brand{flex:1;min-width:0;width:auto}
+      .sidebar-toggle{display:flex;width:30px;height:30px;flex:0 0 30px;align-items:center;justify-content:center;gap:7px;margin-top:1px;padding:0 8px;border:1px solid #365666;border-radius:7px;background:#183b51;color:#d2dfe5;font-size:19px;line-height:1}
+      .sidebar-toggle-label{display:none}.sidebar-toggle:hover{border-color:#6e929e;background:#20495c;color:#fff}.sidebar-toggle-icon{transform:translateX(-1px);transition:transform .16s ease}.sidebar-toggle[aria-pressed=true] .sidebar-toggle-icon{transform:rotate(180deg) translateX(-1px)}
+      .nav{display:grid;gap:12px}.nav-group{position:relative;display:grid;gap:3px}
+      .sidebar .nav .nav-group-trigger,.sidebar .nav .nav-link,.sidebar .nav .nav-child-link,.sidebar .nav .nav-child-disabled{display:flex;min-height:42px;align-items:center;gap:10px;padding:0 9px;border:1px solid transparent;border-radius:8px;color:#d2dfe5;font-size:11px;font-weight:700;text-align:left;transition:background-color .16s ease,border-color .16s ease,color .16s ease}
+      .sidebar .nav .nav-group-trigger{width:100%;justify-content:flex-start;background:transparent}.sidebar .nav .nav-group-trigger:hover,.sidebar .nav .nav-group-trigger[aria-expanded=true],.sidebar .nav .nav-link:hover,.sidebar .nav .nav-child-link:hover{border-color:#335766;background:#183b51;color:#fff}
+      .sidebar .nav .nav-group.has-current>.nav-group-trigger{border-color:#23616a;background:#164653;color:#8ce4e4}.sidebar .nav .nav-link[aria-current=page],.sidebar .nav .nav-child-link[aria-current=page]{border-color:#23616a;background:#164653;color:#8ce4e4;box-shadow:inset 2px 0 #00bfd0}
+      .nav-group-chevron{display:grid;width:16px;height:16px;flex:0 0 16px;place-items:center;margin-left:auto;color:#9bb0bd}.nav-group-chevron:before{width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;content:"";transform:translateY(-1px) rotate(45deg);transition:transform .16s ease}.nav-group-trigger[aria-expanded=true] .nav-group-chevron:before{transform:translateY(1px) rotate(225deg)}
+      .nav-icon{display:grid;width:27px;height:27px;flex:0 0 27px;place-items:center;border:1px solid #365666;border-radius:7px;background:#183b51;color:#bed1d7}.nav-icon svg{display:block;width:15px;height:15px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.7}.nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#28747e;background:#0d5660;color:#a3ebed}
+      .nav-children{display:grid;gap:3px;margin-left:12px;padding-left:9px;border-left:1px solid #315260}.nav-children[hidden]{display:none}.sidebar .nav .nav-child-link,.sidebar .nav .nav-child-disabled{min-height:36px;color:#bacbd2;font-size:10px}.sidebar .nav .nav-child-disabled{justify-content:space-between;color:#8299a3;cursor:not-allowed}
+      .nav-coming-soon{padding:3px 5px;border:1px solid #395663;border-radius:4px;color:#a9bdc4;font-size:8px;font-weight:700;white-space:nowrap}.nav-standalone{display:grid;gap:3px;margin-top:5px;padding-top:9px;border-top:1px solid #244559}
+      .sidebar.is-collapsed{width:76px;align-items:center;padding:18px 8px}.sidebar.is-collapsed+.main-column{margin-left:76px}.sidebar.is-collapsed .brand-header{width:100%;flex-direction:column;align-items:center}.sidebar.is-collapsed .brand{display:grid;width:52px;height:48px;overflow:hidden;place-items:center;padding:0}.sidebar.is-collapsed .brand-logo{display:none}.sidebar.is-collapsed .brand:after{color:#a3ebed;content:"HP";font-size:17px;font-weight:800}
+      .sidebar.is-collapsed .sidebar-toggle{width:42px;flex-basis:42px;padding:0;transform:rotate(180deg)}.sidebar.is-collapsed .nav-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.sidebar.is-collapsed .nav{width:100%;gap:9px}.sidebar.is-collapsed .nav-group{gap:4px}
+      .sidebar.is-collapsed .nav-group-trigger,.sidebar.is-collapsed .nav-link,.sidebar.is-collapsed .nav-child-link,.sidebar.is-collapsed .nav-child-disabled{min-height:43px;justify-content:center;gap:0;padding:0;font-size:0}.sidebar.is-collapsed .nav-group-trigger>span:not(.nav-icon),.sidebar.is-collapsed .nav-group-chevron{display:none}.sidebar.is-collapsed .nav-icon{width:29px;height:29px;flex-basis:29px}.sidebar.is-collapsed .nav-group.is-open{z-index:10}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{position:absolute;top:0;left:calc(100% + 8px);z-index:8;width:204px;margin:0;padding:10px;border:1px solid #365666;border-radius:9px;background:var(--ink,#102a3e);box-shadow:0 10px 25px rgba(0,0,0,.2)}.sidebar.is-collapsed .nav-children:before{padding:3px 8px 8px;color:#9bb0bd;content:attr(data-label);font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+      .sidebar.is-collapsed .nav-group.is-open .nav-child-link,.sidebar.is-collapsed .nav-group.is-open .nav-child-disabled{min-height:38px;justify-content:flex-start;gap:9px;padding:0 8px;font-size:10px}.sidebar.is-collapsed .nav-group.is-open .nav-icon{width:25px;height:25px;flex-basis:25px}.sidebar.is-collapsed .nav-coming-soon{display:none}.sidebar.is-collapsed .nav-group.is-open .nav-coming-soon{display:inline-flex}
+      .sidebar.is-collapsed .nav-standalone{margin-top:5px;padding-top:8px}.sidebar.is-collapsed .nav-standalone .nav-link{font-size:0}.sidebar.is-collapsed .sidebar-bottom{width:100%;padding:12px 0 3px}.sidebar.is-collapsed .connection-state{justify-content:center;font-size:0}.sidebar.is-collapsed .version{display:none}.sidebar :focus-visible{outline:3px solid rgba(0,109,119,.42);outline-offset:2px}
+      @media(max-width:850px){.sidebar,.sidebar.is-collapsed{position:relative;width:auto;align-items:stretch;padding:10px 14px 12px;border-right:0;border-bottom:1px solid #244559}.brand-header,.sidebar.is-collapsed .brand-header{width:auto;flex-direction:row;align-items:center}.brand,.sidebar.is-collapsed .brand{display:block;width:auto;height:auto;overflow:visible;padding:0 4px 10px}.brand-logo,.sidebar.is-collapsed .brand-logo{display:block;width:166px;max-width:100%;height:auto}.sidebar .brand:after{display:none}.sidebar-toggle{display:none}
+      .nav-label,.sidebar-bottom{display:none}.sidebar.is-collapsed .nav-label{position:static;width:auto;height:auto;overflow:visible;clip:auto;white-space:normal}.nav{width:auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 8px}.nav-group{display:grid;grid-column:1/-1;gap:3px}
+      .sidebar .nav .nav-group-trigger,.sidebar .nav .nav-link,.sidebar .nav .nav-child-link,.sidebar .nav .nav-child-disabled,.sidebar.is-collapsed .nav-group-trigger,.sidebar.is-collapsed .nav-link,.sidebar.is-collapsed .nav-child-link,.sidebar.is-collapsed .nav-child-disabled{min-height:40px;justify-content:flex-start;gap:8px;padding:0 8px;font-size:10px}
+      .sidebar.is-collapsed .nav-group-trigger>span:not(.nav-icon),.sidebar.is-collapsed .nav-group-chevron{display:grid}.nav-children,.sidebar.is-collapsed .nav-group.is-open .nav-children{position:static;width:auto;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;padding:2px 0 0;border:0;background:transparent;box-shadow:none}.nav-children:before{display:none}
+      .sidebar .nav .nav-child-link,.sidebar .nav .nav-child-disabled,.sidebar.is-collapsed .nav-group.is-open .nav-child-link,.sidebar.is-collapsed .nav-group.is-open .nav-child-disabled{min-height:40px;justify-content:flex-start;gap:8px;padding:0 8px;font-size:10px}.sidebar.is-collapsed .nav-icon{width:25px;height:25px;flex-basis:25px}.nav-standalone{display:contents}.nav-standalone:before{grid-column:1/-1;margin:9px 3px 2px;color:#9bb0bd;content:"QUẢN TRỊ";font-size:9px;font-weight:800;letter-spacing:.1em}.sidebar.is-collapsed+.main-column,.main-column{margin-left:0}}
+      @media(prefers-reduced-motion:reduce){.sidebar-toggle-icon,.nav-group-chevron:before{transition-duration:.01ms}}
+    </style>
+    <link rel="stylesheet" href="server-theme.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand-header">
+          <a class="brand" href="/" aria-label="HP Telecom, trang chủ">
+            <img class="brand-logo" src="logo-horizontal-dark.svg" alt="" />
+          </a>
+        </div>
+        <p class="nav-label">Không gian quản trị</p>
+        <nav class="nav" aria-label="Điều hướng quản trị">
+          <div class="nav-group">
+            <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="summary-menu" aria-label="Mở thư mục Tổng hợp" title="Tổng hợp" data-nav-toggle>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span>
+              <span>Tổng hợp</span><span class="nav-group-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="nav-children" id="summary-menu" data-label="Tổng hợp" hidden>
+              <a class="nav-child-link" href="./" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
+              <a class="nav-child-link" href="./suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
+              <a class="nav-child-link" href="./didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
+            </div>
+          </div>
+          <div class="nav-group">
+            <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="reports-menu" aria-label="Mở thư mục Báo cáo" title="Báo cáo" data-nav-toggle>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3.5h9l5 5v12H5z"/><path d="M14 3.5v5h5m-10 4h6m-6 4h6"/></svg></span>
+              <span>Báo cáo</span><span class="nav-group-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="nav-children" id="reports-menu" data-label="Báo cáo" hidden>
+              <a class="nav-child-link" href="../baocao/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
+              <a class="nav-child-link" href="../baocao/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
+              <a class="nav-child-link" href="../baocao/tuantuyen/" aria-label="Báo cáo Tuần Tuyến" title="Báo cáo Tuần Tuyến"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
+            </div>
+          </div>
+          <div class="nav-standalone">
+            <a class="nav-link" href="../thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
+            <a class="nav-link" href="../nguoidung/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
+          </div>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="connection-state">Bản xem trước độc lập</div>
+          <p class="version">HP Telecom · Giao diện demo</p>
+        </div>
+      </aside>
+
+      <div class="main-column">
+        <header class="topbar">
+          <span class="topbar-title">Tổng quan vận hành</span>
+          <div class="top-actions">
+            <a class="top-link" href="https://hptelecom.id.vn/support">Hỗ trợ</a>
+            <div class="admin"><span class="avatar" aria-hidden="true">QT</span><span><span class="admin-name">Quản trị viên</span><span class="admin-role">Tài khoản demo</span></span></div>
+          </div>
+        </header>
+
+        <main class="content">
+          <section class="heading">
+            <div>
+              <p class="breadcrumb">Quản trị viên <span aria-hidden="true">/</span> Tổng hợp</p>
+              <h1>Tổng hợp vận hành</h1>
+              <p class="subtitle">Theo dõi tình hình đội hiện trường và sự cố trên cùng một trang.</p>
+            </div>
+            <div class="heading-tools">
+              <span class="demo-badge">Số liệu minh họa</span>
+              <label>
+                <span class="sr-only">Lọc theo tỉnh/thành</span>
+                <select class="date-filter" id="region-filter">
+                  <option value="">Tất cả tỉnh/thành</option>
+                  <option value="An Giang">An Giang</option>
+                  <option value="Bắc Ninh">Bắc Ninh</option>
+                  <option value="Cà Mau">Cà Mau</option>
+                  <option value="Cao Bằng">Cao Bằng</option>
+                  <option value="Đắk Lắk">Đắk Lắk</option>
+                  <option value="Điện Biên">Điện Biên</option>
+                  <option value="Đồng Nai">Đồng Nai</option>
+                  <option value="Đồng Tháp">Đồng Tháp</option>
+                  <option value="Gia Lai">Gia Lai</option>
+                  <option value="Hà Tĩnh">Hà Tĩnh</option>
+                  <option value="Hưng Yên">Hưng Yên</option>
+                  <option value="Khánh Hòa">Khánh Hòa</option>
+                  <option value="Lai Châu">Lai Châu</option>
+                  <option value="Lâm Đồng">Lâm Đồng</option>
+                  <option value="Lạng Sơn">Lạng Sơn</option>
+                  <option value="Lào Cai">Lào Cai</option>
+                  <option value="Nghệ An">Nghệ An</option>
+                  <option value="Ninh Bình">Ninh Bình</option>
+                  <option value="Phú Thọ">Phú Thọ</option>
+                  <option value="Quảng Ngãi">Quảng Ngãi</option>
+                  <option value="Quảng Ninh">Quảng Ninh</option>
+                  <option value="Quảng Trị">Quảng Trị</option>
+                  <option value="Sơn La">Sơn La</option>
+                  <option value="Tây Ninh">Tây Ninh</option>
+                  <option value="Thái Nguyên">Thái Nguyên</option>
+                  <option value="Thanh Hóa">Thanh Hóa</option>
+                  <option value="Tuyên Quang">Tuyên Quang</option>
+                  <option value="Vĩnh Long">Vĩnh Long</option>
+                  <option value="Cần Thơ">Cần Thơ</option>
+                  <option value="Đà Nẵng">Đà Nẵng</option>
+                  <option value="Hà Nội">Hà Nội</option>
+                  <option value="Hải Phòng">Hải Phòng</option>
+                  <option value="Huế">Huế</option>
+                  <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                </select>
+              </label>
+              <label>
+                <span class="sr-only">Khoảng thời gian báo cáo</span>
+                <select class="date-filter" id="period">
+                  <option value="today">Hôm nay</option>
+                  <option value="week" selected>7 ngày gần đây</option>
+                  <option value="month">30 ngày gần đây</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="metrics" aria-label="Chỉ số tổng quan">
+            <article class="metric">
+              <div class="metric-head"><span>Đội đang hoạt động</span><span class="metric-symbol" aria-hidden="true">⌖</span></div>
+              <strong class="metric-value" data-week="18" data-today="12" data-month="22">18</strong>
+              <div class="metric-foot"><strong>14</strong> đội đang nhận nhiệm vụ</div>
+            </article>
+            <article class="metric">
+              <div class="metric-head"><span>Nhiệm vụ đã hoàn tất</span><span class="metric-symbol" aria-hidden="true">✓</span></div>
+              <strong class="metric-value" data-week="246" data-today="38" data-month="918">246</strong>
+              <div class="metric-foot"><strong>+8.4%</strong> so với kỳ trước</div>
+            </article>
+            <article class="metric">
+              <div class="metric-head"><span>Sự cố đang xử lý</span><span class="metric-symbol" aria-hidden="true">△</span></div>
+              <strong class="metric-value" data-week="12" data-today="5" data-month="12">12</strong>
+              <div class="metric-foot"><strong style="color:var(--amber)">3 ưu tiên cao</strong> cần theo dõi</div>
+            </article>
+            <article class="metric">
+              <div class="metric-head"><span>Thời gian phản hồi TB</span><span class="metric-symbol" aria-hidden="true">◷</span></div>
+              <strong class="metric-value" data-week="42 phút" data-today="36 phút" data-month="48 phút">42 phút</strong>
+              <div class="metric-foot"><strong>−6 phút</strong> so với kỳ trước</div>
+            </article>
+          </section>
+
+          <section class="content-grid" aria-label="Tiến độ di dời và đội thực hiện">
+            <article class="panel">
+              <div class="panel-head">
+                <div><h2>Tiến độ nhiệm vụ</h2><p>Nhiệm vụ được giao và hoàn tất theo thời gian</p></div>
+                <div class="chart-legend"><span><i class="legend-dot"></i>Được giao</span><span><i class="legend-dot gray"></i>Hoàn tất</span></div>
+              </div>
+              <div class="chart-area">
+                <svg viewBox="0 0 640 210" role="img" aria-label="Biểu đồ minh họa tiến độ nhiệm vụ trong 7 ngày">
+                  <g stroke="#edf0f4" stroke-width="1">
+                    <path d="M42 22H626"/><path d="M42 62H626"/><path d="M42 102H626"/><path d="M42 142H626"/><path d="M42 182H626"/>
+                  </g>
+                  <g fill="#8793a3" font-size="9" font-family="Manrope, sans-serif">
+                    <text x="4" y="25">80</text><text x="4" y="65">60</text><text x="4" y="105">40</text><text x="4" y="145">20</text><text x="12" y="185">0</text>
+                  </g>
+                  <path d="M45 126 C78 115 98 120 129 95 S183 104 213 81 S269 90 297 68 S352 75 381 54 S438 67 465 48 S520 56 550 37 S598 45 624 29" fill="none" stroke="#006d77" stroke-width="3" stroke-linecap="round"/>
+                  <path d="M45 151 C78 142 100 145 129 127 S183 134 213 111 S268 123 297 99 S352 111 381 87 S438 103 465 82 S520 92 550 72 S599 80 624 60" fill="none" stroke="#b6c4d7" stroke-width="3" stroke-linecap="round"/>
+                  <g fill="#fff" stroke="#006d77" stroke-width="2">
+                    <circle cx="45" cy="126" r="4"/><circle cx="129" cy="95" r="4"/><circle cx="213" cy="81" r="4"/><circle cx="297" cy="68" r="4"/><circle cx="381" cy="54" r="4"/><circle cx="465" cy="48" r="4"/><circle cx="550" cy="37" r="4"/><circle cx="624" cy="29" r="4"/>
+                  </g>
+                </svg>
+                <div class="chart-labels"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div>
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-head"><div><h2>Di dời gần đây</h2><p>Các yêu cầu và đội thực hiện</p></div><a class="text-link" href="/tonghop/didoi">Xem tất cả</a></div>
+              <div class="dispatch-list">
+                <div class="dispatch-row"><span class="team-avatar">DD</span><span><span class="team-title">Di dời tuyến cáp quang</span><span class="team-sub">Ba Đình, Hà Nội · Đang di dời</span></span><span class="dispatch-count"><strong>10/10</strong><small>dự kiến</small></span></div>
+                <div class="dispatch-row"><span class="team-avatar">DD</span><span><span class="team-title">Di dời tủ cáp viễn thông</span><span class="team-sub">Quận 1, TP.HCM · Chờ xử lý</span></span><span class="dispatch-count"><strong>11/10</strong><small>dự kiến</small></span></div>
+                <div class="dispatch-row"><span class="team-avatar">DD</span><span><span class="team-title">Di dời cáp qua khu vực thi công</span><span class="team-sub">Hải Châu, Đà Nẵng · Đang di dời</span></span><span class="dispatch-count"><strong>09/10</strong><small>dự kiến</small></span></div>
+                <div class="dispatch-row"><span class="team-avatar">DD</span><span><span class="team-title">Di dời thiết bị mạng</span><span class="team-sub">Ninh Kiều, Cần Thơ · Đã hoàn tất</span></span><span class="dispatch-count"><strong>08/10</strong><small>hoàn tất</small></span></div>
+              </div>
+            </article>
+          </section>
+
+          <section class="lower-grid" aria-label="Sự cố và hoạt động">
+            <article class="panel">
+              <div class="panel-head"><div><h2>Sự cố cần chú ý</h2><p>Các sự cố mới nhất trong hệ thống demo</p></div><a class="text-link" href="/baocao/suco">Xem tất cả</a></div>
+              <div style="overflow-x:auto">
+                <table class="incident-table">
+                  <thead><tr><th scope="col">Mã sự cố</th><th scope="col">Khu vực</th><th scope="col">Ưu tiên</th><th scope="col">Trạng thái</th><th scope="col">Đội phụ trách</th></tr></thead>
+                  <tbody>
+                    <tr><td class="incident-id">SC-2408</td><td>Ba Đình, Hà Nội</td><td><span class="priority high">Cao</span></td><td><span class="incident-status open">Đang xử lý</span></td><td>Hà Nội 01</td></tr>
+                    <tr><td class="incident-id">SC-2407</td><td>Quận 1, TP.HCM</td><td><span class="priority medium">Trung bình</span></td><td><span class="incident-status">Đã tiếp nhận</span></td><td>TP.HCM 02</td></tr>
+                    <tr><td class="incident-id">SC-2406</td><td>Hải Châu, Đà Nẵng</td><td><span class="priority low">Thấp</span></td><td><span class="incident-status open">Đang xử lý</span></td><td>Đà Nẵng 01</td></tr>
+                    <tr><td class="incident-id">SC-2405</td><td>Ninh Kiều, Cần Thơ</td><td><span class="priority high">Cao</span></td><td><span class="incident-status">Đã tiếp nhận</span></td><td>Chưa phân đội</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><div><h2>Hoạt động gần đây</h2><p>Cập nhật minh họa từ các đội</p></div></div>
+              <div class="activity-list">
+                <div class="activity"><span class="activity-dot"></span><p class="activity-text"><strong>Đội Hà Nội 01</strong> đã tiếp nhận sự cố SC-2408.<span class="activity-time">09:42 · Ba Đình, Hà Nội</span></p></div>
+                <div class="activity"><span class="activity-dot"></span><p class="activity-text"><strong>Đội TP.HCM 02</strong> đã cập nhật trạng thái nhiệm vụ.<span class="activity-time">09:35 · Quận 1, TP.HCM</span></p></div>
+                <div class="activity"><span class="activity-dot"></span><p class="activity-text"><strong>Đội Đà Nẵng 01</strong> đang di dời tuyến cáp qua khu vực thi công.<span class="activity-time">09:28 · Hải Châu, Đà Nẵng</span></p></div>
+              </div>
+            </article>
+          </section>
+
+          <nav class="quick-links" aria-label="Đi đến khu vực quản trị">
+            <a class="quick-link" href="/tonghop/didoi"><span class="quick-icon" aria-hidden="true">⌖</span><span><strong>Quản lý di dời</strong><small>Theo dõi yêu cầu và tiến độ di dời</small></span></a>
+            <a class="quick-link" href="/baocao/suco"><span class="quick-icon" aria-hidden="true">△</span><span><strong>Báo cáo Sự cố</strong><small>Xem và quản lý báo cáo sự cố</small></span></a>
+            <a class="quick-link" href="/nguoidung/"><span class="quick-icon" aria-hidden="true">♙</span><span><strong>Quản lý người dùng</strong><small>Tài khoản, vai trò và đội</small></span></a>
+          </nav>
+          <p class="notice" id="region-filter-note" role="status" aria-live="polite">Trang tổng hợp là bản dựng giao diện độc lập. Số liệu, đội, sự cố và hoạt động đang hiển thị chỉ để minh họa, chưa lấy từ máy chủ HP Telecom.</p>
+        </main>
+      </div>
+    </div>
+    <script>
+      const period = document.querySelector("#period");
+      const regionFilter = document.querySelector("#region-filter");
+      const regionFilterNote = document.querySelector("#region-filter-note");
+      period.addEventListener("change", () => {
+        document.querySelectorAll(".metric-value").forEach((metric) => {
+          metric.textContent = metric.dataset[period.value];
+        });
+      });
+      regionFilter.addEventListener("change", () => {
+        regionFilterNote.textContent = regionFilter.value
+          ? `Đã chọn ${regionFilter.value}. Số liệu trên trang vẫn là dữ liệu minh họa, chưa kết nối bộ lọc theo tỉnh/thành.`
+          : "Trang tổng hợp là bản dựng giao diện độc lập. Số liệu, đội, sự cố và hoạt động đang hiển thị chỉ để minh họa, chưa lấy từ máy chủ HP Telecom.";
+      });
+    </script>
+      <script>
+        (() => {
+          const sidebar = document.querySelector(".sidebar");
+          const nav = sidebar && sidebar.querySelector(".nav");
+          if (!sidebar || !nav) return;
+          const compactNavigation = window.matchMedia("(max-width: 850px)");
+          nav.querySelectorAll("a").forEach((link) => { if (!link.title) link.title = link.textContent.trim(); });
+          const brand = sidebar.querySelector(".brand");
+          const toggle = document.createElement("button");
+          toggle.className = "sidebar-toggle";
+          toggle.type = "button";
+          toggle.setAttribute("aria-pressed", "false");
+          toggle.setAttribute("aria-label", "Thu gọn menu");
+          toggle.title = "Thu gọn menu";
+          toggle.innerHTML = '<span class="sidebar-toggle-icon" aria-hidden="true">‹</span><span class="sidebar-toggle-label">Thu gọn menu</span>';
+          if (brand) brand.insertAdjacentElement("afterend", toggle);
+          function setSidebarCollapsed(collapsed, persist = true) {
+            const shouldCollapse = !compactNavigation.matches && collapsed;
+            sidebar.classList.toggle("is-collapsed", shouldCollapse);
+            toggle.setAttribute("aria-pressed", String(shouldCollapse));
+            toggle.setAttribute("aria-label", shouldCollapse ? "Mở rộng menu" : "Thu gọn menu");
+            toggle.title = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
+            toggle.querySelector(".sidebar-toggle-label").textContent = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
+            if (persist) {
+              try { window.localStorage.setItem("hp-sidebar-collapsed", String(shouldCollapse)); }
+              catch (error) { console.warn("Không lưu được tùy chọn menu trên thiết bị này.", error); }
+            }
+          }
+          try { setSidebarCollapsed(window.localStorage.getItem("hp-sidebar-collapsed") === "true", false); }
+          catch (error) {
+            console.warn("Không đọc được tùy chọn menu trên thiết bị này.", error);
+            setSidebarCollapsed(false, false);
+          }
+          toggle.addEventListener("click", () => setSidebarCollapsed(!sidebar.classList.contains("is-collapsed")));
+          compactNavigation.addEventListener("change", (event) => {
+            if (event.matches && sidebar.classList.contains("is-collapsed")) setSidebarCollapsed(false);
+          });
+          nav.querySelectorAll("[data-nav-toggle]").forEach((button) => {
+            const group = button.closest(".nav-group");
+            const submenu = document.getElementById(button.getAttribute("aria-controls"));
+            if (!group || !submenu) return;
+            group.classList.toggle("has-current", Boolean(submenu.querySelector('[aria-current="page"]')));
+            function setGroupOpen(open) {
+              button.setAttribute("aria-expanded", String(open));
+              button.setAttribute("aria-label", `${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
+              submenu.hidden = !open;
+              group.classList.toggle("is-open", open);
+            }
+            button.addEventListener("pointerenter", (event) => {
+              if (event.pointerType === "mouse" && !group.dataset.pinned) setGroupOpen(true);
+            });
+            group.addEventListener("pointerleave", (event) => {
+              if (event.pointerType === "mouse" && !group.dataset.pinned && !group.contains(document.activeElement)) setGroupOpen(false);
+            });
+            group.addEventListener("focusin", () => setGroupOpen(true));
+            group.addEventListener("focusout", (event) => {
+              if (!group.contains(event.relatedTarget) && !group.dataset.pinned) setGroupOpen(false);
+            });
+            button.addEventListener("click", () => {
+              if (group.dataset.pinned === "true") {
+                delete group.dataset.pinned;
+                setGroupOpen(false);
+              } else {
+                group.dataset.pinned = "true";
+                setGroupOpen(true);
+              }
+            });
+            group.addEventListener("keydown", (event) => {
+              if (event.key === "Escape" && group.classList.contains("is-open")) {
+                delete group.dataset.pinned;
+                setGroupOpen(false);
+                button.focus();
+              }
+            });
+          });
+        })();
+      </script>
+      </body>
+</html>

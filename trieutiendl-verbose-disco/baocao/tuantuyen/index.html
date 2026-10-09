@@ -1,0 +1,1379 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f1f5f6" />
+    <title>Báo cáo Tuần Tuyến | HP Telecom</title>
+    <meta name="description" content="Theo dõi kế hoạch và kết quả tuần tuyến của các đội hiện trường HP Telecom." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink:#102a3e;
+        --muted:#536b77;
+        --teal:#006d77;
+        --line:#dce6ea;
+        --canvas:#f1f5f6;
+        --surface:#fff;
+        --focus:rgba(0,109,119,.32);
+        --green:#16774e;
+        --amber:#94620a;
+        --red:#a83734;
+      }
+      * { box-sizing:border-box; }
+      body { min-width:320px; min-height:100vh; margin:0; background:var(--canvas); color:var(--ink); font-family:"Manrope","Segoe UI",sans-serif; }
+      a { color:inherit; text-decoration:none; }
+      button,input,select { font:inherit; }
+      button,select { cursor:pointer; }
+      .skip-link { position:absolute; top:8px; left:8px; z-index:20; padding:10px 14px; transform:translateY(-150%); background:var(--teal); color:#fff; font-weight:700; }
+      .skip-link:focus { transform:none; }
+      .sidebar { position:fixed; inset:0 auto 0 0; z-index:5; display:flex; width:238px; flex-direction:column; padding:22px 14px; border-right:1px solid #1c4052; background:var(--ink); }
+      .brand-header { display:flex; align-items:flex-start; justify-content:space-between; gap:6px; }
+      .brand { display:block; flex:1; min-width:0; padding:2px 8px 26px; line-height:0; }
+      .brand-logo { display:block; width:194px; max-width:100%; height:auto; }
+      .brand-mark { display:none; width:42px; height:42px; }
+      .sidebar-toggle { display:grid; width:30px; height:30px; flex:0 0 30px; place-items:center; margin-top:1px; border:1px solid #365666; border-radius:7px; background:#183b51; color:#d2dfe5; font-size:19px; line-height:1; }
+      .sidebar-toggle:hover { border-color:#6e929e; background:#20495c; color:#fff; }
+      .nav-label { margin:0 10px 8px; color:#9bb0bd; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+      .nav { display:grid; gap:12px; }
+      .nav-group { position:relative; display:grid; gap:3px; }
+      .nav-group-trigger,.nav-link,.nav-child-link { display:flex; min-height:42px; align-items:center; gap:10px; padding:0 9px; border:1px solid transparent; border-radius:8px; color:#d2dfe5; font-size:11px; font-weight:700; text-align:left; transition:background-color .16s ease,border-color .16s ease,color .16s ease; }
+      .nav-group-trigger { width:100%; justify-content:flex-start; background:transparent; }
+      .nav-group-trigger:hover,.nav-group-trigger[aria-expanded="true"],.nav-link:hover,.nav-child-link:hover { border-color:#335766; background:#183b51; color:#fff; }
+      .nav-group.has-current > .nav-group-trigger { border-color:#23616a; background:#164653; color:#8ce4e4; }
+      .nav-link[aria-current="page"],.nav-child-link[aria-current="page"] { border-color:#23616a; background:#164653; color:#8ce4e4; box-shadow:inset 2px 0 #00bfd0; }
+      .nav-icon { display:grid; width:27px; height:27px; flex:0 0 27px; place-items:center; border:1px solid #365666; border-radius:7px; background:#183b51; color:#bed1d7; }
+      .nav-icon svg { display:block; width:15px; height:15px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.7; }
+      .nav-link[aria-current="page"] .nav-icon,.nav-child-link[aria-current="page"] .nav-icon { border-color:#28747e; background:#0d5660; color:#a3ebed; }
+      .nav-chevron { display:grid; width:16px; height:16px; flex:0 0 16px; place-items:center; margin-left:auto; color:#9bb0bd; }
+      .nav-chevron::before { width:5px; height:5px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; content:""; transform:translateY(-1px) rotate(45deg); transition:transform .16s ease; }
+      .nav-group-trigger[aria-expanded="true"] .nav-chevron::before { transform:translateY(1px) rotate(225deg); }
+      .nav-children { display:grid; gap:3px; margin-left:12px; padding-left:9px; border-left:1px solid #315260; }
+      .nav-children[hidden] { display:none; }
+      .nav-child-link { min-height:36px; color:#bacbd2; font-size:10px; }
+      .nav-standalone { display:grid; gap:3px; margin-top:5px; padding-top:9px; border-top:1px solid #244559; }
+      .sidebar-bottom { margin-top:auto; padding:14px 10px 4px; border-top:1px solid #244559; }
+      .connection-state { display:flex; align-items:center; gap:8px; color:#c6d4dc; font-size:10px; }
+      .connection-state::before { width:7px; height:7px; border-radius:50%; background:#00bfd0; content:""; }
+      .version { margin:8px 0 0; color:#9bb0bd; font-size:10px; }
+      .main-column { min-height:100vh; margin-left:238px; }
+      .sidebar.is-collapsed { width:76px; align-items:center; padding:18px 8px; }
+      .sidebar.is-collapsed + .main-column { margin-left:76px; }
+      .sidebar.is-collapsed .brand-header { width:100%; flex-direction:column; align-items:center; }
+      .sidebar.is-collapsed .brand { display:grid; width:52px; height:48px; overflow:hidden; place-items:center; padding:0; }
+      .sidebar.is-collapsed .brand-logo { display:none; }
+      .sidebar.is-collapsed .brand-mark { display:block; }
+      .sidebar.is-collapsed .sidebar-toggle { transform:rotate(180deg); }
+      .sidebar.is-collapsed .nav-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+      .sidebar.is-collapsed .nav { width:100%; gap:9px; }
+      .sidebar.is-collapsed .nav-group-trigger,.sidebar.is-collapsed .nav-link,.sidebar.is-collapsed .nav-child-link { min-height:43px; justify-content:center; gap:0; padding:0; font-size:0; }
+      .sidebar.is-collapsed .nav-group-trigger > span:not(.nav-icon),.sidebar.is-collapsed .nav-chevron { display:none; }
+      .sidebar.is-collapsed .nav-icon { width:29px; height:29px; flex-basis:29px; }
+      .sidebar.is-collapsed .nav-group.is-open { z-index:10; }
+      .sidebar.is-collapsed .nav-group.is-open .nav-children { position:absolute; top:0; left:calc(100% + 8px); z-index:8; width:204px; margin:0; padding:10px; border:1px solid #365666; border-radius:9px; background:var(--ink); box-shadow:0 10px 25px rgba(0,0,0,.2); }
+      .sidebar.is-collapsed .nav-children::before { padding:3px 8px 8px; color:#9bb0bd; content:attr(data-label); font-size:9px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+      .sidebar.is-collapsed .nav-group.is-open .nav-child-link { min-height:38px; justify-content:flex-start; gap:9px; padding:0 8px; font-size:10px; }
+      .sidebar.is-collapsed .nav-group.is-open .nav-icon { width:25px; height:25px; flex-basis:25px; }
+      .sidebar.is-collapsed .nav-standalone { margin-top:5px; padding-top:8px; }
+      .sidebar.is-collapsed .nav-standalone .nav-link { font-size:0; }
+      .sidebar.is-collapsed .sidebar-bottom { width:100%; padding:12px 0 3px; }
+      .sidebar.is-collapsed .connection-state { justify-content:center; font-size:0; }
+      .sidebar.is-collapsed .version { display:none; }
+      .sidebar :focus-visible,.topbar :focus-visible,.page-shell :focus-visible,dialog :focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+      .topbar { position:sticky; top:0; z-index:4; display:flex; min-height:64px; align-items:center; justify-content:space-between; gap:20px; padding:0 clamp(22px,3vw,44px); border-bottom:1px solid var(--line); background:#fff; box-shadow:0 3px 14px rgba(16,42,62,.045); }
+      .topbar-title { color:#58687d; font-size:12px; }
+      .top-actions,.admin { display:flex; align-items:center; }
+      .top-actions { gap:18px; }
+      .support-link { color:#53647a; font-size:11px; font-weight:700; }
+      .admin { gap:9px; padding-left:16px; border-left:1px solid var(--line); }
+      .avatar { display:grid; width:34px; height:34px; place-items:center; border-radius:50%; background:#e3f4f4; color:var(--teal); font-size:10px; font-weight:800; }
+      .admin-name,.admin-role { display:block; }
+      .admin-name { font-size:11px; font-weight:800; }
+      .admin-role { margin-top:2px; color:var(--muted); font-size:10px; }
+      .page-shell { width:min(1540px,100%); margin:0 auto; padding:34px clamp(24px,3.4vw,52px) 56px; }
+      .breadcrumb { margin:0 0 8px; color:var(--muted); font-size:11px; }
+      .breadcrumb a:hover { color:var(--teal); text-decoration:underline; text-underline-offset:3px; }
+      .page-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:22px; }
+      h1 { margin:0; font-size:clamp(28px,2.4vw,36px); letter-spacing:-.05em; line-height:1.12; }
+      .page-description { max-width:62ch; margin:8px 0 0; color:var(--muted); font-size:12px; line-height:1.6; }
+      .heading-actions { display:flex; align-items:center; gap:9px; }
+      .preview-badge { display:inline-flex; min-height:28px; align-items:center; gap:7px; padding:0 10px; border:1px solid #ecd9ad; border-radius:999px; background:#fffaf0; color:#795619; font-size:10px; font-weight:700; white-space:nowrap; }
+      .preview-badge::before { width:6px; height:6px; border-radius:50%; background:#d49a31; content:""; }
+      .create-button { display:inline-flex; min-height:38px; align-items:center; justify-content:center; gap:8px; padding:0 13px; border:1px solid #006d77; border-radius:7px; background:#006d77; color:#fff; font-size:10px; font-weight:800; white-space:nowrap; }
+      .create-button:hover { border-color:#005861; background:#005861; }
+      .week-toolbar { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:14px; padding:13px 15px; border:1px solid #d9e4e8; border-radius:10px; background:#fff; }
+      .week-label { display:block; margin-bottom:5px; color:#657985; font-size:9px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+      .week-controls { display:flex; align-items:center; gap:8px; }
+      .week-step { display:grid; width:36px; height:36px; place-items:center; border:1px solid #cbd9de; border-radius:7px; background:#fff; color:#315c63; font-size:20px; }
+      .week-step:hover { border-color:#91bdc0; background:#f1f8f8; }
+      .week-input { width:154px; height:36px; padding:0 9px; border:1px solid #cbd9de; border-radius:7px; background:#fff; color:var(--ink); font-size:11px; font-weight:700; }
+      .week-caption { margin:0; color:#566a76; font-size:11px; text-align:right; }
+      .week-caption strong { display:block; margin-bottom:3px; color:var(--ink); font-size:13px; }
+      .month-weeks { display:grid; grid-auto-columns:minmax(128px,1fr); grid-auto-flow:column; gap:7px; margin:0 0 12px; overflow-x:auto; }
+      .month-week { display:grid; min-height:56px; gap:4px; padding:9px 11px; border:1px solid #d9e4e8; border-radius:8px; background:#fff; color:#536b77; text-align:left; }
+      .month-week:hover { border-color:#91bdc0; background:#f7fbfb; }
+      .month-week[aria-pressed="true"] { border-color:#78b9bb; background:#eaf5f4; color:#164f55; box-shadow:inset 0 -2px var(--teal); }
+      .month-week-title { color:var(--ink); font-size:10px; font-weight:800; }
+      .month-week-meta { font-size:9px; }
+      .report-types { display:flex; gap:5px; margin:0 0 14px; padding:4px; border:1px solid #d9e4e8; border-radius:9px; background:#e8eff1; }
+      .report-type { display:flex; min-height:38px; flex:1; align-items:center; justify-content:center; gap:8px; padding:0 12px; border:1px solid transparent; border-radius:6px; background:transparent; color:#536b77; font-size:11px; font-weight:800; }
+      .report-type:hover { background:#f6fafb; color:var(--ink); }
+      .report-type[aria-selected="true"] { border-color:#d9e4e8; background:#fff; color:var(--teal); box-shadow:0 1px 3px rgba(16,42,62,.08); }
+      .report-type-count { color:#617580; font-size:9px; font-weight:700; }
+      .week-strip { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:0; margin-bottom:16px; overflow:hidden; border:1px solid #d9e4e8; border-radius:11px; background:#fff; }
+      .day-button { position:relative; display:grid; min-height:104px; align-content:start; justify-items:start; gap:5px; padding:13px 14px; border:0; border-right:1px solid #e8eef0; background:#fff; color:var(--ink); text-align:left; transition:background-color .15s ease; }
+      .day-button:last-child { border-right:0; }
+      .day-button:hover { background:#f7fbfb; }
+      .day-button[aria-pressed="true"] { background:#eaf5f4; box-shadow:inset 0 -3px var(--teal); }
+      .day-button.is-today .day-number { color:var(--teal); }
+      .day-name { color:#71828c; font-size:9px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+      .day-number { font-size:22px; font-weight:800; letter-spacing:-.05em; line-height:1.05; }
+      .day-load { display:flex; align-items:center; gap:6px; margin-top:3px; color:#617580; font-size:9px; }
+      .day-dot { width:6px; height:6px; border-radius:50%; background:#8fa1aa; }
+      .day-dot.has-work { background:#0d8290; }
+      .week-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; margin:0 0 19px; padding:12px 4px; border-bottom:1px solid #d8e2e6; border-top:1px solid #d8e2e6; background:transparent; }
+      .kpi { position:relative; display:grid; gap:4px; padding:5px 18px; }
+      .kpi:not(:last-child)::after { position:absolute; top:2px; right:0; bottom:2px; width:1px; background:#d8e2e6; content:""; }
+      .kpi-label { color:#536b77; font-size:10px; font-weight:700; }
+      .kpi-line { display:flex; align-items:baseline; gap:8px; }
+      .kpi-value { color:var(--ink); font-size:25px; font-weight:800; letter-spacing:-.06em; line-height:1; }
+      .kpi-note { color:#71828c; font-size:9px; }
+      .kpi-mark { width:7px; height:7px; margin-right:5px; border-radius:50%; background:#087b86; }
+      .kpi-mark.progress { background:#c38813; }
+      .kpi-mark.pending { background:#8998a0; }
+      .filters { display:grid; grid-template-columns:minmax(190px,1fr) minmax(150px,.7fr) minmax(220px,1.15fr) auto; align-items:end; gap:11px; margin-bottom:17px; padding:14px; border:1px solid #d9e4e8; border-radius:10px; background:#fff; }
+      .field { display:grid; gap:6px; }
+      .field label { color:#455d6c; font-size:9px; font-weight:800; letter-spacing:.035em; }
+      .field select,.field input { width:100%; height:38px; padding:0 10px; border:1px solid #cbd9de; border-radius:7px; background:#fff; color:var(--ink); font-size:10px; }
+      .field input::placeholder { color:#667985; opacity:1; }
+      .clear-button,.export-button { display:inline-flex; min-height:38px; align-items:center; justify-content:center; gap:7px; padding:0 12px; border:1px solid #cbd9de; border-radius:7px; background:#fff; color:#315c63; font-size:10px; font-weight:800; white-space:nowrap; }
+      .clear-button:hover,.export-button:hover { border-color:#91bdc0; background:#f2f8f8; }
+      .export-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; }
+      .export-note { margin:5px 1px 0; color:#687b85; font-size:9px; line-height:1.45; text-align:right; }
+      .list-head { display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin:0 1px 9px; }
+      .list-head h2 { margin:0; font-size:14px; font-weight:800; letter-spacing:-.02em; }
+      .list-head p { margin:4px 0 0; color:var(--muted); font-size:10px; }
+      .list-tools { display:flex; align-items:center; gap:10px; }
+      .result-count { color:#566a76; font-size:10px; font-weight:700; white-space:nowrap; }
+      .selection-count { color:#315c63; font-size:10px; font-weight:800; white-space:nowrap; }
+      .clear-selection { padding:0; border:0; background:transparent; color:var(--teal); font-size:10px; font-weight:800; text-decoration:underline; text-underline-offset:2px; }
+      .clear-selection[hidden] { display:none; }
+      .table-wrap { overflow:auto; border:1px solid #d9e4e8; border-radius:10px; background:#fff; }
+      table { width:100%; border-collapse:collapse; text-align:left; }
+      th { position:sticky; top:0; z-index:1; height:40px; padding:0 13px; background:#edf3f5; color:#526773; font-size:9px; font-weight:800; letter-spacing:.045em; text-transform:uppercase; white-space:nowrap; }
+      td { height:59px; padding:9px 13px; border-top:1px solid #edf0f4; color:#394a61; font-size:10px; vertical-align:middle; }
+      tbody tr:hover { background:#f6fafb; }
+      tbody tr.is-selected { background:#eef8f8; }
+      .select-cell { width:42px; text-align:center; }
+      .route-select { width:16px; height:16px; accent-color:var(--teal); cursor:pointer; }
+      .selection-head { display:grid; place-items:center; }
+      .route-cell { min-width:245px; }
+      .route-report-button { display:block; width:100%; padding:0; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+      .route-report-button:focus-visible { outline:3px solid rgba(0,109,119,.3); outline-offset:3px; border-radius:3px; }
+      .route-code { display:block; color:var(--teal); font-size:11px; font-weight:800; letter-spacing:.01em; }
+      .route-task { display:block; max-width:300px; margin-top:3px; color:#667985; font-size:9px; line-height:1.4; }
+      .route-report-button:hover .route-code { color:#005861; text-decoration:underline; text-underline-offset:2px; }
+      .team-cell { min-width:135px; white-space:nowrap; }
+      .team-assignees { display:block; max-width:190px; margin-top:3px; overflow:hidden; color:#667985; font-size:9px; line-height:1.4; text-overflow:ellipsis; white-space:normal; }
+      .day-cell { min-width:122px; color:#536b77; white-space:nowrap; }
+      .time-cell { min-width:106px; color:#536b77; white-space:nowrap; }
+      .status-pill { display:inline-flex; min-height:23px; align-items:center; gap:6px; padding:0 8px; border:1px solid transparent; border-radius:999px; font-size:9px; font-weight:800; white-space:nowrap; }
+      .status-pill::before { width:6px; height:6px; border-radius:50%; background:currentColor; content:""; }
+      .status-pill[data-status="Hoàn thành"] { border-color:#c5e5d2; background:#eaf6ef; color:#176b45; }
+      .status-pill[data-status="Đang thực hiện"] { border-color:#f0d99e; background:#fff7e3; color:#805b0d; }
+      .status-pill[data-status="Chờ xác nhận"] { border-color:#d8e1e5; background:#f3f6f7; color:#586e79; }
+      .status-pill[data-status="Cần xử lý"] { border-color:#f0c9c6; background:#fff1f0; color:#a13d38; }
+      .detail-button { display:inline-grid; width:30px; height:30px; place-items:center; border:1px solid #d5e2e6; border-radius:6px; background:#fff; color:var(--teal); font-size:16px; }
+      .detail-button:hover { border-color:#9bc7ca; background:#eef8f8; }
+      .empty-state { padding:35px 16px; color:var(--muted); font-size:11px; text-align:center; }
+      .empty-state[hidden] { display:none; }
+      .notice { display:flex; align-items:flex-start; gap:9px; margin:12px 0 0; color:#687b85; font-size:9px; line-height:1.55; }
+      .notice-mark { display:grid; width:17px; height:17px; flex:0 0 auto; place-items:center; border:1px solid #9bc7c5; border-radius:50%; color:var(--teal); font-size:9px; font-weight:800; }
+      dialog { width:min(540px,calc(100% - 28px)); max-height:min(82vh,700px); padding:0; overflow:auto; border:1px solid var(--line); border-radius:12px; background:#fff; color:var(--ink); box-shadow:0 18px 55px rgba(16,42,62,.2); }
+      dialog::backdrop { background:rgba(14,26,43,.48); }
+      .dialog-inner { padding:20px 22px; }
+      .dialog-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; padding-bottom:15px; border-bottom:1px solid var(--line); }
+      .dialog-head h2 { margin:0; font-size:17px; letter-spacing:-.03em; }
+      .dialog-head p { margin:4px 0 0; color:var(--muted); font-size:10px; }
+      .dialog-close { display:grid; width:32px; height:32px; flex:0 0 auto; place-items:center; border:1px solid var(--line); border-radius:6px; background:#fff; color:#536b77; font-size:17px; }
+      .detail-list { display:grid; grid-template-columns:132px 1fr; margin:9px 0 0; }
+      .detail-list dt,.detail-list dd { margin:0; padding:10px 0; border-bottom:1px solid #edf0f4; font-size:10px; line-height:1.5; }
+      .detail-list dt { color:var(--muted); }
+      .detail-list dd { color:#34495a; font-weight:650; }
+      .dialog-actions { display:flex; justify-content:flex-end; padding-top:16px; }
+      .dialog-done { min-height:36px; padding:0 13px; border:1px solid var(--teal); border-radius:7px; background:var(--teal); color:#fff; font-size:10px; font-weight:800; }
+      .create-dialog { width:min(580px,calc(100% - 28px)); }
+      .create-form { display:grid; gap:13px; margin-top:15px; }
+      .create-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
+      .create-form label { display:grid; gap:6px; color:#455d6c; font-size:10px; font-weight:800; }
+      .create-form input,.create-form select,.create-form textarea { width:100%; min-height:39px; padding:8px 10px; border:1px solid #cbd9de; border-radius:7px; background:#fff; color:var(--ink); font:inherit; font-size:11px; }
+      .create-form textarea { min-height:88px; resize:vertical; line-height:1.5; }
+      .create-help { margin:-3px 0 0; color:var(--muted); font-size:9px; line-height:1.5; }
+      .personnel-picker { position:relative; display:grid; gap:6px; min-width:0; margin:0; padding:0; border:0; }
+      .personnel-picker[hidden] { display:none; }
+      .personnel-picker legend { margin-bottom:0; padding:0; color:#455d6c; font-size:10px; font-weight:800; }
+      .personnel-help { margin:0; color:var(--muted); font-size:9px; line-height:1.45; }
+      .personnel-trigger { display:flex; width:100%; min-height:39px; align-items:center; justify-content:space-between; gap:10px; padding:8px 10px; border:1px solid #cbd9de; border-radius:7px; background:#fff; color:var(--ink); font:inherit; font-size:11px; text-align:left; cursor:pointer; }
+      .personnel-trigger:hover,.personnel-trigger[aria-expanded="true"] { border-color:#91bdc0; }
+      .personnel-trigger::after { width:7px; height:7px; flex:0 0 7px; border-right:1.5px solid #536b77; border-bottom:1.5px solid #536b77; content:""; transform:translateY(-2px) rotate(45deg); }
+      .personnel-menu { position:absolute; top:calc(100% + 5px); right:0; left:0; z-index:8; display:grid; gap:2px; max-height:210px; overflow:auto; padding:5px; border:1px solid #cbd9de; border-radius:7px; background:#fff; box-shadow:0 8px 20px rgba(16,42,62,.14); }
+      .personnel-menu[hidden] { display:none; }
+      .personnel-option { display:flex; min-height:36px; align-items:center; gap:8px; padding:0 8px; border-radius:5px; color:#34495a; font-size:10px; font-weight:650; cursor:pointer; }
+      .personnel-option:hover { background:#f2f8f8; }
+      .personnel-option input { width:15px; min-height:15px; height:15px; flex:0 0 15px; margin:0; padding:0; accent-color:var(--teal); }
+      .personnel-option input:disabled { cursor:not-allowed; }
+      .personnel-selection { min-height:14px; color:#536b77; font-size:9px; font-weight:700; }
+      .generate-report[hidden] { display:none; }
+      .work-results { display:grid; gap:12px; margin-top:16px; padding-top:15px; border-top:1px solid var(--line); }
+      .work-results[hidden],.combined-report[hidden] { display:none; }
+      .work-results h3,.combined-report h3 { margin:0; font-size:12px; }
+      .work-results-intro { margin:4px 0 0; color:var(--muted); font-size:9px; line-height:1.5; }
+      .result-entry-list { display:grid; gap:10px; }
+      .result-entry { display:grid; gap:7px; padding:11px; border:1px solid #d9e4e8; border-radius:8px; background:#fbfcfc; }
+      .result-entry-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+      .result-entry-head strong { font-size:10px; }
+      .result-entry-state { color:#667985; font-size:9px; }
+      .result-entry-state.is-saved { color:#176b45; font-weight:800; }
+      .result-entry textarea { width:100%; min-height:70px; padding:8px 10px; border:1px solid #cbd9de; border-radius:7px; color:var(--ink); font:inherit; font-size:10px; line-height:1.5; resize:vertical; }
+      .save-result { justify-self:end; min-height:31px; padding:0 10px; border:1px solid #cbd9de; border-radius:6px; background:#fff; color:#315c63; font-size:9px; font-weight:800; }
+      .save-result:hover { border-color:#91bdc0; background:#f2f8f8; }
+      .generate-report { min-height:36px; padding:0 12px; border:1px solid var(--teal); border-radius:7px; background:var(--teal); color:#fff; font-size:10px; font-weight:800; }
+      .generate-report:disabled { border-color:#ccd8dc; background:#e8eef0; color:#75858d; cursor:not-allowed; }
+      .combined-report { display:grid; gap:8px; padding:12px; border:1px solid #c7dfdd; border-radius:8px; background:#f2f8f7; }
+      .combined-report pre { margin:0; color:#34495a; font:inherit; font-size:10px; line-height:1.55; white-space:pre-wrap; overflow-wrap:anywhere; }
+      .download-report { justify-self:end; min-height:32px; padding:0 10px; border:1px solid #9bc7c5; border-radius:6px; background:#fff; color:#315c63; font-size:9px; font-weight:800; }
+      .create-submit { min-height:38px; padding:0 13px; border:1px solid var(--teal); border-radius:7px; background:var(--teal); color:#fff; font-size:10px; font-weight:800; }
+      .create-submit:hover { background:#005861; }
+      @media(max-width:1080px) {
+        .sidebar { width:204px; }
+        .main-column { margin-left:204px; }
+        .filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .field-search,.filters .clear-button { grid-column:1/-1; }
+        .week-strip { overflow-x:auto; }
+        .day-button { min-width:88px; }
+      }
+      @media(max-width:850px) {
+        .sidebar,.sidebar.is-collapsed { position:relative; width:auto; align-items:stretch; padding:10px 14px 12px; border-right:0; border-bottom:1px solid #244559; }
+        .brand-header,.sidebar.is-collapsed .brand-header { width:auto; flex-direction:row; align-items:center; }
+        .brand,.sidebar.is-collapsed .brand { display:block; width:auto; height:auto; overflow:visible; padding:0 4px 10px; }
+        .brand-logo,.sidebar.is-collapsed .brand-logo { display:block; width:166px; max-width:100%; height:auto; }
+        .brand-mark,.sidebar.is-collapsed .brand-mark { display:none; }
+        .sidebar .brand::after { display:none; }
+        .sidebar-toggle { display:none; }
+        .nav-label,.sidebar-bottom { display:none; }
+        .nav { width:auto; grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px 8px; }
+        .nav-group { grid-column:1/-1; }
+        .nav-group-trigger,.nav-link,.nav-child-link,.sidebar.is-collapsed .nav-group-trigger,.sidebar.is-collapsed .nav-link,.sidebar.is-collapsed .nav-child-link { min-height:40px; justify-content:flex-start; gap:8px; padding:0 8px; font-size:10px; }
+        .sidebar.is-collapsed .nav-group-trigger > span:not(.nav-icon),.sidebar.is-collapsed .nav-chevron { display:grid; }
+        .sidebar.is-collapsed .nav-icon { width:25px; height:25px; flex-basis:25px; }
+        .nav-children,.sidebar.is-collapsed .nav-group.is-open .nav-children { position:static; width:auto; grid-template-columns:repeat(2,minmax(0,1fr)); margin:0; padding:2px 0 0; border:0; background:transparent; box-shadow:none; }
+        .nav-children::before { display:none; }
+        .sidebar.is-collapsed .nav-group.is-open .nav-child-link { min-height:40px; justify-content:flex-start; gap:8px; padding:0 8px; font-size:10px; }
+        .nav-standalone { display:contents; }
+        .nav-standalone::before { grid-column:1/-1; margin:9px 3px 2px; color:#9bb0bd; content:"QUẢN TRỊ"; font-size:9px; font-weight:800; letter-spacing:.1em; }
+        .sidebar.is-collapsed + .main-column,.main-column { margin-left:0; }
+        .topbar { min-height:54px; padding:0 16px; }
+        .admin { padding-left:0; border-left:0; }
+        .admin > span:last-child { display:none; }
+        .page-shell { padding:25px 16px 38px; }
+      }
+      @media(max-width:620px) {
+        .page-shell { padding:22px 12px 32px; }
+        .page-heading { align-items:flex-start; flex-direction:column; gap:11px; margin-bottom:16px; }
+        h1 { font-size:27px; }
+        .heading-actions { width:100%; }
+        .create-button { flex:1; }
+        .create-form-grid { grid-template-columns:1fr; }
+        .personnel-list { grid-template-columns:1fr; }
+        .week-toolbar { align-items:flex-start; flex-direction:column; gap:10px; padding:12px; }
+        .week-caption { width:100%; text-align:left; }
+        .week-caption strong { display:inline; margin-right:6px; }
+        .month-weeks { grid-auto-columns:minmax(112px,1fr); }
+        .report-type { min-height:42px; flex-direction:column; gap:2px; }
+        .week-strip { grid-template-columns:repeat(7,minmax(68px,1fr)); }
+        .day-button { min-width:68px; min-height:91px; padding:10px 8px; }
+        .day-number { font-size:19px; }
+        .week-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); row-gap:10px; padding:11px 2px; }
+        .kpi { padding:5px 11px; }
+        .kpi:nth-child(2)::after { display:none; }
+        .kpi-value { font-size:22px; }
+        .filters { grid-template-columns:1fr; gap:9px; padding:12px; }
+        .field-search,.filters .clear-button { grid-column:auto; }
+        .filters .clear-button { width:100%; }
+        .list-head { align-items:flex-start; flex-direction:column; }
+        .list-tools { width:100%; justify-content:space-between; }
+        .export-actions { justify-content:flex-start; }
+        .export-note { max-width:100%; text-align:left; }
+        .table-wrap { overflow:visible; border:0; background:transparent; }
+        table,tbody { display:block; width:100%; }
+        thead { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); clip-path:inset(50%); white-space:nowrap; }
+        tbody { display:grid; gap:8px; }
+        tbody tr { display:grid; grid-template-columns:24px minmax(0,1fr) auto; gap:9px 10px; padding:12px; border:1px solid #d9e4e8; border-radius:9px; background:#fff; }
+        td { display:block; min-width:0; height:auto; padding:0; border:0; }
+        td::before { display:block; margin-bottom:4px; color:#71828c; content:attr(data-label); font-size:8px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+        td.select-cell { grid-column:1; grid-row:1; padding-top:2px; }
+        td.route-cell { grid-column:2/-1; grid-row:1; }
+        td.route-cell::before,.detail-cell::before { display:none; }
+        td.team-cell { grid-column:2; }
+        td.day-cell { grid-column:2; }
+        td.time-cell { grid-column:3; grid-row:2; align-self:end; }
+        td.status-cell { grid-column:2; }
+        td.action-cell { grid-column:3; grid-row:4; align-self:center; }
+        .route-task { max-width:none; }
+        .empty-state { border:1px solid #d9e4e8; border-radius:9px; background:#fff; }
+      }
+      @media(max-width:370px) {
+        .topbar { padding-inline:12px; }
+        .topbar-title { font-size:10px; }
+        .week-input { width:140px; }
+        .detail-list { grid-template-columns:104px 1fr; }
+      }
+      @media(prefers-reduced-motion:reduce) {
+        *,*::before,*::after { scroll-behavior:auto!important; transition-duration:.01ms!important; }
+      }
+    </style>
+    <link rel="stylesheet" href="../../server-theme.css" />
+  </head>
+  <body>
+    <!--
+      THESIS: Treat each month as a sequence of selectable field-operation weeks, separated into inspection and maintenance work.
+      OWN-WORLD: HP Telecom navy navigation, white operational surfaces, teal route marks, and status colors with explicit meaning.
+      STORY: Select a month and week, switch between inspection and maintenance, then narrow by team/day/status or inspect a route.
+      FIRST VIEWPORT: Page title and month selector lead; weeks in the month and a seven-day route strip precede category totals, filters, and the start of the route register.
+      FORM: Established HP Telecom admin world; operate-mode monthly schedule above a dense, responsive report table. Sample data is explicitly illustrative.
+    -->
+    <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
+    <aside class="sidebar">
+      <div class="brand-header">
+        <a class="brand" href="/tonghop/" aria-label="HP Telecom, trang tổng quan" title="HP Telecom">
+          <svg class="brand-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 303 64" role="img" aria-labelledby="brand-title brand-description">
+            <title id="brand-title">HP Telecom</title>
+            <desc id="brand-description">Điều hành hiện trường</desc>
+            <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
+              <path d="M30 7a23 23 0 0 0-22 16"/>
+              <path d="M7 32a23 23 0 0 0 17 22"/>
+              <path d="M34 55a23 23 0 0 0 18-19"/>
+              <path d="M54 27A23 23 0 0 0 38 9"/>
+            </g>
+            <circle cx="21" cy="7" r="3.2" fill="#00bfd0"/>
+            <circle cx="53" cy="47" r="3.2" fill="#00bfd0"/>
+            <text x="10" y="39" fill="#fff" font-family="Arial,sans-serif" font-size="25" font-weight="800" letter-spacing="-2">HP</text>
+            <text x="76" y="29" fill="#fff" font-family="Arial,sans-serif" font-size="23" font-weight="700" letter-spacing="-.7">HP Telecom</text>
+            <text x="76" y="50" fill="#a3ebed" font-family="Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="2.1">ĐIỀU HÀNH HIỆN TRƯỜNG</text>
+          </svg>
+          <svg class="brand-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true">
+            <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
+              <path d="M30 7a23 23 0 0 0-22 16"/>
+              <path d="M7 32a23 23 0 0 0 17 22"/>
+              <path d="M34 55a23 23 0 0 0 18-19"/>
+              <path d="M54 27A23 23 0 0 0 38 9"/>
+            </g>
+            <circle cx="21" cy="7" r="3.2" fill="#00bfd0"/>
+            <circle cx="53" cy="47" r="3.2" fill="#00bfd0"/>
+            <text x="10" y="39" fill="#fff" font-family="Arial,sans-serif" font-size="25" font-weight="800" letter-spacing="-2">HP</text>
+          </svg>
+        </a>
+      </div>
+      <p class="nav-label">Không gian quản trị</p>
+      <nav class="nav" aria-label="Điều hướng quản trị">
+        <div class="nav-group">
+          <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="summary-menu" aria-label="Mở thư mục Tổng hợp" title="Tổng hợp" data-nav-toggle>
+            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span>
+            <span>Tổng hợp</span><span class="nav-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="nav-children" id="summary-menu" data-label="Tổng hợp" hidden>
+            <a class="nav-child-link" href="../../tonghop/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
+            <a class="nav-child-link" href="../../tonghop/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
+            <a class="nav-child-link" href="../../tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="reports-menu" aria-label="Mở thư mục Báo cáo" title="Báo cáo" data-nav-toggle>
+            <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3.5h9l5 5v12H5z"/><path d="M14 3.5v5h5m-10 4h6m-6 4h6"/></svg></span>
+            <span>Báo cáo</span><span class="nav-chevron" aria-hidden="true"></span>
+          </button>
+          <div class="nav-children" id="reports-menu" data-label="Báo cáo" hidden>
+            <a class="nav-child-link" href="../suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
+            <a class="nav-child-link" href="../didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
+            <a class="nav-child-link" href="./" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
+          </div>
+        </div>
+        <div class="nav-standalone">
+          <a class="nav-link" href="../../thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
+          <a class="nav-link" href="../../nguoidung/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
+        </div>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="connection-state">Bản xem trước độc lập</div>
+        <p class="version">HP Telecom · Giao diện demo</p>
+      </div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <span class="topbar-title">Báo cáo vận hành · Tuần tuyến</span>
+        <div class="top-actions">
+          <a class="support-link" href="https://hptelecom.id.vn/support">Hỗ trợ</a>
+          <div class="admin"><span class="avatar" aria-hidden="true">QT</span><span><span class="admin-name">Quản trị viên</span><span class="admin-role">Tài khoản demo</span></span></div>
+        </div>
+      </header>
+
+      <main class="page-shell" id="main-content">
+        <section class="page-heading" aria-labelledby="page-title">
+          <div>
+            <p class="breadcrumb"><a href="/tonghop/">Không gian quản trị</a> <span aria-hidden="true">/</span> <a href="/baocao/suco/">Báo cáo</a> <span aria-hidden="true">/</span> Tuần Tuyến</p>
+            <h1 id="page-title">Báo cáo Tuần Tuyến</h1>
+            <p class="page-description">Theo dõi lịch kiểm tra và bảo dưỡng tuyến, tiến độ của từng đội cùng các hạng mục cần xác nhận trong tuần.</p>
+          </div>
+          <div class="heading-actions"><span class="preview-badge">Dữ liệu minh họa</span><button class="create-button" id="open-create-dialog" type="button"><span aria-hidden="true">＋</span> Tạo tuyến giao việc</button></div>
+        </section>
+
+        <section class="week-toolbar" aria-label="Chọn tuần báo cáo">
+          <div>
+            <label class="week-label" for="week-picker">Tháng báo cáo</label>
+            <div class="week-controls">
+                <button class="week-step" id="previous-month" type="button" aria-label="Tháng trước">‹</button>
+                <input class="week-input" id="week-picker" type="month" value="2026-10" />
+                <button class="week-step" id="next-month" type="button" aria-label="Tháng tiếp theo">›</button>
+            </div>
+          </div>
+            <p class="week-caption"><strong id="week-range">05 – 11 tháng 10, 2026</strong><span id="week-number">Tuần 2 trong tháng · Thứ Hai – Chủ Nhật</span></p>
+        </section>
+
+          <nav class="month-weeks" id="month-weeks" aria-label="Tuần trong tháng"></nav>
+          <section class="week-strip" id="week-strip" aria-label="Khối lượng công việc theo ngày"></section>
+
+          <div class="report-types" role="tablist" aria-label="Loại công việc">
+            <button class="report-type" id="inspection-tab" type="button" role="tab" aria-selected="true" aria-controls="routes-panel" data-category="Kiểm tra">Kiểm tra <span class="report-type-count" id="inspection-count"></span></button>
+            <button class="report-type" id="maintenance-tab" type="button" role="tab" aria-selected="false" aria-controls="routes-panel" data-category="Bảo dưỡng" tabindex="-1">Bảo dưỡng <span class="report-type-count" id="maintenance-count"></span></button>
+          </div>
+
+          <section class="week-kpis" aria-label="Tổng quan tiến độ tuần">
+          <div class="kpi"><span class="kpi-label">Tuyến trong kế hoạch</span><div class="kpi-line"><strong class="kpi-value" id="total-count">8</strong><span class="kpi-note">tuyến</span></div></div>
+          <div class="kpi"><span class="kpi-label"><span class="kpi-mark"></span>Hoàn thành</span><div class="kpi-line"><strong class="kpi-value" id="complete-count">5</strong><span class="kpi-note">đã ghi nhận</span></div></div>
+          <div class="kpi"><span class="kpi-label"><span class="kpi-mark progress"></span>Đang thực hiện</span><div class="kpi-line"><strong class="kpi-value" id="progress-count">2</strong><span class="kpi-note">đang xử lý</span></div></div>
+          <div class="kpi"><span class="kpi-label"><span class="kpi-mark pending"></span>Chờ xác nhận</span><div class="kpi-line"><strong class="kpi-value" id="pending-count">1</strong><span class="kpi-note">cần kiểm tra</span></div></div>
+        </section>
+
+        <form class="filters" id="filters" role="search" onsubmit="return false">
+          <div class="field">
+            <label for="team-filter">Team / Đội</label>
+            <select id="team-filter">
+              <option value="">Tất cả đội</option>
+              <option value="Tây Đắk Lắk">Tây Đắk Lắk</option>
+              <option value="Đông Đắk Lắk">Đông Đắk Lắk</option>
+              <option value="Nam Đắk Lắk">Nam Đắk Lắk</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="status-filter">Trạng thái</label>
+            <select id="status-filter">
+              <option value="">Tất cả trạng thái</option>
+              <option>Hoàn thành</option>
+              <option>Đang thực hiện</option>
+              <option>Chờ xác nhận</option>
+              <option>Cần xử lý</option>
+            </select>
+          </div>
+          <div class="field field-search">
+            <label for="route-search">Tìm tuyến hoặc nội dung</label>
+            <input id="route-search" type="search" placeholder="Ví dụ: DLBT09 hoặc kiểm tra măng xông" autocomplete="off" />
+          </div>
+          <button class="clear-button" id="clear-filters" type="button">Xóa bộ lọc</button>
+        </form>
+
+        <section id="routes-panel" role="tabpanel" aria-labelledby="inspection-tab" tabindex="0">
+          <div class="list-head">
+            <div><h2 id="list-title">Sổ theo dõi tuyến</h2><p id="list-caption">Lịch và kết quả công việc trong tuần đã chọn.</p></div>
+            <div class="list-tools">
+              <span class="result-count" id="result-count" role="status" aria-live="polite">8 tuyến</span>
+              <span class="selection-count" id="selection-count" role="status" aria-live="polite">Chưa chọn tuyến</span>
+              <button class="clear-selection" id="clear-selection" type="button" hidden>Bỏ chọn</button>
+              <div class="export-actions" aria-label="Xuất danh sách tuyến">
+                <button class="export-button" id="export-excel" type="button" title="Xuất bảng tính Microsoft Excel"><span aria-hidden="true">↓</span> Excel</button>
+                <button class="export-button" id="export-kmz" type="button" title="Xuất tệp bản đồ Google Earth KMZ"><span aria-hidden="true">↓</span> KMZ</button>
+                <button class="export-button" id="export-csv" type="button"><span aria-hidden="true">↓</span> CSV</button>
+              </div>
+            </div>
+          </div>
+          <p class="export-note" id="export-note" aria-live="polite">Chọn tuyến bằng ô bên trái từng dòng. Khi có lựa chọn, Excel, KMZ và CSV chỉ xuất các tuyến đã chọn; nếu chưa chọn, xuất danh sách đang lọc.</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th class="select-cell" scope="col"><label class="selection-head"><input class="route-select" id="select-visible-routes" type="checkbox" aria-label="Chọn tất cả tuyến đang hiển thị" title="Chọn tất cả tuyến đang hiển thị"></label></th><th scope="col">Tuyến / Nội dung</th><th scope="col">Team / Đội</th><th scope="col">Tháng bắt đầu</th><th scope="col">Cập nhật</th><th scope="col">Trạng thái</th><th scope="col"><span class="visually-hidden">Chi tiết</span></th></tr></thead>
+              <tbody id="route-rows"></tbody>
+            </table>
+            <p class="empty-state" id="empty-state" hidden>Không có tuyến phù hợp trong tuần này. Hãy đổi tuần hoặc xóa bộ lọc.</p>
+          </div>
+        </section>
+
+        <p class="notice"><span class="notice-mark" aria-hidden="true">i</span><span>Bản dựng giao diện độc lập. Tuyến, trạng thái và danh sách nhân sự đang hiển thị là dữ liệu minh họa, chưa kết nối hệ thống HP Telecom.</span></p>
+      </main>
+    </div>
+
+    <dialog id="route-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-inner">
+        <div class="dialog-head"><div><h2 id="dialog-title"></h2><p>Thông tin tuyến trong bản xem trước</p></div><button class="dialog-close" id="close-dialog" type="button" aria-label="Đóng chi tiết">×</button></div>
+        <dl class="detail-list" id="detail-list"></dl>
+        <section class="work-results" id="work-results" aria-labelledby="work-results-title" hidden>
+        <div><h3 id="work-results-title">Kết quả từ nhân sự nhận việc</h3><p class="work-results-intro" id="work-results-intro"></p></div>
+          <div class="result-entry-list" id="result-entry-list"></div>
+          <button class="generate-report" id="generate-report" type="button" disabled>Tạo báo cáo tổng hợp</button>
+          <section class="combined-report" id="combined-report" aria-labelledby="combined-report-title" hidden>
+            <h3 id="combined-report-title">Báo cáo tổng hợp</h3>
+            <pre id="combined-report-content"></pre>
+            <button class="download-report" id="download-report" type="button">Tải báo cáo (.txt)</button>
+          </section>
+        </section>
+        <div class="dialog-actions"><button class="dialog-done" id="done-dialog" type="button">Đóng chi tiết</button></div>
+      </div>
+    </dialog>
+    <dialog class="create-dialog" id="create-dialog" aria-labelledby="create-dialog-title">
+      <div class="dialog-inner">
+        <div class="dialog-head">
+          <div><h2 id="create-dialog-title">Tạo tuyến giao việc</h2><p>Phân công kiểm tra hoặc bảo dưỡng cho đội hiện trường.</p></div>
+          <button class="dialog-close" id="close-create-dialog" type="button" aria-label="Đóng biểu mẫu">×</button>
+        </div>
+        <form class="create-form" id="create-route-form">
+          <div class="create-form-grid">
+            <label>Loại công việc
+              <select id="create-category" name="category" required>
+                <option value="Kiểm tra">Kiểm tra</option>
+                <option value="Bảo dưỡng">Bảo dưỡng</option>
+              </select>
+            </label>
+            <label>Mã tuyến
+              <input id="create-code" name="code" type="text" maxlength="60" placeholder="Ví dụ: DLBT09-LDDR02" required />
+            </label>
+            <label>Team / Đội nhận việc
+              <select id="create-team" name="team" required>
+                <option value="">Chọn đội thực hiện</option>
+                <option>Tây Đắk Lắk</option>
+                <option>Đông Đắk Lắk</option>
+                <option>Nam Đắk Lắk</option>
+              </select>
+            </label>
+            <label>Tháng bắt đầu thực hiện
+              <input id="create-start-month" name="startMonth" type="month" required />
+            </label>
+          </div>
+          <label>Cách tổng hợp kết quả
+            <select id="create-collection-mode" name="collectionMode" aria-describedby="collection-mode-help">
+              <option value="single">Giao từng người</option>
+              <option value="multiple">Giao nhiều người</option>
+            </select>
+          </label>
+          <p class="create-help" id="collection-mode-help">Giao một người để nhận kết quả riêng, hoặc giao nhiều người để gộp thành báo cáo hoàn chỉnh.</p>
+          <fieldset class="personnel-picker" id="personnel-picker" hidden>
+            <legend>Nhân sự nhận việc</legend>
+            <p class="personnel-help" id="personnel-help">Chọn một người thuộc đội nhận việc. Tên đang là dữ liệu mẫu.</p>
+            <button class="personnel-trigger" id="personnel-trigger" type="button" aria-expanded="false" aria-controls="personnel-list" aria-describedby="personnel-help personnel-selection">Chọn nhân sự</button>
+            <div class="personnel-menu" id="personnel-list" role="group" aria-label="Chọn nhân sự nhận việc" hidden></div>
+            <span class="personnel-selection" id="personnel-selection" aria-live="polite">Chưa chọn nhân sự</span>
+          </fieldset>
+          <label>Nội dung giao việc
+            <textarea id="create-task" name="task" maxlength="500" placeholder="Mô tả hạng mục cần thực hiện trên tuyến" required></textarea>
+          </label>
+          <p class="create-help">Bản xem trước chỉ thêm công việc tạm thời trên trang này, chưa lưu lên hệ thống HP Telecom.</p>
+          <div class="dialog-actions"><button class="dialog-done" id="cancel-create" type="button">Hủy</button><button class="create-submit" type="submit">Tạo và giao việc</button></div>
+        </form>
+      </div>
+    </dialog>
+    <script>
+      const sampleRoutes = [
+        { code:"DLBT09-LDDR02", team:"Tây Đắk Lắk", day:5, task:"Kiểm tra tuyến trục, vệ sinh hộp phối quang và đo suy hao.", update:"07:45", status:"Hoàn thành", owner:"Đội Tây 01", result:"Đã kiểm tra 12 vị trí; không ghi nhận suy hao bất thường.", distance:"8,4 km" },
+        { code:"DLMD16-DLMD22", team:"Tây Đắk Lắk", day:6, task:"Kiểm tra măng xông, dây treo và khoảng võng cáp.", update:"09:20", status:"Hoàn thành", owner:"Đội Tây 02", result:"Hoàn tất kiểm tra; đã ghi nhận ảnh hiện trường.", distance:"5,2 km" },
+        { code:"DLKP32-DLKP22", team:"Đông Đắk Lắk", day:7, task:"Rà soát điểm giao cắt và tình trạng biển báo tuyến.", update:"10:10", status:"Hoàn thành", owner:"Đội Đông 01", result:"Biển báo đủ; một vị trí cần vệ sinh tủ phối quang.", distance:"6,1 km" },
+        { code:"DLEH70-DLEH08", team:"Tây Đắk Lắk", day:7, task:"Đo kiểm tín hiệu và đối chiếu sơ đồ tuyến.", update:"14:35", status:"Hoàn thành", owner:"Đội Tây 01", result:"Số liệu đã đối chiếu với hồ sơ tuyến.", distance:"4,8 km" },
+        { code:"DLCK03-DLCK09", team:"Đông Đắk Lắk", day:8, task:"Kiểm tra tủ cáp, khóa tiếp địa và mối nối.", update:"16:10", status:"Chờ xác nhận", owner:"Đội Đông 02", result:"Đội đã gửi kết quả; chờ điều phối viên xác nhận.", distance:"7,3 km" },
+        { code:"DLMD05-DLMD20", team:"Nam Đắk Lắk", day:9, task:"Kiểm tra hành lang tuyến và vị trí có nguy cơ va quệt.", update:"08:25", status:"Đang thực hiện", owner:"Đội Nam 01", result:"Đang kiểm tra đoạn tuyến phía Đông.", distance:"9,6 km" },
+        { code:"DLES27-DLES20", team:"Tây Đắk Lắk", day:9, task:"Rà soát cột treo và cập nhật ảnh hiện trường.", update:"09:05", status:"Đang thực hiện", owner:"Đội Tây 02", result:"Đang cập nhật hình ảnh và biên bản kiểm tra.", distance:"5,7 km" },
+        { code:"DLKA04-DLKA11", team:"Nam Đắk Lắk", day:10, task:"Kiểm tra tuyến nhánh và đối soát vật tư dự phòng.", update:"Theo lịch", status:"Chờ xác nhận", owner:"Đội Nam 02", result:"Chưa đến lịch kiểm tra.", distance:"6,8 km" }
+      ];
+      const maintenanceRoutes = [
+        { code:"DLBT09-LDDR02", team:"Tây Đắk Lắk", day:5, task:"Bảo dưỡng hộp phối quang, vệ sinh đầu nối và siết lại phụ kiện.", update:"08:15", status:"Hoàn thành", owner:"Đội Tây 01", result:"Đã vệ sinh và siết lại 6 đầu nối.", distance:"8,4 km" },
+        { code:"DLMD16-DLMD22", team:"Tây Đắk Lắk", day:7, task:"Gia cố dây treo và chỉnh khoảng võng cáp.", update:"11:30", status:"Đang thực hiện", owner:"Đội Tây 02", result:"Đã gia cố 3 vị trí; đang tiếp tục tuyến.", distance:"5,2 km" },
+        { code:"DLCK03-DLCK09", team:"Đông Đắk Lắk", day:8, task:"Bảo dưỡng tủ cáp, kiểm tra khóa và vệ sinh bên trong.", update:"15:10", status:"Chờ xác nhận", owner:"Đội Đông 02", result:"Đã gửi ảnh sau bảo dưỡng, chờ xác nhận.", distance:"7,3 km" },
+        { code:"DLKA04-DLKA11", team:"Nam Đắk Lắk", day:10, task:"Thay dây néo hư hỏng và dọn hành lang tuyến.", update:"Theo lịch", status:"Chờ xác nhận", owner:"Đội Nam 02", result:"Chưa đến lịch bảo dưỡng.", distance:"6,8 km" }
+      ];
+      const allSampleRoutes = [
+        ...sampleRoutes.map(route => ({ ...route, category:"Kiểm tra" })),
+        ...maintenanceRoutes.map(route => ({ ...route, category:"Bảo dưỡng" }))
+      ];
+      const teamPersonnel = {
+        "Tây Đắk Lắk":["Nguyễn Văn An","Trần Quốc Bảo","Lê Minh Khánh","Phạm Hữu Tài"],
+        "Đông Đắk Lắk":["Lê Hoàng Nam","Nguyễn Đức Huy","Phan Thành Đạt","Võ Minh Trí"],
+        "Nam Đắk Lắk":["Trần Minh Tuấn","Nguyễn Hoài Phương","Đỗ Quốc Việt","Bùi Thanh Sơn"]
+      };
+      const createdRoutes = [];
+      const dayNames = ["Thứ Hai","Thứ Ba","Thứ Tư","Thứ Năm","Thứ Sáu","Thứ Bảy","Chủ Nhật"];
+      const dayShort = ["T2","T3","T4","T5","T6","T7","CN"];
+      const picker = document.querySelector("#week-picker");
+      const monthWeeks = document.querySelector("#month-weeks");
+      const teamFilter = document.querySelector("#team-filter");
+      const statusFilter = document.querySelector("#status-filter");
+      const searchInput = document.querySelector("#route-search");
+      const routeRows = document.querySelector("#route-rows");
+      const emptyState = document.querySelector("#empty-state");
+      const resultCount = document.querySelector("#result-count");
+      const weekStrip = document.querySelector("#week-strip");
+      const routeDialog = document.querySelector("#route-dialog");
+      let selectedDay = "";
+      let selectedWeekIndex = 1;
+      let selectedCategory = "Kiểm tra";
+      let activeRoute=null;
+      const selectedRouteKeys=new Set();
+
+      function monthWeekStarts(value) {
+        const match = value.match(/^(\d{4})-(\d{2})$/);
+        if (!match) throw new Error(`Tháng không hợp lệ: ${value}`);
+        const year = Number(match[1]);
+        const month = Number(match[2]) - 1;
+        if (month < 0 || month > 11) throw new Error(`Tháng không hợp lệ: ${value}`);
+        const firstOfMonth = new Date(Date.UTC(year,month,1));
+        const firstMonday = new Date(firstOfMonth);
+        firstMonday.setUTCDate(firstOfMonth.getUTCDate() - ((firstOfMonth.getUTCDay() + 6) % 7));
+        const lastOfMonth = new Date(Date.UTC(year,month+1,0));
+        const weeks = [];
+        for (let monday=new Date(firstMonday); monday<=lastOfMonth; monday.setUTCDate(monday.getUTCDate()+7)) {
+          weeks.push(new Date(monday));
+        }
+        return weeks;
+      }
+      function isoWeekValue(date) {
+        const thursday = new Date(Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate()));
+        thursday.setUTCDate(thursday.getUTCDate() + 3 - ((thursday.getUTCDay() + 6) % 7));
+        const year = thursday.getUTCFullYear();
+        const jan4 = new Date(Date.UTC(year,0,4));
+        const firstThursday = new Date(jan4);
+        firstThursday.setUTCDate(jan4.getUTCDate() + 3 - ((jan4.getUTCDay() + 6) % 7));
+        const week = 1 + Math.round((thursday - firstThursday) / 604800000);
+        return `${year}-W${String(week).padStart(2,"0")}`;
+      }
+      function dateLabel(date, options) {
+        return new Intl.DateTimeFormat("vi-VN", { timeZone:"UTC", ...options }).format(date);
+      }
+      function monthValue(date) {
+        return `${date.getUTCFullYear()}-${String(date.getUTCMonth()+1).padStart(2,"0")}`;
+      }
+      function monthLabel(value) {
+        const match=value.match(/^(\d{4})-(\d{2})$/);
+        const month=match?Number(match[2]):0;
+        if (!match||month<1||month>12) throw new Error(`Tháng bắt đầu không hợp lệ: ${value}`);
+        return dateLabel(new Date(Date.UTC(Number(match[1]),month-1,1)),{month:"long",year:"numeric"});
+      }
+      function shortDateLabel(date) {
+        return `${String(date.getUTCDate()).padStart(2,"0")}/${String(date.getUTCMonth()+1).padStart(2,"0")}`;
+      }
+      function weekData() {
+        const weeks = monthWeekStarts(picker.value);
+        selectedWeekIndex = Math.max(0,Math.min(selectedWeekIndex,weeks.length-1));
+        const monday = weeks[selectedWeekIndex];
+        const sunday = new Date(monday);
+        sunday.setUTCDate(monday.getUTCDate() + 6);
+        document.querySelector("#week-range").textContent = `${shortDateLabel(monday)} – ${dateLabel(sunday,{day:"2-digit",month:"2-digit",year:"numeric"})}`;
+        document.querySelector("#week-number").textContent = `Tuần ${selectedWeekIndex+1} trong tháng · Thứ Hai – Chủ Nhật`;
+        return monday;
+      }
+      function weekRoutes(monday) {
+        const sampleWeek = isoWeekValue(monday)==="2026-W41"
+          ? allSampleRoutes.map(route => {
+            const date = new Date(monday);
+            date.setUTCDate(monday.getUTCDate() + route.day - 5);
+            return { ...route, date };
+          })
+          : [];
+        return [...sampleWeek,...createdRoutes.filter(route => isoWeekValue(route.date)===isoWeekValue(monday))];
+      }
+      function categoryRoutes(monday) {
+        return weekRoutes(monday).filter(route => route.category===selectedCategory);
+      }
+      function renderMonthWeeks() {
+        const weeks = monthWeekStarts(picker.value);
+        monthWeeks.replaceChildren();
+        weeks.forEach((monday,index) => {
+          const sunday = new Date(monday);
+          sunday.setUTCDate(monday.getUTCDate()+6);
+          const count = weekRoutes(monday).filter(route => route.category===selectedCategory).length;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "month-week";
+          button.dataset.weekIndex = String(index);
+          button.setAttribute("aria-pressed",String(index===selectedWeekIndex));
+          button.setAttribute("aria-label",`Tuần ${index+1}, ${shortDateLabel(monday)} đến ${shortDateLabel(sunday)}, ${count} tuyến ${selectedCategory.toLocaleLowerCase("vi")}`);
+          button.innerHTML = `<span class="month-week-title">Tuần ${index+1}</span><span class="month-week-meta">${shortDateLabel(monday)} – ${shortDateLabel(sunday)} · ${count} tuyến</span>`;
+          monthWeeks.append(button);
+        });
+      }
+      function renderWeekStrip(monday,routes) {
+        const today = new Date();
+        const isCurrentWeek = isoWeekValue(new Date(Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()))) === isoWeekValue(monday);
+        weekStrip.replaceChildren();
+        for (let index=0; index<7; index++) {
+          const date = new Date(monday);
+          date.setUTCDate(monday.getUTCDate()+index);
+          const dayRoutes = routes.filter(route => route.date.getUTCDate() === date.getUTCDate());
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `day-button${isCurrentWeek && date.getUTCDate()===today.getDate() && date.getUTCMonth()===today.getMonth()?" is-today":""}`;
+          button.setAttribute("aria-pressed",String(selectedDay===String(date.getUTCDate())));
+          button.setAttribute("aria-label",`${dayNames[index]} ${dateLabel(date,{day:"numeric",month:"long"})}, ${dayRoutes.length} tuyến`);
+          button.dataset.day = String(date.getUTCDate());
+          button.innerHTML = `<span class="day-name">${dayShort[index]}</span><span class="day-number">${String(date.getUTCDate()).padStart(2,"0")}</span><span class="day-load"><span class="day-dot${dayRoutes.length?" has-work":""}"></span>${dayRoutes.length} tuyến</span>`;
+          weekStrip.append(button);
+        }
+      }
+      function visibleRoutes(routes) {
+        const query = searchInput.value.trim().normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("vi");
+        return routes.filter(route => {
+          const text = `${route.code} ${route.team} ${route.task} ${route.owner} ${route.result}`.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("vi");
+          return (!query || text.includes(query))
+            && (!teamFilter.value || route.team===teamFilter.value)
+            && (!statusFilter.value || route.status===statusFilter.value)
+            && (!selectedDay || route.date.getUTCDate()===Number(selectedDay));
+        }).sort((a,b) => a.date-b.date || a.code.localeCompare(b.code,"vi"));
+      }
+      function routeSelectionKey(route) {
+        return `${isoWeekValue(route.date)}|${route.category}|${route.code}`;
+      }
+      function currentWeekRoutes() {
+        return categoryRoutes(monthWeekStarts(picker.value)[selectedWeekIndex]);
+      }
+      function exportRoutes() {
+        const routes=currentWeekRoutes();
+        return selectedRouteKeys.size
+          ? routes.filter(route => selectedRouteKeys.has(routeSelectionKey(route)))
+          : visibleRoutes(routes);
+      }
+      function updateSelectionUI(visible) {
+        const selectedCount=selectedRouteKeys.size;
+        const selectionCount=document.querySelector("#selection-count");
+        const clearSelection=document.querySelector("#clear-selection");
+        const selectVisible=document.querySelector("#select-visible-routes");
+        selectionCount.textContent=selectedCount?`Đã chọn ${selectedCount} tuyến`:"Chưa chọn tuyến";
+        clearSelection.hidden=selectedCount===0;
+        const selectedVisible=visible.filter(route => selectedRouteKeys.has(routeSelectionKey(route))).length;
+        selectVisible.checked=visible.length>0&&selectedVisible===visible.length;
+        selectVisible.indeterminate=selectedVisible>0&&selectedVisible<visible.length;
+        document.querySelector("#export-note").textContent=selectedCount
+          ? `Excel, KMZ và CSV sẽ xuất ${selectedCount} tuyến đã chọn, kể cả tuyến đang ẩn bởi bộ lọc.`
+          : "Chọn tuyến bằng ô bên trái từng dòng. Khi có lựa chọn, Excel, KMZ và CSV chỉ xuất các tuyến đã chọn; nếu chưa chọn, xuất danh sách đang lọc.";
+      }
+      function renderRows(routes) {
+        const visible = visibleRoutes(routes);
+        routeRows.replaceChildren();
+        visible.forEach(route => {
+          const row = document.createElement("tr");
+          const dateText = monthLabel(route.startMonth||monthValue(route.date));
+          const selected=selectedRouteKeys.has(routeSelectionKey(route));
+          row.classList.toggle("is-selected",selected);
+          row.innerHTML = `<td class="select-cell" data-label="Chọn tuyến"><input class="route-select" type="checkbox" data-select-route="${routeSelectionKey(route)}" aria-label="Chọn tuyến ${route.code}"${selected?" checked":""}></td><td class="route-cell" data-label="Tuyến / Nội dung"><button class="route-report-button" type="button" data-route-code="${route.code}" aria-label="Mở báo cáo tuyến ${route.code}"><span class="route-code">${route.code}</span><span class="route-task">${route.task}</span></button></td><td class="team-cell" data-label="Team / Đội">${route.team}${route.assignees?.length?`<span class="team-assignees">${route.assignees.join(", ")}</span>`:""}</td><td class="day-cell" data-label="Tháng bắt đầu">${dateText}</td><td class="time-cell" data-label="Cập nhật">${route.update}</td><td class="status-cell" data-label="Trạng thái"><span class="status-pill" data-status="${route.status}">${route.status}</span></td><td class="action-cell detail-cell"><button class="detail-button" type="button" data-route-code="${route.code}" aria-label="Xem chi tiết tuyến ${route.code}">›</button></td>`;
+          routeRows.append(row);
+        });
+        resultCount.textContent = `${visible.length} / ${routes.length} tuyến`;
+        emptyState.hidden = visible.length > 0;
+        updateSelectionUI(visible);
+        return visible;
+      }
+      function updateKpis(routes) {
+        document.querySelector("#total-count").textContent = routes.length;
+        document.querySelector("#complete-count").textContent = routes.filter(route => route.status==="Hoàn thành").length;
+        document.querySelector("#progress-count").textContent = routes.filter(route => route.status==="Đang thực hiện").length;
+        document.querySelector("#pending-count").textContent = routes.filter(route => route.status==="Chờ xác nhận").length;
+      }
+      function render() {
+        const monday = weekData();
+        const routes = categoryRoutes(monday);
+        renderWeekStrip(monday,routes);
+        updateKpis(routes);
+        renderRows(routes);
+        const hasSamples = routes.length > 0;
+        document.querySelector("#list-title").textContent = `Danh sách tuyến ${selectedCategory.toLocaleLowerCase("vi")}`;
+        document.querySelector("#list-caption").textContent = hasSamples
+          ? `Lịch và kết quả ${selectedCategory.toLocaleLowerCase("vi")} trong tuần đã chọn.`
+          : `Chưa có dữ liệu mẫu ${selectedCategory.toLocaleLowerCase("vi")} cho tuần này.`;
+        document.querySelector("#routes-panel").setAttribute("aria-labelledby",selectedCategory==="Kiểm tra"?"inspection-tab":"maintenance-tab");
+        document.querySelector("#inspection-tab").setAttribute("aria-selected",String(selectedCategory==="Kiểm tra"));
+        document.querySelector("#inspection-tab").tabIndex=selectedCategory==="Kiểm tra"?0:-1;
+        document.querySelector("#maintenance-tab").setAttribute("aria-selected",String(selectedCategory==="Bảo dưỡng"));
+        document.querySelector("#maintenance-tab").tabIndex=selectedCategory==="Bảo dưỡng"?0:-1;
+        document.querySelector("#inspection-count").textContent=weekRoutes(monday).filter(route => route.category==="Kiểm tra").length;
+        document.querySelector("#maintenance-count").textContent=weekRoutes(monday).filter(route => route.category==="Bảo dưỡng").length;
+        renderMonthWeeks();
+      }
+      function moveMonth(amount) {
+        const [year,month] = picker.value.split("-").map(Number);
+        const date = new Date(Date.UTC(year,month-1+amount,1));
+        picker.value=`${date.getUTCFullYear()}-${String(date.getUTCMonth()+1).padStart(2,"0")}`;
+        selectedDay = "";
+        selectedRouteKeys.clear();
+        render();
+      }
+      function openCreateDialog() {
+        const startMonthInput=document.querySelector("#create-start-month");
+        document.querySelector("#create-route-form").reset();
+        renderPersonnelList("");
+        document.querySelector("#personnel-trigger").textContent="Chọn nhân sự";
+        startMonthInput.value=picker.value;
+        document.querySelector("#create-category").value=selectedCategory;
+        startMonthInput.setCustomValidity("");
+        document.querySelector("#create-dialog").showModal();
+        document.querySelector("#create-code").focus();
+      }
+      function renderPersonnelList(team) {
+        const pickerElement=document.querySelector("#personnel-picker");
+        const list=document.querySelector("#personnel-list");
+        list.replaceChildren();
+        pickerElement.hidden=!team;
+        const trigger=document.querySelector("#personnel-trigger");
+        trigger.setAttribute("aria-expanded","false");
+        list.hidden=true;
+        document.querySelector("#personnel-selection").textContent="Chưa chọn nhân sự";
+        trigger.textContent=team?"Chọn nhân sự":"Chọn đội trước";
+        if (!team) return;
+        (teamPersonnel[team]||[]).forEach((name,index) => {
+          const label=document.createElement("label");
+          label.className="personnel-option";
+          const checkbox=document.createElement("input");
+          checkbox.type="checkbox";
+          checkbox.name="assignees";
+          checkbox.value=name;
+          checkbox.id=`assignee-${index}`;
+          const text=document.createElement("span");
+          text.textContent=name;
+          label.append(checkbox,text);
+          list.append(label);
+        });
+        updatePersonnelSelection();
+      }
+      function updatePersonnelSelection() {
+        const checkboxes=[...document.querySelectorAll('#personnel-list input[name="assignees"]')];
+        const selected=checkboxes.filter(input => input.checked).length;
+        const mode=document.querySelector("#create-collection-mode").value;
+        const names=checkboxes.filter(input => input.checked).map(input => input.value);
+        checkboxes.forEach(input => { input.disabled=mode==="single"&&!input.checked&&selected>=1; });
+        document.querySelector("#personnel-help").textContent=mode==="multiple"
+          ? "Chọn từ hai người trở lên trong đội. Mỗi người nhập kết quả riêng; tên đang là dữ liệu mẫu."
+          : "Chọn một người trong đội nhận việc và gửi kết quả; tên đang là dữ liệu mẫu.";
+        document.querySelector("#personnel-selection").textContent=mode==="multiple"
+          ? `Đã chọn ${selected} người · cần ít nhất 2`
+          : `Đã chọn ${selected}/1 người`;
+        document.querySelector("#personnel-trigger").setAttribute("aria-invalid","false");
+        document.querySelector("#personnel-trigger").textContent=selected
+          ? mode==="single"?names[0]:`${selected} người đã chọn`
+          : "Chọn nhân sự";
+        document.querySelector("#create-team").setCustomValidity("");
+      }
+      function formatCsv(value) { return `"${String(value).replace(/"/g,'""')}"`; }
+      function exportHeaders() {
+        return ["Loại công việc","Tuyến","Team / Đội","Nhân sự nhận việc","Cách tổng hợp kết quả","Tháng bắt đầu thực hiện","Nội dung","Phụ trách","Cập nhật","Trạng thái","Kết quả tổng hợp","Chiều dài tuyến"];
+      }
+      function exportDataRows() {
+        const routes=exportRoutes();
+        return routes.map(route => [
+          route.category,route.code,route.team,route.assignees?.join(", ")||"",route.collectionMode==="multiple"?"Giao nhiều người":"Giao từng người",
+          monthLabel(route.startMonth||monthValue(route.date)),
+          route.task,route.owner,route.update,route.status,route.combinedReport||route.result,route.distance
+        ]);
+      }
+      function fileSafeName(value) {
+        return value.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9-]+/g,"-").replace(/^-|-$/g,"").toLocaleLowerCase("en");
+      }
+      function xmlEscape(value) {
+        return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
+      }
+      function makeStoredZip(files,mimeType) {
+        const encoder=new TextEncoder();
+        const crcTable=Uint32Array.from({length:256},(_,index) => {
+          let value=index;
+          for (let bit=0;bit<8;bit++) value=value&1?0xedb88320^(value>>>1):value>>>1;
+          return value>>>0;
+        });
+        function crc32(bytes) {
+          let crc=0xffffffff;
+          for (const byte of bytes) crc=crcTable[(crc^byte)&0xff]^(crc>>>8);
+          return (crc^0xffffffff)>>>0;
+        }
+        function zipRecord(size,signature) {
+          const bytes=new Uint8Array(size);
+          new DataView(bytes.buffer).setUint32(0,signature,true);
+          return bytes;
+        }
+        const localParts=[];
+        const directoryParts=[];
+        let offset=0;
+        for (const [name,content] of files) {
+          const nameBytes=encoder.encode(name);
+          const data=encoder.encode(content);
+          const crc=crc32(data);
+          const local=zipRecord(30,0x04034b50);
+          const localView=new DataView(local.buffer);
+          localView.setUint16(4,20,true);
+          localView.setUint16(6,0x0800,true);
+          localView.setUint16(8,0,true);
+          localView.setUint16(10,0,true);
+          localView.setUint16(12,0x0021,true);
+          localView.setUint32(14,crc,true);
+          localView.setUint32(18,data.length,true);
+          localView.setUint32(22,data.length,true);
+          localView.setUint16(26,nameBytes.length,true);
+          localParts.push(local,nameBytes,data);
+          const central=zipRecord(46,0x02014b50);
+          const centralView=new DataView(central.buffer);
+          centralView.setUint16(4,20,true);
+          centralView.setUint16(6,20,true);
+          centralView.setUint16(8,0x0800,true);
+          centralView.setUint16(10,0,true);
+          centralView.setUint16(12,0,true);
+          centralView.setUint16(14,0x0021,true);
+          centralView.setUint32(16,crc,true);
+          centralView.setUint32(20,data.length,true);
+          centralView.setUint32(24,data.length,true);
+          centralView.setUint16(28,nameBytes.length,true);
+          centralView.setUint32(42,offset,true);
+          directoryParts.push(central,nameBytes);
+          offset+=local.length+nameBytes.length+data.length;
+        }
+        const directorySize=directoryParts.reduce((total,part)=>total+part.length,0);
+        const end=zipRecord(22,0x06054b50);
+        const endView=new DataView(end.buffer);
+        endView.setUint16(8,files.length,true);
+        endView.setUint16(10,files.length,true);
+        endView.setUint32(12,directorySize,true);
+        endView.setUint32(16,offset,true);
+        return new Blob([...localParts,...directoryParts,end],{type:mimeType});
+      }
+      function downloadBlob(blob,filename) {
+        const url=URL.createObjectURL(blob);
+        const link=document.createElement("a");
+        link.href=url;
+        link.download=filename;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url),1000);
+      }
+      function downloadExcel() {
+        const rows=[exportHeaders(),...exportDataRows()];
+        const columnName=index => {
+          let name="";
+          for (let value=index+1;value;value=Math.floor((value-1)/26)) name=String.fromCharCode(65+(value-1)%26)+name;
+          return name;
+        };
+        const worksheetRows=rows.map((row,rowIndex) => `<row r="${rowIndex+1}">${row.map((value,columnIndex) => {
+          const reference=`${columnName(columnIndex)}${rowIndex+1}`;
+          return `<c r="${reference}" t="inlineStr"><is><t xml:space="preserve">${xmlEscape(value)}</t></is></c>`;
+        }).join("")}</row>`).join("");
+        const sheet=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="A1:${columnName(exportHeaders().length-1)}${rows.length}"/><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="18"/><sheetData>${worksheetRows}</sheetData><autoFilter ref="A1:${columnName(exportHeaders().length-1)}${rows.length}"/></worksheet>`;
+        const files=[
+          ["[Content_Types].xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'],
+          ["_rels/.rels",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+          ["xl/workbook.xml",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Bao cao tuan tuyen" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+          ["xl/_rels/workbook.xml.rels",'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'],
+          ["xl/worksheets/sheet1.xml",sheet]
+        ];
+        downloadBlob(makeStoredZip(files,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),`bao-cao-${selectedCategory==="Bảo dưỡng"?"bao-duong":"kiem-tra"}-tuan-tuyen-${picker.value}-tuan-${selectedWeekIndex+1}.xlsx`);
+        document.querySelector("#export-note").textContent=`Đã xuất Excel gồm ${rows.length-1} tuyến${selectedRouteKeys.size?" đã chọn":" đang hiển thị"}.`;
+      }
+      function downloadKmz() {
+        const routes=exportRoutes();
+        const hasCoordinates=routes.some(route => Array.isArray(route.coordinates)&&route.coordinates.length>=2);
+        const placemarks=routes.map(route => {
+          const fields=[
+            ["Loại công việc",route.category],["Team / Đội",route.team],
+            ["Nhân sự nhận việc",route.assignees?.join(", ")||""],
+            ["Cách tổng hợp kết quả",route.collectionMode==="multiple"?"Giao nhiều người":"Giao từng người"],
+            ["Tháng bắt đầu thực hiện",monthLabel(route.startMonth||monthValue(route.date))],
+            ["Nội dung",route.task],["Trạng thái",route.status],
+            ["Kết quả",route.combinedReport||route.result]
+          ];
+          const extendedData=fields.map(([name,value])=>`<Data name="${xmlEscape(name)}"><value>${xmlEscape(value)}</value></Data>`).join("");
+          const coordinates=(route.coordinates||[]).map(point => {
+            const values=Array.isArray(point)?point:[point.longitude,point.latitude,point.altitude||0];
+            const longitude=Number(values[0]),latitude=Number(values[1]),altitude=Number(values[2]||0);
+            return Number.isFinite(longitude)&&Number.isFinite(latitude)&&longitude>=-180&&longitude<=180&&latitude>=-90&&latitude<=90
+              ? `${longitude},${latitude},${Number.isFinite(altitude)?altitude:0}`
+              : "";
+          }).filter(Boolean);
+          const geometry=coordinates.length>=2?`<LineString><tessellate>1</tessellate><coordinates>${coordinates.join(" ")}</coordinates></LineString>`:"";
+          const description=fields.map(([name,value])=>`${name}: ${value}`).join("\n");
+          return `<Placemark><name>${xmlEscape(route.code)}</name><description>${xmlEscape(description)}</description><ExtendedData>${extendedData}</ExtendedData>${geometry}</Placemark>`;
+        }).join("");
+        const note=hasCoordinates?"":"Dữ liệu mẫu chưa có tọa độ tuyến; các tuyến được liệt kê nhưng chưa hiển thị hình học trên bản đồ.";
+        const kml=`<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>${xmlEscape(`Tuần ${selectedWeekIndex+1} · ${selectedCategory} · ${picker.value}`)}</name><description>${xmlEscape(note)}</description><Folder><name>${xmlEscape(selectedCategory)}</name>${placemarks}</Folder></Document></kml>`;
+        downloadBlob(makeStoredZip([["doc.kml",kml]],"application/vnd.google-earth.kmz"),`bao-cao-${selectedCategory==="Bảo dưỡng"?"bao-duong":"kiem-tra"}-tuan-tuyen-${picker.value}-tuan-${selectedWeekIndex+1}.kmz`);
+        document.querySelector("#export-note").textContent=hasCoordinates
+          ? `Đã xuất ${routes.length} tuyến${selectedRouteKeys.size?" đã chọn":" đang hiển thị"} sang KMZ.`
+          : `Đã xuất ${routes.length} tuyến${selectedRouteKeys.size?" đã chọn":" đang hiển thị"} sang KMZ. Dữ liệu mẫu chưa có tọa độ nên tệp liệt kê tuyến nhưng chưa vẽ được đường trên bản đồ.`;
+      }
+      function renderWorkResults(route) {
+        const section=document.querySelector("#work-results");
+        const entries=document.querySelector("#result-entry-list");
+        const report=document.querySelector("#combined-report");
+        const reportButton=document.querySelector("#generate-report");
+        entries.replaceChildren();
+        const assigned=route.assignees||[];
+        section.hidden=assigned.length===0||!route.resultEntries;
+        if (section.hidden) return;
+        const isMultiple=route.collectionMode==="multiple";
+        document.querySelector("#work-results-title").textContent=`Kết quả từ ${assigned.length} nhân sự`;
+        document.querySelector("#work-results-intro").textContent=isMultiple
+          ? "Mỗi người ghi và lưu kết quả riêng. Khi tất cả đã gửi, có thể ghép thành báo cáo hoàn chỉnh."
+          : "Nhân sự nhận việc ghi và lưu kết quả để điều phối viên kiểm tra.";
+        assigned.forEach((name,index) => {
+          const savedResult=route.resultEntries[name]||"";
+          const card=document.createElement("div");
+          card.className="result-entry";
+          const header=document.createElement("div");
+          header.className="result-entry-head";
+          const person=document.createElement("strong");
+          person.textContent=`Kết quả của ${name}`;
+          const state=document.createElement("span");
+          state.className=`result-entry-state${savedResult?" is-saved":""}`;
+          state.textContent=savedResult?"Đã lưu":"Chưa nhập";
+          const textarea=document.createElement("textarea");
+          textarea.dataset.resultIndex=String(index);
+          textarea.setAttribute("aria-label",`Kết quả công việc của ${name}`);
+          textarea.maxLength=1200;
+          textarea.placeholder=`${name} ghi kết quả phần việc đã thực hiện`;
+          textarea.value=savedResult;
+          const save=document.createElement("button");
+          save.type="button";
+          save.className="save-result";
+          save.dataset.saveResult=String(index);
+          save.textContent=savedResult?"Lưu cập nhật":"Lưu kết quả";
+          header.append(person,state);
+          card.append(header,textarea,save);
+          entries.append(card);
+        });
+        const hasAllResults=assigned.every(name => Boolean(route.resultEntries[name]?.trim()));
+        reportButton.hidden=!isMultiple;
+        reportButton.disabled=!isMultiple||!hasAllResults;
+        reportButton.textContent=route.combinedReport?"Tạo lại báo cáo hoàn chỉnh":"Tạo báo cáo hoàn chỉnh";
+        report.hidden=!route.combinedReport;
+        document.querySelector("#combined-report-content").textContent=route.combinedReport||"";
+      }
+      function refreshRouteDetails(route) {
+        document.querySelectorAll("#detail-list dt").forEach(term => {
+          const description=term.nextElementSibling;
+          if (term.textContent==="Trạng thái") description.textContent=route.status;
+          if (term.textContent==="Kết quả") description.textContent=route.combinedReport||route.result;
+        });
+      }
+      function createCombinedReport(route) {
+        const startMonth=route.startMonth?monthLabel(route.startMonth):dateLabel(route.date,{month:"long",year:"numeric"});
+        return [
+          "BÁO CÁO TỔNG HỢP TUYẾN",
+          `Tuyến: ${route.code}`,
+          `Loại công việc: ${route.category}`,
+          `Team / Đội: ${route.team}`,
+          `Tháng bắt đầu thực hiện: ${startMonth}`,
+          `Nội dung giao việc: ${route.task}`,
+          "",
+          ...route.assignees.flatMap((name,index) => [`${index+1}. Kết quả của ${name}`,route.resultEntries[name],""]),
+          `Tổng hợp từ kết quả của ${route.assignees.length} nhân sự.`
+        ].join("\n");
+      }
+      function showDetails(route) {
+        document.querySelector("#dialog-title").textContent = route.code;
+        const details = [
+          ["Loại công việc",route.category],
+          ["Team / Đội",route.team],
+          ...(route.assignees?.length?[["Nhân sự nhận việc",route.assignees.join(", ")]]:[]),
+        ...(route.assignees?.length?[["Cách tổng hợp kết quả",route.collectionMode==="multiple"?"Giao nhiều người":"Giao từng người"]]:[]),
+        ["Tháng bắt đầu thực hiện",monthLabel(route.startMonth||monthValue(route.date))],
+          ["Nội dung",route.task],
+          ["Phụ trách",route.owner],
+          ["Cập nhật",route.update],
+          ["Trạng thái",route.status],
+          ["Kết quả",route.combinedReport||route.result],
+          ["Chiều dài tuyến",route.distance]
+        ];
+        const list = document.querySelector("#detail-list");
+        list.replaceChildren();
+        details.forEach(([label,value]) => {
+          const term = document.createElement("dt");
+          const description = document.createElement("dd");
+          term.textContent = label;
+          description.textContent = value;
+          list.append(term,description);
+        });
+        renderWorkResults(route);
+        routeDialog.showModal();
+      }
+      picker.addEventListener("change",() => { selectedDay=""; selectedRouteKeys.clear(); render(); });
+      document.querySelector("#previous-month").addEventListener("click",() => moveMonth(-1));
+      document.querySelector("#next-month").addEventListener("click",() => moveMonth(1));
+      monthWeeks.addEventListener("click",event => {
+        const button=event.target.closest("[data-week-index]");
+        if (!button) return;
+        selectedWeekIndex=Number(button.dataset.weekIndex);
+        selectedDay="";
+        selectedRouteKeys.clear();
+        render();
+      });
+      document.querySelector(".report-types").addEventListener("click",event => {
+        const button=event.target.closest("[data-category]");
+        if (!button) return;
+        selectedCategory=button.dataset.category;
+        selectedDay="";
+        selectedRouteKeys.clear();
+        render();
+      });
+      document.querySelector(".report-types").addEventListener("keydown",event => {
+        const tabs=[...document.querySelectorAll(".report-type")];
+        const index=tabs.indexOf(event.target);
+        const nextIndex=event.key==="ArrowRight"?(index+1)%tabs.length:event.key==="ArrowLeft"?(index+tabs.length-1)%tabs.length:event.key==="Home"?0:event.key==="End"?tabs.length-1:-1;
+        if (nextIndex<0) return;
+        event.preventDefault();
+        tabs[nextIndex].focus();
+        tabs[nextIndex].click();
+      });
+      weekStrip.addEventListener("click",event => {
+        const button = event.target.closest("[data-day]");
+        if (!button) return;
+        selectedDay = selectedDay===button.dataset.day ? "" : button.dataset.day;
+        render();
+      });
+      document.querySelector("#filters").addEventListener("input",render);
+      document.querySelector("#filters").addEventListener("change",render);
+      document.querySelector("#clear-filters").addEventListener("click",() => {
+        teamFilter.value="";
+        statusFilter.value="";
+        searchInput.value="";
+        selectedDay="";
+        render();
+      });
+      document.querySelector("#export-excel").addEventListener("click",downloadExcel);
+      document.querySelector("#export-kmz").addEventListener("click",downloadKmz);
+      document.querySelector("#export-csv").addEventListener("click",() => {
+        const csv = [exportHeaders(),...exportDataRows()]
+          .map(row => row.map(formatCsv).join(",")).join("\r\n");
+        const url = URL.createObjectURL(new Blob(["\uFEFF",csv],{type:"text/csv;charset=utf-8"}));
+        const link = document.createElement("a");
+        link.href=url;
+        link.download=`bao-cao-${selectedCategory==="Bảo dưỡng"?"bao-duong":"kiem-tra"}-tuan-tuyen-${picker.value}-tuan-${selectedWeekIndex+1}.csv`;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url),1000);
+        document.querySelector("#export-note").textContent=`Đã xuất CSV gồm ${exportDataRows().length} tuyến${selectedRouteKeys.size?" đã chọn":" đang hiển thị"}.`;
+      });
+      document.querySelector("#close-dialog").addEventListener("click",() => routeDialog.close());
+      document.querySelector("#done-dialog").addEventListener("click",() => routeDialog.close());
+      routeDialog.addEventListener("click",event => { if (event.target===routeDialog) routeDialog.close(); });
+      const resultEntryList=document.querySelector("#result-entry-list");
+      routeRows.addEventListener("change",event => {
+        const checkbox=event.target.closest("[data-select-route]");
+        if (!checkbox) return;
+        if (checkbox.checked) selectedRouteKeys.add(checkbox.dataset.selectRoute);
+        else selectedRouteKeys.delete(checkbox.dataset.selectRoute);
+        checkbox.closest("tr").classList.toggle("is-selected",checkbox.checked);
+        updateSelectionUI(visibleRoutes(currentWeekRoutes()));
+      });
+      document.querySelector("#select-visible-routes").addEventListener("change",event => {
+        const visible=visibleRoutes(currentWeekRoutes());
+        visible.forEach(route => {
+          const key=routeSelectionKey(route);
+          if (event.target.checked) selectedRouteKeys.add(key);
+          else selectedRouteKeys.delete(key);
+        });
+        renderRows(currentWeekRoutes());
+      });
+      document.querySelector("#clear-selection").addEventListener("click",() => {
+        selectedRouteKeys.clear();
+        renderRows(currentWeekRoutes());
+      });
+      document.querySelector("#route-rows").addEventListener("click",event => {
+        const button = event.target.closest("[data-route-code]");
+        if (!button) return;
+        activeRoute = categoryRoutes(monthWeekStarts(picker.value)[selectedWeekIndex]).find(item => item.code===button.dataset.routeCode);
+        if (activeRoute) showDetails(activeRoute);
+      });
+      resultEntryList.addEventListener("click",event => {
+        const button=event.target.closest("[data-save-result]");
+        if (!button||!activeRoute) return;
+        const index=Number(button.dataset.saveResult);
+        const name=activeRoute.assignees[index];
+        const textarea=resultEntryList.querySelector(`[data-result-index="${index}"]`);
+        const result=textarea.value.trim();
+        if (!result) {
+          textarea.setCustomValidity("Nhập kết quả công việc trước khi lưu.");
+          textarea.reportValidity();
+          return;
+        }
+        textarea.setCustomValidity("");
+        activeRoute.resultEntries[name]=result;
+        activeRoute.combinedReport="";
+        const savedCount=activeRoute.assignees.filter(person => Boolean(activeRoute.resultEntries[person]?.trim())).length;
+        const isMultiple=activeRoute.collectionMode==="multiple";
+        activeRoute.result=isMultiple
+          ? `Đã nhận ${savedCount}/${activeRoute.assignees.length} kết quả; đang chờ nhân sự còn lại.`
+          : result;
+        activeRoute.status=savedCount===activeRoute.assignees.length?"Chờ xác nhận":"Đang thực hiện";
+        renderWorkResults(activeRoute);
+        refreshRouteDetails(activeRoute);
+        render();
+      });
+      document.querySelector("#generate-report").addEventListener("click",() => {
+        if (!activeRoute||activeRoute.collectionMode!=="multiple"||!activeRoute.assignees.every(name => Boolean(activeRoute.resultEntries?.[name]?.trim()))) return;
+        activeRoute.combinedReport=createCombinedReport(activeRoute);
+        activeRoute.result=activeRoute.combinedReport;
+        renderWorkResults(activeRoute);
+        refreshRouteDetails(activeRoute);
+        render();
+      });
+      document.querySelector("#download-report").addEventListener("click",() => {
+        if (!activeRoute?.combinedReport) return;
+        const url=URL.createObjectURL(new Blob([activeRoute.combinedReport],{type:"text/plain;charset=utf-8"}));
+        const link=document.createElement("a");
+        link.href=url;
+        link.download=`bao-cao-tuyen-${activeRoute.code}.txt`;
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(url),1000);
+      });
+      const createDialog=document.querySelector("#create-dialog");
+      const createTeam=document.querySelector("#create-team");
+      document.querySelector("#open-create-dialog").addEventListener("click",openCreateDialog);
+      document.querySelector("#close-create-dialog").addEventListener("click",() => createDialog.close());
+      document.querySelector("#cancel-create").addEventListener("click",() => createDialog.close());
+      createDialog.addEventListener("click",event => { if (event.target===createDialog) createDialog.close(); });
+      document.querySelector("#create-start-month").addEventListener("input",event => event.target.setCustomValidity(""));
+      createTeam.addEventListener("change",() => renderPersonnelList(createTeam.value));
+      const collectionMode=document.querySelector("#create-collection-mode");
+      const personnelMenu=document.querySelector("#personnel-list");
+      const personnelPicker=document.querySelector("#personnel-picker");
+      const personnelTrigger=document.querySelector("#personnel-trigger");
+      function closePersonnelMenu() {
+        personnelMenu.hidden=true;
+        personnelTrigger.setAttribute("aria-expanded","false");
+      }
+      personnelTrigger.addEventListener("click",() => {
+        const open=personnelMenu.hidden;
+        personnelMenu.hidden=!open;
+        personnelTrigger.setAttribute("aria-expanded",String(open));
+        if (open) personnelMenu.querySelector('input[name="assignees"]:not(:disabled)')?.focus();
+      });
+      personnelMenu.addEventListener("change",event => {
+        if (event.target.matches('input[name="assignees"]')) {
+          updatePersonnelSelection();
+          if (collectionMode.value==="single"&&event.target.checked) closePersonnelMenu();
+        }
+      });
+      collectionMode.addEventListener("change",() => {
+        if (collectionMode.value==="single") {
+          const selected=[...personnelMenu.querySelectorAll('input[name="assignees"]:checked')];
+          selected.slice(1).forEach(person => { person.checked=false; });
+        }
+        updatePersonnelSelection();
+      });
+      createDialog.addEventListener("click",event => {
+        if (!personnelPicker.contains(event.target)) closePersonnelMenu();
+      });
+      createDialog.addEventListener("keydown",event => {
+        if (event.key==="Escape"&&!personnelMenu.hidden) {
+          event.preventDefault();
+          closePersonnelMenu();
+          personnelTrigger.focus();
+        }
+      });
+      document.querySelector("#create-route-form").addEventListener("submit",event => {
+        event.preventDefault();
+        const code=document.querySelector("#create-code").value.trim();
+        const team=document.querySelector("#create-team").value;
+        const task=document.querySelector("#create-task").value.trim();
+        const category=document.querySelector("#create-category").value;
+        const startMonth=document.querySelector("#create-start-month").value;
+        const assignmentMode=collectionMode.value;
+        if (!code||!team||!task||!startMonth) return;
+        const assignees=[...document.querySelectorAll('#personnel-list input[name="assignees"]:checked')].map(input => input.value);
+        const validAssigneeCount=assignmentMode==="single"?assignees.length===1:assignees.length>=2;
+        if (!validAssigneeCount) {
+          const selectionMessage=assignmentMode==="single"
+            ? "Vui lòng chọn một nhân sự nhận tuyến."
+            : "Vui lòng chọn ít nhất hai nhân sự để tổng hợp kết quả.";
+          document.querySelector("#personnel-selection").textContent=selectionMessage;
+          personnelTrigger.setAttribute("aria-invalid","true");
+          personnelTrigger.focus();
+          if (personnelMenu.hidden) personnelTrigger.click();
+          return;
+        }
+        createTeam.setCustomValidity("");
+        const monday=monthWeekStarts(picker.value)[selectedWeekIndex];
+        const sunday=new Date(monday);
+        sunday.setUTCDate(monday.getUTCDate()+6);
+        const today=new Date();
+        const todayUtc=new Date(Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()));
+        const date=new Date(todayUtc>=monday&&todayUtc<=sunday?todayUtc:monday);
+        createdRoutes.push({
+          code,team,task,category,date,startMonth,assignees,collectionMode:assignmentMode,resultEntries:{},combinedReport:"",status:"Đang thực hiện",owner:assignees.join(", "),update:"Vừa tạo",
+          result:"Công việc vừa được giao; chưa có kết quả từ nhân sự.",distance:"—"
+        });
+        selectedCategory=category;
+        selectedRouteKeys.clear();
+        teamFilter.value="";
+        statusFilter.value="";
+        searchInput.value="";
+        selectedDay="";
+        render();
+        document.querySelector("#list-caption").textContent=`Đã thêm tuyến ${code} vào danh sách ${category.toLocaleLowerCase("vi")} trong bản xem trước.`;
+        createDialog.close();
+      });
+
+      (() => {
+        const sidebar = document.querySelector(".sidebar");
+        const nav = sidebar.querySelector(".nav");
+        const compactNavigation = window.matchMedia("(max-width:850px)");
+        const brand = sidebar.querySelector(".brand");
+        const toggle = document.createElement("button");
+        toggle.className="sidebar-toggle";
+        toggle.type="button";
+        toggle.setAttribute("aria-pressed","false");
+        toggle.setAttribute("aria-label","Thu gọn menu");
+        toggle.title="Thu gọn menu";
+        toggle.innerHTML='<span aria-hidden="true">‹</span>';
+        brand.insertAdjacentElement("afterend",toggle);
+        function setCollapsed(collapsed,persist=true) {
+          const value=!compactNavigation.matches&&collapsed;
+          sidebar.classList.toggle("is-collapsed",value);
+          toggle.setAttribute("aria-pressed",String(value));
+          toggle.setAttribute("aria-label",value?"Mở rộng menu":"Thu gọn menu");
+          toggle.title=value?"Mở rộng menu":"Thu gọn menu";
+          if (persist) {
+            try { localStorage.setItem("hp-sidebar-collapsed",String(value)); }
+            catch (error) { console.warn("Không lưu được tùy chọn thu gọn menu.",error); }
+          }
+        }
+        try { setCollapsed(localStorage.getItem("hp-sidebar-collapsed")==="true",false); }
+        catch (error) { console.warn("Không đọc được tùy chọn thu gọn menu.",error); }
+        toggle.addEventListener("click",() => setCollapsed(!sidebar.classList.contains("is-collapsed")));
+        compactNavigation.addEventListener("change",event => { if (event.matches) setCollapsed(false); });
+        nav.querySelectorAll("[data-nav-toggle]").forEach(button => {
+          const group=button.closest(".nav-group");
+          const submenu=document.getElementById(button.getAttribute("aria-controls"));
+          group.classList.toggle("has-current",Boolean(submenu.querySelector('[aria-current="page"]')));
+          function setOpen(open) {
+            button.setAttribute("aria-expanded",String(open));
+            button.setAttribute("aria-label",`${open?"Đóng":"Mở"} thư mục ${submenu.dataset.label}`);
+            submenu.hidden=!open;
+            group.classList.toggle("is-open",open);
+          }
+          button.addEventListener("pointerenter",event => { if (event.pointerType==="mouse"&&!group.dataset.pinned) setOpen(true); });
+          group.addEventListener("pointerleave",event => { if (event.pointerType==="mouse"&&!group.dataset.pinned&&!group.contains(document.activeElement)) setOpen(false); });
+          group.addEventListener("focusin",() => setOpen(true));
+          group.addEventListener("focusout",event => { if (!group.contains(event.relatedTarget)&&!group.dataset.pinned) setOpen(false); });
+          button.addEventListener("click",() => {
+            if (group.dataset.pinned==="true") { delete group.dataset.pinned; setOpen(false); }
+            else { group.dataset.pinned="true"; setOpen(true); }
+          });
+          group.addEventListener("keydown",event => {
+            if (event.key==="Escape"&&group.classList.contains("is-open")) {
+              delete group.dataset.pinned;
+              setOpen(false);
+              button.focus();
+            }
+          });
+        });
+      })();
+      render();
+    </script>
+  </body>
+</html>
