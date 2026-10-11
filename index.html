@@ -593,6 +593,57 @@
         }
       }
     </style>
+    <style id="noc-dark-theme">
+      :root {
+        color-scheme: dark;
+        --bg: #1e2a38; --bg-2: #1e2a38;
+        --surface: #26364a; --surface-strong: #2d3f55;
+        --text: #f3f6fa; --muted: #b8c5d3;
+        --primary: #5cc7d1; --primary-2: #86dae1; --soft: #d3dde7;
+        --line: #3d516a; --success: #6ad39a;
+        --shadow: 0 12px 30px rgba(0, 0, 0, .3);
+      }
+      body { background: #1e2a38; color: var(--text); }
+      .topbar { background: #26364a; border-radius: 14px; backdrop-filter: none; }
+      .lang-switcher { background: #1a2431; border-color: #4c627c; }
+      .globe { box-shadow: none; }
+      .lang-btn.active { background: #38506b; color: #fff; }
+      .primary-btn { background: #5cc7d1; color: #0b2328; box-shadow: none; border-radius: 8px; }
+      .primary-btn:hover { background: #86dae1; }
+      .secondary-btn, .ghost-btn { background: transparent; color: #f3f6fa; border: 1px solid #4c627c; border-radius: 8px; }
+      .secondary-btn:hover, .ghost-btn:hover { background: #38506b; border-color: #637b97; }
+      .eyebrow-row { background: #2d3f55; border-color: #4c627c; color: #d3dde7; border-radius: 6px; }
+      .eyebrow-dot { background: #5cc7d1; }
+      .hero-copy h1, .card-head h2, .section-heading h2, .cta-card h2 { letter-spacing: -0.04em; }
+      .metrics strong, .small-box strong, .feature-card h3 { letter-spacing: -0.03em; }
+      .panel-card { background: #26364a; border-radius: 14px; box-shadow: 0 20px 44px rgba(0, 0, 0, .35); }
+      .pill { border-radius: 6px; }
+      .pill.success { background: #1f4a35; border: 1px solid #3f8a62; color: #6ad39a; }
+      .chart-box { background: #1a2431; border-radius: 10px; }
+      .chart-line { background: #1e2a38; border-radius: 8px; }
+      .chart-line::before { border-color: #5cc7d1; border-left-color: transparent; border-bottom-color: transparent; }
+      .task-item { background: #2d3f55; border-radius: 10px; }
+      .task-icon.blue { background: #3b5a7a; }
+      .task-icon.cyan { background: #1d6670; }
+      .floating-box { background: #2d3f55; border-radius: 10px; box-shadow: 0 12px 30px rgba(0, 0, 0, .35); }
+      .mini-chart { background: #1a2431; }
+      .mini-chart span { background: #5cc7d1; }
+      .trust-badges { background: #26364a; border-radius: 10px; }
+      .trust-badges span { background: #2d3f55; color: #d3dde7; border-radius: 8px; }
+      .eyebrow { color: #5cc7d1; }
+      .feature-card, .workflow-step { background: #26364a; border-radius: 10px; box-shadow: none; }
+      .feature-card.highlight { background: #2d3f55; }
+      .icon-wrap { border-radius: 10px; }
+      .icon-wrap.cyan, .icon-wrap.blue { background: #1d4a52; color: #a9eaf0; }
+      .icon-wrap.gold { background: #4a3a17; color: #f0b955; }
+      .workflow-step span { background: #1d4a52; color: #a9eaf0; border-radius: 8px; }
+      .cta-card { background: #2d3f55; border: 1px solid #4c627c; border-radius: 14px; box-shadow: none; }
+      .eyebrow.light { color: #86dae1; }
+      .secondary-btn.light { background: transparent; border: 1px solid #637b97; color: #f3f6fa; }
+      .secondary-btn.light:hover { background: #38506b; }
+      .primary-btn:focus-visible, .secondary-btn:focus-visible, .ghost-btn:focus-visible, .lang-btn:focus-visible, .nav a:focus-visible { outline: 3px solid rgba(92, 199, 209, .5); outline-offset: 2px; }
+    </style>
+      <meta name="hp-ui-release" content="github-d-20261012" />
   </head>
   <body>
     <div class="page-shell">
@@ -614,7 +665,7 @@
           <a href="#product" data-i18n="navPlatform">Nền tảng</a>
           <a href="#features" data-i18n="navSolution">Giải pháp</a>
           <a href="#workflow" data-i18n="navWorkflow">Quy trình</a>
-          <a href="/nhom/">Team/Đội</a>
+          <a href="/staging/nhom/">Team/Đội</a>
           <a href="#contact" data-i18n="navContact">Liên hệ</a>
         </nav>
 
@@ -625,7 +676,7 @@
             <button class="lang-btn" type="button" data-lang="en">EN</button>
             <button class="lang-btn" type="button" data-lang="zh">CN</button>
           </div>
-          <a class="ghost-btn" href="/dangnhap/" data-i18n="loginBtn">Đăng nhập</a>
+          <a class="ghost-btn" href="/staging/dangnhap" data-i18n="loginBtn">Đăng nhập</a>
           <button class="primary-btn" type="button" data-i18n="demoBtn">Yêu cầu demo</button>
         </div>
       </header>
@@ -805,6 +856,6 @@
       </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=github-d-20261012-r2"></script>
   </body>
 </html>

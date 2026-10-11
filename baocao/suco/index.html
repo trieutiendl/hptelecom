@@ -115,7 +115,95 @@
       .photo-card a{display:flex;min-height:185px;max-height:290px;align-items:center;justify-content:center;background:#102a3e}.photo-card img{display:block;width:100%;height:100%;max-height:290px;object-fit:contain}.photo-card figcaption{padding:8px 10px;color:var(--muted);font-size:10px;line-height:1.45}
       @media(max-width:480px){.photo-grid{grid-template-columns:1fr}.photo-card a{min-height:160px}}
     </style>
-    <link rel="stylesheet" href="../../server-theme.css" />
+    <link rel="stylesheet" href="../../server-theme.css?v=github-d-20261012-r2" />
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;--canvas:#1e2a38;--bg:#1e2a38;--panel:#26364a;--panel-2:#2d3f55;--surface:#26364a;--field:#1a2431;--ink:#f3f6fa;--text:#f3f6fa;--muted:#b8c5d3;--line:#3d516a;--line-2:#4c627c;--cyan:#5cc7d1;--teal:#5cc7d1;--blue:#5cc7d1;--focus:rgba(92,199,209,.5);--green:#6ad39a;--amber:#f0b955;--red:#ff8078}
+      body{background:var(--canvas);color:var(--ink)}
+      ::selection{background:#3b8f98;color:#fff}
+      .skip-link{background:#5cc7d1;color:#0b2328}
+      .sidebar{background:#17212d;border-color:var(--line);box-shadow:none;color:#d3dde7}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{background:#17212d;border-color:var(--line);box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar .nav-label,.sidebar .version,.sidebar .nav-coming-soon,.nav-group-chevron,.nav-standalone:before,.sidebar.is-collapsed .nav-children:before{color:#a3b2c1;border-color:var(--line)}
+      .nav a,.sidebar .nav .nav-group-trigger,.sidebar .nav .nav-link,.sidebar .nav .nav-child-link{color:#d3dde7}
+      .sidebar .nav .nav-child-disabled{color:#94a3b3}
+      .nav a:hover,.sidebar .nav .nav-group-trigger:hover,.sidebar .nav .nav-group-trigger[aria-expanded=true],.sidebar .nav .nav-link:hover,.sidebar .nav .nav-child-link:hover{border-color:var(--line);background:#233245;color:#fff}
+      .nav a[aria-current=page],.sidebar .nav .nav-group.has-current>.nav-group-trigger,.sidebar .nav .nav-link[aria-current=page],.sidebar .nav .nav-child-link[aria-current=page]{border-color:var(--line-2);background:#2b4058;color:#fff;box-shadow:inset 2px 0 var(--cyan)}
+      .nav-icon{border-color:var(--line);background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:var(--line)}
+      .sidebar-toggle,.sidebar .sidebar-toggle{border-color:var(--line);background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:var(--line-2);background:#2b4058;color:#fff}
+      .sidebar-bottom,.nav-standalone{border-top-color:var(--line)}
+      .connection-state,.sidebar .connection-state{color:#c3cfdb}
+      .connection-state::before{background:var(--green)}
+      .sidebar.is-collapsed .brand:after{color:#f3f6fa}
+      .sidebar :focus-visible,.topbar :focus-visible,.filter-panel :focus-visible,.report-nav :focus-visible,.table-wrap :focus-visible,.dialog-inner :focus-visible,:focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+
+      .topbar{background:var(--canvas);border-color:var(--line);box-shadow:none}
+      .topbar-title,.top-link,.support-link,.admin-role{color:var(--muted)}
+      .admin,.admin-name{border-left-color:var(--line);color:var(--ink)}
+      .avatar{border:1px solid #3f8e97;background:#1d4a52;color:#9be6ee;border-radius:10px}
+      h1,.list-title,.dialog-heading h2,.edit-photo-heading,.detail-images-title{color:var(--ink)}
+      .page-description,.breadcrumb,.list-count,.empty-state,.record-summary,.record-muted,.export-status,.selection-hint{color:var(--muted)}
+      .demo-badge,.preview-label{border-color:#8a6a26;border-radius:6px;background:#4a3a17;color:var(--amber)}
+      .demo-badge::before{background:var(--amber);border-radius:2px}
+
+      .report-nav{border-color:var(--line);border-radius:10px;background:var(--panel);box-shadow:none}
+      .report-tab{color:var(--muted)}
+      .report-tab:hover{background:#2f4259;color:#fff}
+      .report-tab[aria-current=page]{border-color:transparent;border-bottom-color:var(--cyan);background:var(--panel);color:var(--cyan)}
+      .tab-count{border-radius:6px;background:#1f2d3d;color:#c3cfdb}
+      .preview-notice,.notice{border-color:#8a6a26;border-radius:10px;background:#4a3a17;color:#f6dca0}
+      .notice-symbol{border-color:var(--amber);color:var(--amber)}
+      .filter-panel,.list-toolbar,.table-wrap,.selection-hint{border-color:var(--line);background:var(--panel);box-shadow:none;color:var(--ink)}
+      .filter-panel{border-radius:10px}
+      .list-toolbar{border-radius:10px 10px 0 0}
+      .table-wrap{border-radius:0 0 10px 10px}
+      .selection-count{color:var(--ink)}
+      .clear-selection{color:var(--cyan)}
+      .selection-checkbox,.route-select{accent-color:var(--cyan)}
+      .field label,.edit-field,label{color:#d3dde7}
+      .field select,.field input,.field textarea,.edit-field input,.edit-field select,.edit-field textarea,.edit-photo-card input[type=text],input,select,textarea{border-color:var(--line-2);border-radius:8px;background:var(--field);color:var(--ink)}
+      .field input::placeholder,input::placeholder,textarea::placeholder{color:#94a3b3}
+      .field select:focus-visible,.field input:focus-visible,.edit-field input:focus-visible,.edit-field select:focus-visible,.edit-field textarea:focus-visible{border-color:var(--cyan);outline:3px solid rgba(92,199,209,.4);outline-offset:0}
+      select option{background:var(--field);color:var(--ink)}
+      .action-button,.edit-actions button[type=submit],.primary-button{border-color:var(--cyan);border-radius:8px;background:var(--cyan);color:#0b2328;font-weight:800}
+      .action-button:hover,.edit-actions button[type=submit]:hover{border-color:#86dae1;background:#86dae1;color:#0b2328;transform:none}
+      .export-button,.edit-actions button,.dialog-close{border-color:var(--line-2);border-radius:8px;background:transparent;color:#dbe4ed}
+      .export-button:hover,.edit-actions button:hover,.dialog-close:hover{border-color:#637b97;background:#38506b;color:#fff}
+      .edit-actions button[aria-label="Xóa vĩnh viễn"],.detail-actions .delete-report-button{border-color:#b3413f;background:#b3413f;color:#fff}
+      .edit-actions button[aria-label="Xóa vĩnh viễn"]:hover,.detail-actions .delete-report-button:hover{border-color:#c9514e;background:#c9514e;color:#fff}
+      .edit-error,.delete-error{color:var(--red)!important}
+      .delete-confirm p{color:var(--ink)}.delete-warning{color:var(--muted)!important}
+
+      th,table th{background:#1f2d3d;color:#b8c5d3}
+      td,table td{border-color:var(--line);color:#dbe4ed}
+      tbody tr:nth-child(even){background:#2a3b50}
+      tbody tr:hover,tbody tr:nth-child(even):hover{background:#2f4259;color:#fff}
+      tbody tr.is-selected,tbody tr.is-selected:hover{background:#25525a}
+      td.sequence-cell,.record-code,.text-link{color:var(--cyan)}
+      .record-link:hover .record-code{color:#86dae1}
+      .record-code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+      .row-open{border-color:var(--line-2);border-radius:8px;color:var(--cyan)}
+      .record-photo-count{border-color:#3f7a82;border-radius:6px;background:#1d4a52;color:#a9eaf0}
+
+      dialog{border:1px solid var(--line-2);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:0 28px 80px rgba(0,0,0,.5)}
+      dialog::backdrop{background:rgba(10,16,24,.6)}
+      .dialog-heading,.dialog-heading h2,.edit-photo-fields{border-color:var(--line)}
+      .details-list dt,.details-list dd{border-color:var(--line)}
+      .details-list dt,.edit-photo-note,.edit-photo-filename,.photo-card figcaption,.edit-photo-card label{color:var(--muted)}
+      .details-list dd{color:var(--ink)}
+      .photo-group-title,.edit-photo-group-title{color:#d3dde7}
+      .photo-card,.edit-photo-card{border-color:var(--line);background:var(--panel-2)}
+      .photo-card a,.photo-card img,.edit-photo-card img{background:#141d28}
+      .edit-photo-card input[type=file]{color:var(--ink)}
+      .edit-photo-adder{border-style:dashed;border-color:var(--accent);color:var(--ink);font-weight:800}
+      @media(max-width:850px){.sidebar,.sidebar.is-collapsed{background:#17212d;border-color:var(--line)}}
+      @media(max-width:720px){.sidebar{border-bottom-color:var(--line)}tbody tr{border-top-color:var(--line)}}
+    </style>
+      <style>[data-admin-only][hidden] { display: none !important; }</style>
+    <script src="/staging/staging-access.js?v=github-d-20261012-r2" defer></script>
+      <meta name="hp-ui-release" content="github-d-20261012" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
@@ -163,7 +251,7 @@
         </div>
         <div class="nav-standalone">
           <a class="nav-link" href="../../thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
-          <a class="nav-link" href="../../nguoidung/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
+          <a class="nav-link" href="../../nguoidung/" data-admin-only hidden><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
         </div>
       </nav>
       <div class="sidebar-bottom"><div class="connection-state">Bản xem trước độc lập</div><p class="version">HP Telecom · Giao diện demo</p></div>
@@ -307,8 +395,8 @@
       const editTeam=document.querySelector('#edit-form [name="team"]');
       rows.forEach(row=>{row.dataset.team=normalizeTeam(row.dataset.team);row.querySelector('[data-label="Team / Đội"]').textContent=row.dataset.team});
       const selectedReportKeys=new Set();
-      const editStorageKey="hptelecom-report-edits-suco-v1";
-      const deleteStorageKey="hptelecom-report-deleted-suco-v1";
+      const editStorageKey="hptelecom-staging-report-edits-suco-v1";
+      const deleteStorageKey="hptelecom-staging-report-deleted-suco-v1";
       rows.forEach((row,index)=>{row.dataset.editId=`suco-${index+1}`});
       const toReceivedAt=row=>{const match=row.dataset.date.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:\s*·\s*(\d{2}):(\d{2}))?$/);if(!match)throw new Error(`Ngày tiếp nhận không hợp lệ: ${row.dataset.date}`);return Date.UTC(Number(match[3]),Number(match[2])-1,Number(match[1]),Number(match[4]||0),Number(match[5]||0))};
       const sortRows=()=>rows.sort((a,b)=>toReceivedAt(a)-toReceivedAt(b)).forEach((row,index)=>{row.querySelector("[data-sequence]").textContent=String(index+1);row.dataset.selectionKey=row.querySelector(".record-code").textContent.trim();row.parentElement.append(row)});
@@ -403,7 +491,7 @@
       const photoUrls=new Map(),temporaryPhotoUrls=new Set(),pendingPhotoFiles=new Map();
       const photoDatabasePromise=new Promise((resolve,reject)=>{
         if(!("indexedDB" in window)){reject(new Error("Trình duyệt không hỗ trợ lưu ảnh cục bộ."));return}
-        const request=indexedDB.open("hptelecom-report-photos-suco-v1",1);
+        const request=indexedDB.open("hptelecom-staging-report-photos-suco-v1",1);
         request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains("photos"))request.result.createObjectStore("photos",{keyPath:"key"})};
         request.onsuccess=()=>resolve(request.result);
         request.onerror=()=>reject(request.error||new Error("Không mở được kho ảnh trên trình duyệt."));
@@ -453,7 +541,7 @@
         note.className="edit-photo-note";note.textContent="Chọn ảnh để thay ảnh cũ, sửa chú thích hoặc thêm nhiều ảnh. Mỗi ảnh tối đa 10 MB; số lượng tùy dung lượng trình duyệt. Thay đổi chỉ lưu trong trình duyệt này.";
         editPhotoFields.append(editPhotoHeading,note);
         const groupGrids=[];
-        const appendPhotoCard=(grid,photo,groupIndex,photoIndex)=>{
+        const appendPhotoCard=(grid,photo,groupIndex,photoIndex,before=null)=>{
           const card=document.createElement("div"),image=document.createElement("img"),captionLabel=document.createElement("label"),captionInput=document.createElement("input"),fileLabel=document.createElement("label"),fileInput=document.createElement("input"),filename=document.createElement("span");
           card.className="edit-photo-card";image.alt=photo.caption;image.src=resolvedPhotoSrc(photo.src);
           captionLabel.textContent="Chú thích";captionInput.type="text";captionInput.value=photo.caption;captionInput.maxLength=200;captionInput.required=true;captionInput.dataset.photoCaption="";captionInput.dataset.groupIndex=String(groupIndex);captionInput.dataset.photoIndex=String(photoIndex);
@@ -468,38 +556,39 @@
             const previewUrl=URL.createObjectURL(file);temporaryPhotoUrls.add(previewUrl);pendingPhotoFiles.set(slot,{file,url:previewUrl,isNew:Boolean(previous?.isNew)});
             image.src=previewUrl;filename.textContent=file.name;editError.hidden=true;
           });
-          captionLabel.append(captionInput);card.append(image,captionLabel,fileLabel);grid.append(card);
+          captionLabel.append(captionInput);card.append(image,captionLabel,fileLabel);grid.insertBefore(card,before);
         };
+                  const addedCounts=new Map();
+                  const attachAdder=(grid,groupIndex,startIndex,groupTitle)=>{
+                    const label=document.createElement("label"),input=document.createElement("input"),hint=document.createElement("span");
+                    label.className="edit-photo-card edit-photo-adder";label.append(document.createTextNode(`+ Thêm ảnh vào mục "${groupTitle}"`));
+                    input.type="file";input.accept="image/*";input.multiple=true;input.setAttribute("aria-label",`Thêm ảnh vào mục ${groupTitle}`);
+                    hint.className="edit-photo-filename";hint.textContent="Có thể chọn nhiều tệp cùng lúc";label.append(input,hint);grid.append(label);
+                    input.addEventListener("change",()=>{
+                      let added=0;
+                      [...input.files||[]].forEach(file=>{
+                        if(!file.type.startsWith("image/")||!file.size){showPhotoError(`${file.name} không phải là ảnh hợp lệ và đã được bỏ qua.`);return}
+                        if(file.size>10*1024*1024){showPhotoError(`${file.name} vượt quá giới hạn 10 MB và đã được bỏ qua.`);return}
+                        const photoIndex=startIndex+(addedCounts.get(groupIndex)||0),slot=photoSlotKey(groupIndex,photoIndex),url=URL.createObjectURL(file),caption=file.name.replace(/\.[^.]+$/,"").slice(0,200)||groupTitle;
+                        temporaryPhotoUrls.add(url);pendingPhotoFiles.set(slot,{file,url,isNew:true});addedCounts.set(groupIndex,(addedCounts.get(groupIndex)||0)+1);
+                        appendPhotoCard(grid,{src:url,caption},groupIndex,photoIndex,label);added++;addedPhotosCount++;
+                      });
+                      if(added){hint.textContent=`Đã thêm ${added} ảnh vào "${groupTitle}"; có thể sửa chú thích.`;editPhotoHeading.textContent=`Ảnh hiện trường (${groups.reduce((sum,group)=>sum+group.photos.length,0)+addedPhotosCount})`;editError.hidden=true}
+                      input.value="";
+                    });
+                  };
         groups.forEach((group,groupIndex)=>{
           const section=document.createElement("section"),groupTitle=document.createElement("h4"),grid=document.createElement("div");
           section.className="edit-photo-group";groupTitle.className="edit-photo-group-title";groupTitle.textContent=group.title;grid.className="edit-photo-grid";
           group.photos.forEach((photo,photoIndex)=>appendPhotoCard(grid,photo,groupIndex,photoIndex));
-          section.append(groupTitle,grid);editPhotoFields.append(section);groupGrids[groupIndex]=grid;
+          attachAdder(grid,groupIndex,group.photos.length,group.title);
+          section.append(groupTitle,grid);editPhotoFields.append(section);
         });
-        const existingAdditionalIndex=groups.findIndex(group=>group.title==="Ảnh bổ sung");
-        addedPhotoGroupIndex=existingAdditionalIndex>=0?existingAdditionalIndex:groups.length;
-        addedPhotoStartIndex=existingAdditionalIndex>=0?groups[existingAdditionalIndex].photos.length:0;
-        let additionalGrid=existingAdditionalIndex>=0?groupGrids[existingAdditionalIndex]:null;
-        if(!additionalGrid){
-          const section=document.createElement("section"),groupTitle=document.createElement("h4");
-          section.className="edit-photo-group";groupTitle.className="edit-photo-group-title";groupTitle.textContent="Ảnh bổ sung";additionalGrid=document.createElement("div");additionalGrid.className="edit-photo-grid";section.append(groupTitle,additionalGrid);editPhotoFields.append(section);
+        if(!groups.some(group=>group.title==="Ảnh bổ sung")){
+          const section=document.createElement("section"),groupTitle=document.createElement("h4"),grid=document.createElement("div");
+          section.className="edit-photo-group";groupTitle.className="edit-photo-group-title";groupTitle.textContent="Ảnh bổ sung (mục khác)";grid.className="edit-photo-grid";
+          attachAdder(grid,groups.length,0,"Ảnh bổ sung");section.append(groupTitle,grid);editPhotoFields.append(section);
         }
-        const addPhotosLabel=document.createElement("label"),addPhotosInput=document.createElement("input"),addPhotosHint=document.createElement("span");
-        addPhotosLabel.className="edit-photo-card";addPhotosLabel.append(document.createTextNode("Thêm ảnh từ thiết bị"));
-        addPhotosInput.type="file";addPhotosInput.accept="image/*";addPhotosInput.multiple=true;addPhotosInput.setAttribute("aria-label","Chọn nhiều ảnh để thêm vào báo cáo");
-        addPhotosHint.className="edit-photo-filename";addPhotosHint.textContent="Có thể chọn nhiều tệp cùng lúc";addPhotosLabel.append(addPhotosInput,addPhotosHint);additionalGrid.append(addPhotosLabel);
-        addPhotosInput.addEventListener("change",()=>{
-          const files=[...addPhotosInput.files||[]];let added=0;
-          files.forEach(file=>{
-            if(!file.type.startsWith("image/")||!file.size){showPhotoError(`${file.name} không phải là ảnh hợp lệ và đã được bỏ qua.`);return}
-            if(file.size>10*1024*1024){showPhotoError(`${file.name} vượt quá giới hạn 10 MB và đã được bỏ qua.`);return}
-            const photoIndex=addedPhotoStartIndex+[...pendingPhotoFiles.values()].filter(item=>item.isNew).length,slot=photoSlotKey(addedPhotoGroupIndex,photoIndex),url=URL.createObjectURL(file),caption=file.name.replace(/\.[^.]+$/,"").slice(0,200)||"Ảnh bổ sung";
-            temporaryPhotoUrls.add(url);pendingPhotoFiles.set(slot,{file,url,isNew:true});
-            appendPhotoCard(additionalGrid,{src:url,caption},addedPhotoGroupIndex,photoIndex);added++;addedPhotosCount++;
-          });
-          if(added){addPhotosHint.textContent=`Đã thêm ${added} ảnh vào bản nháp; có thể sửa chú thích bên dưới.`;editPhotoHeading.textContent=`Ảnh hiện trường (${groups.reduce((sum,group)=>sum+group.photos.length,0)+addedPhotosCount})`;editError.hidden=true}
-          addPhotosInput.value="";
-        });
         editPhotoFields.hidden=false;
       };
       const renderDetails=row=>{
@@ -538,8 +627,7 @@
         const groups=photoGroupsFor(activeReport)||[],nextPhotos=groups.map((group,groupIndex)=>({title:group.title,photos:group.photos.map((photo,photoIndex)=>{const captionInput=editPhotoFields.querySelector(`[data-photo-caption][data-group-index="${groupIndex}"][data-photo-index="${photoIndex}"]`);return{...photo,caption:captionInput?captionInput.value.trim():photo.caption}})}));
         const newPhotoSlots=[...pendingPhotoFiles.entries()].filter(([,item])=>item.isNew).sort(([left],[right])=>{const[aGroup,aPhoto]=left.split(":").map(Number),[bGroup,bPhoto]=right.split(":").map(Number);return aGroup-bGroup||aPhoto-bPhoto});
         if(nextPhotos&&newPhotoSlots.length){
-          if(!nextPhotos[addedPhotoGroupIndex])nextPhotos[addedPhotoGroupIndex]={title:"Ảnh bổ sung",photos:[]};
-          newPhotoSlots.forEach(([slot])=>{const photoIndex=Number(slot.split(":")[1]),captionInput=editPhotoFields.querySelector(`[data-photo-caption][data-group-index="${addedPhotoGroupIndex}"][data-photo-index="${photoIndex}"]`);nextPhotos[addedPhotoGroupIndex].photos.push({src:"",caption:captionInput?.value.trim()||""})});
+          newPhotoSlots.forEach(([slot])=>{const[groupIndex,photoIndex]=slot.split(":").map(Number),captionInput=editPhotoFields.querySelector(`[data-photo-caption][data-group-index="${groupIndex}"][data-photo-index="${photoIndex}"]`);if(!nextPhotos[groupIndex])nextPhotos[groupIndex]={title:"Ảnh bổ sung",photos:[]};nextPhotos[groupIndex].photos.push({src:"",caption:captionInput?.value.trim()||""})});
         }
         if(nextPhotos?.some(group=>group.photos.some(photo=>!photo.caption))){showPhotoError("Chú thích ảnh không được để trống.");return}
         if(pendingPhotoFiles.size&&!await photoStorageReady){showPhotoError("Không thể lưu ảnh trong trình duyệt này. Hãy thử lại trong cửa sổ trình duyệt thông thường.");return}
@@ -601,11 +689,11 @@
             toggle.title = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
             toggle.querySelector(".sidebar-toggle-label").textContent = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
             if (persist) {
-              try { window.localStorage.setItem("hp-sidebar-collapsed", String(shouldCollapse)); }
+              try { window.localStorage.setItem("hp-staging-sidebar-collapsed", String(shouldCollapse)); }
               catch (error) { console.warn("Không lưu được tùy chọn menu trên thiết bị này.", error); }
             }
           }
-          try { setSidebarCollapsed(window.localStorage.getItem("hp-sidebar-collapsed") === "true", false); }
+          try { setSidebarCollapsed(window.localStorage.getItem("hp-staging-sidebar-collapsed") === "true", false); }
           catch (error) {
             console.warn("Không đọc được tùy chọn menu trên thiết bị này.", error);
             setSidebarCollapsed(false, false);
@@ -619,37 +707,49 @@
             const submenu = document.getElementById(button.getAttribute("aria-controls"));
             if (!group || !submenu) return;
             group.classList.toggle("has-current", Boolean(submenu.querySelector('[aria-current="page"]')));
-            function setGroupOpen(open) {
+            let closeTimer;
+            let pointerPress = false;
+            let lastPointer = "";
+            function setOpen(open) {
+              clearTimeout(closeTimer);
               button.setAttribute("aria-expanded", String(open));
               button.setAttribute("aria-label", `${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
               submenu.hidden = !open;
               group.classList.toggle("is-open", open);
             }
-            button.addEventListener("pointerenter", (event) => {
-              if (event.pointerType === "mouse" && !group.dataset.pinned) setGroupOpen(true);
+            setOpen(group.matches(":hover"));
+            group.addEventListener("pointerenter", (event) => {
+              if (event.pointerType === "mouse") setOpen(true);
             });
             group.addEventListener("pointerleave", (event) => {
-              if (event.pointerType === "mouse" && !group.dataset.pinned && !group.contains(document.activeElement)) setGroupOpen(false);
+              if (event.pointerType !== "mouse") return;
+              // Mouse focus must not keep the current page's menu pinned open.
+              clearTimeout(closeTimer);
+              closeTimer = setTimeout(() => setOpen(false), 140);
             });
-            group.addEventListener("focusin", () => setGroupOpen(true));
+            group.addEventListener("pointerdown", (event) => {
+              lastPointer = event.pointerType;
+              pointerPress = true;
+            });
+            group.addEventListener("pointerup", () => { pointerPress = false; });
+            group.addEventListener("pointercancel", () => { pointerPress = false; });
+            group.addEventListener("focusin", () => { if (!pointerPress) setOpen(true); });
             group.addEventListener("focusout", (event) => {
-              if (!group.contains(event.relatedTarget) && !group.dataset.pinned) setGroupOpen(false);
+              if (!group.contains(event.relatedTarget) && !group.matches(":hover")) setOpen(false);
             });
-            button.addEventListener("click", () => {
-              if (group.dataset.pinned === "true") {
-                delete group.dataset.pinned;
-                setGroupOpen(false);
-              } else {
-                group.dataset.pinned = "true";
-                setGroupOpen(true);
-              }
+            button.addEventListener("click", (event) => {
+              if (event.detail > 0 && lastPointer === "mouse") setOpen(true);
+              else setOpen(submenu.hidden);
             });
             group.addEventListener("keydown", (event) => {
-              if (event.key === "Escape" && group.classList.contains("is-open")) {
-                delete group.dataset.pinned;
-                setGroupOpen(false);
+              if (event.key === "Escape") {
+                event.preventDefault();
                 button.focus();
+                setOpen(false);
               }
+            });
+            new MutationObserver(() => setOpen(false)).observe(sidebar, {
+              attributes: true, attributeFilter: ["class"]
             });
           });
         })();

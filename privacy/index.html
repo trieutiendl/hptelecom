@@ -10,7 +10,7 @@ FORM: Read-mode technical document; persistent section navigation supports direc
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#071721" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Chính sách quyền riêng tư | HP Telecom</title>
     <meta name="description" content="Tìm hiểu dữ liệu HP Telecom Server xử lý, quyền thiết bị, lưu giữ, truy cập và xóa dữ liệu." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -123,12 +123,50 @@ FORM: Read-mode technical document; persistent section navigation supports direc
         html { scroll-behavior: auto; }
       }
     </style>
+    <style id="noc-dark-theme">
+      :root {
+        color-scheme: dark;
+        --bg: #1e2a38; --header: #17212d; --surface: #26364a; --surface-raised: #2d3f55;
+        --line: #3d516a; --text: #f3f6fa; --muted: #b8c5d3; --quiet: #b0bfcd;
+        --cyan: #5cc7d1; --link: #86dae1; --focus: #86dae1;
+      }
+      .skip-link { border-color: #4c627c; }
+      .site-header { border-bottom-color: #3d516a; }
+      .header-nav { color: #d3dde7; }
+      .header-nav .nav-action { border-color: #4c627c; border-radius: 8px; }
+      h1 { letter-spacing: -.04em; }
+      .breadcrumb a { color: #d3dde7; }
+      .document-deck { color: #c3cfdb; }
+      .meta-tag { border-color: #4c627c; border-radius: 6px; color: #d3dde7; background: #2d3f55; }
+      .meta-tag::before { background: #5cc7d1; }
+      .contents h2 { color: #c3cfdb; }
+      .contents a { color: #c3cfdb; border-radius: 8px; }
+      .contents a:hover { background: #2d3f55; color: #fff; }
+      .policy { border-color: #3d516a; border-radius: 10px; }
+      .policy-section { border-bottom-color: #3d516a; }
+      .policy-section h2, .policy-section strong { color: #f3f6fa; }
+      .policy-section p, .policy-section li { color: #c9d4df; }
+      .policy-section li::marker { color: #5cc7d1; }
+      .contact-link { border-color: #4c627c; border-radius: 8px; color: #f3f6fa; }
+      .contact-link:hover { border-color: #5cc7d1; background: #38506b; }
+      .contact-link-primary { border-color: #5cc7d1; background: #5cc7d1; color: #0b2328; }
+      .contact-link-primary:hover { border-color: #86dae1; background: #86dae1; color: #0b2328; }
+      footer { border-top-color: #3d516a; background: #17212d; }
+      .footer-inner { color: #b8c5d3; }
+      .footer-inner a { color: #d3dde7; }
+      @media (max-width: 760px) {
+        .contents nav { scrollbar-color: #4c627c #17212d; }
+        .contents a { border-color: #4c627c; }
+        .contents .contents-contact a { border-color: #4c627c; }
+      }
+    </style>
+      <meta name="hp-ui-release" content="github-d-20261012" />
   </head>
   <body>
     <a class="skip-link" href="#main">Chuyển đến nội dung chính</a>
     <header class="site-header">
       <div class="header-inner">
-        <a class="brand" href="/" aria-label="HP Telecom — về trang chủ">
+        <a class="brand" href="/staging/" aria-label="HP Telecom — về trang chủ">
           <svg class="brand-logo" viewBox="0 0 303 64" role="img" aria-labelledby="brand-title brand-description">
             <title id="brand-title">HP Telecom</title>
             <desc id="brand-description">Điều hành hiện trường</desc>
@@ -146,15 +184,15 @@ FORM: Read-mode technical document; persistent section navigation supports direc
           </svg>
         </a>
         <nav class="header-nav" aria-label="Điều hướng">
-          <a href="/">Về trang chủ <span aria-hidden="true">↗</span></a>
-          <a class="nav-action" href="/support">Trung tâm hỗ trợ</a>
+          <a href="/staging/">Về trang chủ <span aria-hidden="true">↗</span></a>
+          <a class="nav-action" href="/staging/support">Trung tâm hỗ trợ</a>
         </nav>
       </div>
     </header>
 
     <main id="main" class="container">
       <section class="document-head" aria-labelledby="page-title">
-        <p class="breadcrumb"><a href="/">HP Telecom</a><span aria-hidden="true"> / </span>Chính sách</p>
+        <p class="breadcrumb"><a href="/staging/">HP Telecom</a><span aria-hidden="true"> / </span>Chính sách</p>
         <h1 id="page-title">Chính sách quyền riêng tư</h1>
         <p class="document-deck">HP Telecom Server hỗ trợ nhân viên ghi nhận công việc kỹ thuật hiện trường, lập báo cáo và đồng bộ dữ liệu với máy chủ HP Telecom do tổ chức của bạn cấu hình. Chính sách này mô tả dữ liệu ứng dụng xử lý và cách bạn có thể yêu cầu hỗ trợ.</p>
         <div class="document-meta">
@@ -220,7 +258,7 @@ FORM: Read-mode technical document; persistent section navigation supports direc
             <p>Để được hỗ trợ hoặc gửi yêu cầu về quyền riêng tư, viết tới email hỗ trợ hoặc xem trang hỗ trợ HP Telecom.</p>
             <div class="contact-links">
               <a class="contact-link contact-link-primary" href="/cdn-cgi/l/email-protection#186c6a717d6d6c717d767c74587f75797174367b7775"><span aria-hidden="true">✉</span> Email hỗ trợ</a>
-              <a class="contact-link" href="/support">Trang hỗ trợ HP Telecom <span aria-hidden="true">↗</span></a>
+              <a class="contact-link" href="/staging/support">Trang hỗ trợ HP Telecom <span aria-hidden="true">↗</span></a>
             </div>
           </section>
         </article>
@@ -230,7 +268,7 @@ FORM: Read-mode technical document; persistent section navigation supports direc
     <footer>
       <div class="footer-inner container">
         <span>HP Telecom Server · Chính sách quyền riêng tư</span>
-        <a href="/support">Trung tâm hỗ trợ</a>
+        <a href="/staging/support">Trung tâm hỗ trợ</a>
       </div>
     </footer>
   </body>

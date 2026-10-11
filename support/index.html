@@ -10,7 +10,7 @@ FORM: Read-mode dark dashboard; a compact persistent topic rail and searchable c
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#071721" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Hỗ trợ ứng dụng | HP Telecom</title>
     <meta name="description" content="Hướng dẫn đăng ký tài khoản, xử lý lỗi đồng bộ và liên hệ hỗ trợ ứng dụng HP Telecom Server." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -352,12 +352,86 @@ FORM: Read-mode dark dashboard; a compact persistent topic rail and searchable c
         .support-workspace { margin-top: 12px; margin-bottom: 40px; }
       }
     </style>
+    <style id="noc-dark-theme">
+      :root {
+        color-scheme: dark;
+        --ink: #f3f6fa; --ink-soft: #d3dde7; --muted: #b8c5d3;
+        --teal: #5cc7d1; --cyan: #86dae1;
+        --paper: #1e2a38; --white: #26364a; --line: #3d516a; --mint: #1d4a52;
+        --warning: #f0b955; --warning-bg: #4a3a17;
+      }
+      body { background: #1e2a38; color: #f3f6fa; }
+      .masthead { background: #17212d; color: #f3f6fa; box-shadow: 0 1px 0 #3d516a; }
+      .masthead-links { color: #d3dde7; }
+      .masthead-links a:hover { color: #86dae1; }
+      .masthead-links .login-link { border-color: #4c627c; border-radius: 8px; color: #f3f6fa; }
+      .masthead-links .login-link:hover { border-color: #5cc7d1; color: #86dae1; }
+      .support-workspace { border-color: #3d516a; border-radius: 10px; background: #26364a; box-shadow: 0 12px 30px rgba(0, 0, 0, .3); }
+      .assistant-rail { background: #17212d; }
+      .rail-brand { border-color: #3d516a; }
+      .rail-mark { border-color: #3f7a82; border-radius: 8px; background: #1d4a52; color: #a9eaf0; }
+      .rail-brand small, .rail-note, .rail-privacy { color: #b8c5d3; }
+      .rail-heading { color: #b0bfcd; }
+      .topic-button { border-radius: 8px; color: #d3dde7; }
+      .topic-button:hover, .topic-button[aria-pressed="true"] { border-color: #4c627c; background: #2b4058; color: #fff; }
+      .topic-dot { background: #5cc7d1; }
+      .rail-call { border-color: #4c627c; border-radius: 8px; color: #f3f6fa; }
+      .rail-call:hover { border-color: #5cc7d1; color: #86dae1; }
+      .conversation, .chat-scroll { background: #26364a; }
+      .conversation-head, .conversation-compose { border-color: #3d516a; background: #2d3f55; }
+      .assistant-avatar { background: #1d4a52; color: #a9eaf0; }
+      .conversation-title small { color: #b8c5d3; }
+      .guide-label { border-color: #4c627c; border-radius: 6px; background: #26364a; color: #d3dde7; }
+      .welcome-bubble h1, .welcome-bubble h1 + p { letter-spacing: -.04em; }
+      .welcome-bubble p { color: #b8c5d3; }
+      .quick-prompt { border-color: #4c627c; border-radius: 8px; background: #2d3f55; color: #d3dde7; }
+      .quick-prompt:hover, .quick-prompt[aria-pressed="true"] { border-color: #5cc7d1; background: #1d4a52; color: #e6fafc; }
+      h1, h2 { letter-spacing: -.04em; }
+      .search-wrap input, .compose-field { border-color: #4c627c; border-radius: 8px; background: #1a2431; color: #f3f6fa; }
+      .compose-field input { color: #f3f6fa; }
+      .search-wrap input::placeholder, .compose-field input::placeholder { color: #94a3b3; }
+      .search-wrap svg { color: #b0bfcd; }
+      .search-wrap input:focus-visible, .compose-field:focus-within { border-color: #5cc7d1; box-shadow: 0 0 0 3px rgba(92, 199, 209, .3); outline: 0; }
+      .search-status, .compose-hint, .contact-strip p { color: #b8c5d3; }
+      .guide-group h2 { color: #b0bfcd; }
+      .guide-group h2::before { background: #637b97; }
+      .guide-item, .guide-item:last-child { border-color: #3d516a; }
+      .guide-item summary { color: #f3f6fa; }
+      .guide-item summary:hover { background: #2d3f55; }
+      .guide-item summary::after { color: #5cc7d1; }
+      .guide-answer { background: #2d3f55; color: #d3dde7; }
+      .guide-answer a { color: #86dae1; }
+      .privacy-note { border-color: #8a6a26; border-radius: 8px; background: #4a3a17; color: #f0b955; }
+      .no-results { border-color: #4c627c; border-radius: 8px; background: #2d3f55; color: #d3dde7; }
+      .compose-field button { border-radius: 6px; background: #5cc7d1; color: #0b2328; }
+      .compose-field button:hover { background: #86dae1; }
+      .contact-strip { border-color: #3d516a; }
+      .contact-strip a { border-color: #4c627c; border-radius: 8px; color: #86dae1; }
+      .contact-strip a:hover { border-color: #5cc7d1; background: #38506b; }
+      .button { border-radius: 8px; background: #5cc7d1; border-color: #5cc7d1; color: #0b2328; }
+      .button:hover { background: #86dae1; }
+      .button-secondary { border-color: #4c627c; background: transparent; color: #f3f6fa; }
+      .button-secondary:hover { border-color: #5cc7d1; background: #38506b; color: #fff; }
+      footer { background: #17212d; }
+      .footer-inner { border-color: #3d516a; color: #b8c5d3; }
+      .footer-inner a { color: #d3dde7; }
+      :focus-visible { outline-color: #86dae1; }
+      @media (max-width: 760px) {
+        .rail-mark { background: #1d4a52; }
+        .topic-nav { scrollbar-color: #4c627c #17212d; }
+        .topic-button { border-color: #4c627c; }
+        .conversation-head, .conversation-compose { background: #2d3f55; }
+        .chat-scroll { background: #26364a; }
+        .contact-strip a { background: #1a2431; }
+      }
+    </style>
+      <meta name="hp-ui-release" content="github-d-20261012" />
   </head>
   <body>
     <a class="skip-link" href="#main">Chuyển đến nội dung hỗ trợ</a>
     <header class="masthead">
       <div class="masthead-inner">
-        <a class="brand" href="/" aria-label="HP Telecom — về trang chủ">
+        <a class="brand" href="/staging/" aria-label="HP Telecom — về trang chủ">
           <svg class="brand-logo" viewBox="0 0 303 64" role="img" aria-labelledby="brand-title brand-description">
             <title id="brand-title">HP Telecom</title>
             <desc id="brand-description">Điều hành hiện trường</desc>
@@ -375,8 +449,8 @@ FORM: Read-mode dark dashboard; a compact persistent topic rail and searchable c
           </svg>
         </a>
         <nav class="masthead-links" aria-label="Điều hướng chính">
-          <a href="/">Về trang chủ <span aria-hidden="true">↗</span></a>
-          <a class="login-link" href="/dangnhap">Mở ứng dụng</a>
+          <a href="/staging/">Về trang chủ <span aria-hidden="true">↗</span></a>
+          <a class="login-link" href="/staging/dangnhap">Mở ứng dụng</a>
         </nav>
       </div>
     </header>
@@ -442,7 +516,7 @@ FORM: Read-mode dark dashboard; a compact persistent topic rail and searchable c
               <details class="guide-item" data-search="đăng ký tạo tài khoản tên đăng nhập mật khẩu team đội số điện thoại email">
                 <summary>Tôi đăng ký tài khoản mới như thế nào?</summary>
                 <div class="guide-answer">
-                  <p>Tại <a href="/dangnhap">màn hình đăng nhập</a>, chọn <strong>Tạo tài khoản</strong> và điền họ tên, tên đăng nhập, mật khẩu, Team/Đội, số điện thoại và email.</p>
+                  <p>Tại <a href="/staging/dangnhap">màn hình đăng nhập</a>, chọn <strong>Tạo tài khoản</strong> và điền họ tên, tên đăng nhập, mật khẩu, Team/Đội, số điện thoại và email.</p>
                   <p>Yêu cầu được chuyển đến quản trị viên xét duyệt. Bạn có thể đăng nhập sau khi tài khoản được duyệt và cấp quyền.</p>
                 </div>
               </details>
@@ -518,7 +592,7 @@ FORM: Read-mode dark dashboard; a compact persistent topic rail and searchable c
     <footer>
       <div class="footer-inner container">
         <span>HP Telecom Server · Hỗ trợ ứng dụng</span>
-        <a href="/privacy">Chính sách quyền riêng tư</a>
+        <a href="/staging/privacy">Chính sách quyền riêng tư</a>
       </div>
     </footer>
     <script>

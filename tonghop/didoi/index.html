@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f3f7f8" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Di dời | HP Telecom</title>
     <meta name="description" content="Theo dõi và quản lý các yêu cầu di dời HP Telecom." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -227,7 +227,7 @@
       .sidebar .nav .nav-child-link,.sidebar .nav .nav-child-disabled,.sidebar.is-collapsed .nav-group.is-open .nav-child-link,.sidebar.is-collapsed .nav-group.is-open .nav-child-disabled{min-height:40px;justify-content:flex-start;gap:8px;padding:0 8px;font-size:10px}.sidebar.is-collapsed .nav-icon{width:25px;height:25px;flex-basis:25px}.nav-standalone{display:contents}.nav-standalone:before{grid-column:1/-1;margin:9px 3px 2px;color:#9bb0bd;content:"QUẢN TRỊ";font-size:9px;font-weight:800;letter-spacing:.1em}.sidebar.is-collapsed+.main-column,.main-column{margin-left:0}}
       @media(prefers-reduced-motion:reduce){.sidebar-toggle-icon,.nav-group-chevron:before{transition-duration:.01ms}}
     </style>
-    <link rel="stylesheet" href="../../server-theme.css" />
+    <link rel="stylesheet" href="../../server-theme.css?v=github-d-20261012-r2" />
     <style>
       body.relocation-page {
         --ink: #102a3e;
@@ -252,11 +252,71 @@
       body.relocation-page .report-panel .report-note,
       body.relocation-page .report-panel .notice { color: #405866 !important; }
     </style>
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;--ink:#f3f6fa;--muted:#b8c5d3;--blue:#5cc7d1;--teal:#5cc7d1;--line:#3d516a;--canvas:#1e2a38;--surface:#26364a;--green:#6ad39a;--amber:#f0b955;--red:#ff8078;--focus:#5cc7d1;--panel:#26364a;--panel-2:#2d3f55;--field:#1a2431;--line-2:#4c627c}
+      body,body.relocation-page{background:var(--canvas);color:var(--ink);color-scheme:dark}
+      ::selection{background:#3b8f98;color:#fff}
+      .sidebar{background:#17212d;color:#d3dde7;border-color:var(--line)}
+      .nav-label,.version,.nav-group-chevron,.sidebar .nav-coming-soon{color:#a3b2c1;border-color:var(--line)}
+      .nav a,.sidebar .nav .nav-group-trigger,.sidebar .nav .nav-link,.sidebar .nav .nav-child-link,.sidebar .nav .nav-child-disabled{color:#d3dde7}
+      .sidebar .nav .nav-child-link{color:#c3cfdb}
+      .sidebar .nav .nav-child-disabled{color:#94a3b3}
+      .sidebar .nav a:hover,.sidebar .nav .nav-group-trigger:hover,.sidebar .nav .nav-group-trigger[aria-expanded=true],.sidebar .nav .nav-link:hover,.sidebar .nav .nav-child-link:hover{border-color:var(--line);background:#233245;color:#fff}
+      .sidebar .nav a[aria-current=page],.sidebar .nav .nav-group.has-current>.nav-group-trigger,.sidebar .nav .nav-link[aria-current=page],.sidebar .nav .nav-child-link[aria-current=page]{border-color:var(--line-2);background:#2b4058;color:#fff;box-shadow:inset 2px 0 var(--blue)}
+      .nav-icon,.sidebar .nav .nav-icon{border-color:var(--line);background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:var(--line)}
+      .nav-standalone,.sidebar-bottom{border-top-color:var(--line)}
+      .sidebar-toggle{border-color:var(--line);background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:var(--line-2);background:#2b4058;color:#fff}
+      .connection-state{color:#c3cfdb}.connection-state::before{background:var(--blue)}
+      .sidebar.is-collapsed .brand:after{color:#f3f6fa}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{border-color:var(--line);background:#17212d;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar.is-collapsed .nav-children:before,.nav-standalone:before{color:#a3b2c1}
+      .sidebar :focus-visible,.report-button:focus-visible,.report-control:focus-visible,.report-tab:focus-visible,.top-link:focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+      .topbar{background:var(--canvas);border-color:var(--line);box-shadow:none}
+      .topbar-title,.top-link{color:var(--muted)}.top-link:hover{color:var(--ink)}
+      .admin{border-left-color:var(--line)}
+      .avatar{background:#1d4a52;color:#a9eaf0;border:1px solid #3f7a82}
+      .admin-name{color:var(--ink)}.admin-role,.breadcrumb,.subtitle,.report-field>span,.report-note,.empty{color:var(--muted)}
+      body.relocation-page h1,body.relocation-page .report-panel h2,.relocation-page h1,.relocation-page .report-panel h2{color:var(--ink)!important;letter-spacing:-.03em}
+      body.relocation-page .content,body.relocation-page .report-panel,body.relocation-page .report-sheet{color:var(--ink)!important}
+      body.relocation-page .report-panel .report-note{color:var(--muted)!important}
+      body.relocation-page .report-panel .notice{color:#a3b2c1!important}
+      .demo-badge{border-color:#8a6a26;border-radius:6px;background:#4a3a17;color:var(--amber)}
+      .demo-badge::before{border-radius:2px;background:var(--amber)}
+      .report-controls,.report-toolbar,.report-tabs,.report-panel{border-color:var(--line);background:var(--panel)}
+      .report-controls{border-radius:10px}
+      .report-toolbar{border-radius:10px 10px 0 0}
+      .report-panel{border-radius:0 0 10px 10px}
+      #materials-panel .report-toolbar{border:0;background:transparent}
+      .report-control,body.relocation-page .report-control{border-color:var(--line-2);border-radius:8px;background:var(--field);color:var(--ink)!important;color-scheme:dark}
+      .report-control::placeholder{color:#94a3b3;opacity:1}
+      .report-control:focus-visible{border-color:var(--blue);box-shadow:0 0 0 3px rgba(92,199,209,.3)}
+      .report-button{border-color:var(--blue);border-radius:8px;background:var(--blue);color:#0b2328}
+      .report-button:hover{filter:none;border-color:#86dae1;background:#86dae1;color:#0b2328}
+      .report-button.secondary{border-color:var(--line-2);background:transparent;color:#dbe4ed}
+      .report-button.secondary:hover{border-color:#637b97;background:#38506b;color:#fff}
+      .report-meta{border-color:#3f7a82;border-radius:8px;background:#1d3a48;color:#c9eef2}
+      .report-tab,body.relocation-page .report-tab{color:var(--muted)!important}
+      .report-tab:hover{background:#2f4259;color:#fff!important}
+      .report-tab[aria-selected="true"],body.relocation-page .report-tab[aria-selected="true"]{border-bottom-color:var(--blue);background:transparent;color:var(--blue)!important}
+      .report-sheet{border-color:var(--line);border-radius:8px;background:var(--panel)}
+      .report-sheet th,body.relocation-page .report-sheet table th{background:var(--panel-2);color:#dbe4ed!important}
+      .report-sheet td,body.relocation-page .report-sheet table td{border-top-color:var(--line);color:#dbe4ed!important}
+      .report-sheet tbody tr:nth-child(even) td{background:#2a3b50}
+      .report-sheet tbody tr:hover td{background:#2f4259;color:#fff!important}
+      .report-sheet tr.report-total td,body.relocation-page .report-sheet tr.report-total td{background:#34495f;color:#fff!important}
+      @media(max-width:850px){.sidebar,.sidebar.is-collapsed{border-color:var(--line);background:#17212d}.nav-children,.sidebar.is-collapsed .nav-group.is-open .nav-children{border-color:var(--line);background:transparent;box-shadow:none}}
+    </style>
+      <style>[data-admin-only][hidden] { display: none !important; }</style>
+    <script src="/staging/staging-access.js?v=github-d-20261012-r2" defer></script>
+      <meta name="hp-ui-release" content="github-d-20261012" />
   </head>
   <body class="relocation-page">
     <aside class="sidebar">
       <div class="brand-header">
-        <a class="brand" href="/" aria-label="HP Telecom, trang chủ">
+        <a class="brand" href="/staging/" aria-label="HP Telecom, trang chủ">
           <img class="brand-logo" src="../logo-horizontal-dark.svg" alt="" />
         </a>
       </div>
@@ -286,7 +346,7 @@
         </div>
         <div class="nav-standalone">
           <a class="nav-link" href="../../thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
-          <a class="nav-link" href="../../nguoidung/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
+          <a class="nav-link" href="../../nguoidung/" data-admin-only hidden><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
         </div>
       </nav>
       <div class="sidebar-bottom"><div class="connection-state">Bản xem trước độc lập</div><p class="version">HP Telecom · Giao diện demo</p></div>
@@ -295,11 +355,11 @@
     <div class="main-column">
       <header class="topbar">
         <span class="topbar-title">Tổng hợp Di dời</span>
-        <div class="top-actions"><a class="top-link" href="https://hptelecom.id.vn/support">Hỗ trợ</a><div class="admin"><span class="avatar" aria-hidden="true">QT</span><span><span class="admin-name">Quản trị viên</span><span class="admin-role">Tài khoản demo</span></span></div></div>
+        <div class="top-actions"><a class="top-link" href="/staging/support">Hỗ trợ</a><div class="admin"><span class="avatar" aria-hidden="true">QT</span><span><span class="admin-name">Quản trị viên</span><span class="admin-role">Tài khoản demo</span></span></div></div>
       </header>
       <main class="content">
         <section class="heading">
-          <div><p class="breadcrumb"><a href="/tonghop/">Tổng hợp</a> <span aria-hidden="true">/</span> Di dời</p><h1>Tổng hợp Di dời</h1><p class="subtitle">Xem báo cáo di dời theo tháng, đội thực hiện và khối lượng vật tư.</p></div>
+          <div><p class="breadcrumb"><a href="/staging/tonghop/">Tổng hợp</a> <span aria-hidden="true">/</span> Di dời</p><h1>Tổng hợp Di dời</h1><p class="subtitle">Xem báo cáo di dời theo tháng, đội thực hiện và khối lượng vật tư.</p></div>
           <div class="heading-actions"><span class="demo-badge">Dữ liệu minh họa</span></div>
         </section>
 
@@ -457,7 +517,7 @@
         `Đã chọn ${event.target.value||"Tất cả Team/Đội"}; bảng vẫn là dữ liệu minh họa, chưa lọc dữ liệu máy chủ.`));
       document.querySelector("#update-routes").addEventListener("click",()=>notify("Bản demo độc lập: chưa kết nối máy chủ để cập nhật danh sách tuyến."));
       document.querySelector("#aggregate-relocations").addEventListener("click",()=>notify("Đang xem báo cáo tổng hợp Di dời mẫu."));
-      document.querySelector("#aggregate-incidents").addEventListener("click",()=>{window.location.href="/baocao/suco/";});
+      document.querySelector("#aggregate-incidents").addEventListener("click",()=>{window.location.href="/staging/baocao/suco/";});
       document.querySelector("#view-report").addEventListener("click",()=>{
         selectReportTab(relocationTab);
         document.querySelector("#relocation-report-head").scrollIntoView({behavior:"smooth",block:"nearest"});
@@ -509,11 +569,11 @@
             toggle.title = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
             toggle.querySelector(".sidebar-toggle-label").textContent = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
             if (persist) {
-              try { window.localStorage.setItem("hp-sidebar-collapsed", String(shouldCollapse)); }
+              try { window.localStorage.setItem("hp-staging-sidebar-collapsed", String(shouldCollapse)); }
               catch (error) { console.warn("Không lưu được tùy chọn menu trên thiết bị này.", error); }
             }
           }
-          try { setSidebarCollapsed(window.localStorage.getItem("hp-sidebar-collapsed") === "true", false); }
+          try { setSidebarCollapsed(window.localStorage.getItem("hp-staging-sidebar-collapsed") === "true", false); }
           catch (error) {
             console.warn("Không đọc được tùy chọn menu trên thiết bị này.", error);
             setSidebarCollapsed(false, false);
@@ -526,41 +586,50 @@
             const group = button.closest(".nav-group");
             const submenu = document.getElementById(button.getAttribute("aria-controls"));
             if (!group || !submenu) return;
-            const hasCurrentPage = Boolean(submenu.querySelector('[aria-current="page"]'));
-            group.classList.toggle("has-current", hasCurrentPage);
-            function setGroupOpen(open) {
+            group.classList.toggle("has-current", Boolean(submenu.querySelector('[aria-current="page"]')));
+            let closeTimer;
+            let pointerPress = false;
+            let lastPointer = "";
+            function setOpen(open) {
+              clearTimeout(closeTimer);
               button.setAttribute("aria-expanded", String(open));
               button.setAttribute("aria-label", `${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
               submenu.hidden = !open;
               group.classList.toggle("is-open", open);
             }
-            setGroupOpen(false);
-            button.addEventListener("pointerenter", (event) => {
-              if (event.pointerType === "mouse" && !group.dataset.pinned) setGroupOpen(true);
+            setOpen(group.matches(":hover"));
+            group.addEventListener("pointerenter", (event) => {
+              if (event.pointerType === "mouse") setOpen(true);
             });
             group.addEventListener("pointerleave", (event) => {
-              if (event.pointerType === "mouse" && !group.dataset.pinned
-                && !group.contains(document.activeElement)) setGroupOpen(false);
+              if (event.pointerType !== "mouse") return;
+              // Mouse focus must not keep the current page's menu pinned open.
+              clearTimeout(closeTimer);
+              closeTimer = setTimeout(() => setOpen(false), 140);
             });
-            group.addEventListener("focusin", () => setGroupOpen(true));
+            group.addEventListener("pointerdown", (event) => {
+              lastPointer = event.pointerType;
+              pointerPress = true;
+            });
+            group.addEventListener("pointerup", () => { pointerPress = false; });
+            group.addEventListener("pointercancel", () => { pointerPress = false; });
+            group.addEventListener("focusin", () => { if (!pointerPress) setOpen(true); });
             group.addEventListener("focusout", (event) => {
-              if (!group.contains(event.relatedTarget) && !group.dataset.pinned) setGroupOpen(false);
+              if (!group.contains(event.relatedTarget) && !group.matches(":hover")) setOpen(false);
             });
-            button.addEventListener("click", () => {
-              if (group.dataset.pinned === "true") {
-                delete group.dataset.pinned;
-                setGroupOpen(false);
-              } else {
-                group.dataset.pinned = "true";
-                setGroupOpen(true);
-              }
+            button.addEventListener("click", (event) => {
+              if (event.detail > 0 && lastPointer === "mouse") setOpen(true);
+              else setOpen(submenu.hidden);
             });
             group.addEventListener("keydown", (event) => {
-              if (event.key === "Escape" && group.classList.contains("is-open")) {
-                delete group.dataset.pinned;
-                setGroupOpen(false);
+              if (event.key === "Escape") {
+                event.preventDefault();
                 button.focus();
+                setOpen(false);
               }
+            });
+            new MutationObserver(() => setOpen(false)).observe(sidebar, {
+              attributes: true, attributeFilter: ["class"]
             });
           });
         })();

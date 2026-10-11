@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f3f7f8" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Tổng hợp Sự cố | HP Telecom</title>
     <meta name="description" content="Tổng hợp báo cáo sự cố theo Team/Đội và thời gian." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -156,11 +156,74 @@
       }
       @media(prefers-reduced-motion:reduce){.sidebar-toggle-icon,.nav-group-chevron:before{transition-duration:.01ms}}
     </style>
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;--ink:#f3f6fa;--muted:#b8c5d3;--blue:#5cc7d1;--line:#3d516a;--canvas:#1e2a38;--amber:#f0b955;--panel:#26364a;--panel-2:#2d3f55;--field:#1a2431;--line-2:#4c627c}
+      body{background:var(--canvas);color:var(--ink)}
+      ::selection{background:#3b8f98;color:#fff}
+      .sidebar{background:#17212d;color:#d3dde7;border-color:var(--line)}
+      .brand-wordmark{color:#f3f6fa}
+      .nav-label,.version,.nav-group>summary:after,.nav-group-chevron{color:#a3b2c1}
+      .nav a,.nav-group>summary,.sidebar .nav .nav-group-trigger,.sidebar .nav .nav-link,.sidebar .nav .nav-child-link{color:#d3dde7}
+      .nav a:hover,.nav-group[open]>summary,.nav-group>summary:hover,.sidebar .nav .nav-group-trigger:hover,.sidebar .nav .nav-group-trigger[aria-expanded=true],.sidebar .nav .nav-link:hover,.sidebar .nav .nav-child-link:hover{border-color:var(--line);background:#233245;color:#fff}
+      .nav a[aria-current=page],.sidebar .nav .nav-group.has-current>.nav-group-trigger,.sidebar .nav .nav-link[aria-current=page],.sidebar .nav .nav-child-link[aria-current=page]{border-color:var(--line-2);background:#2b4058;color:#fff;box-shadow:inset 2px 0 var(--blue)}
+      .sidebar .nav .nav-icon{border-color:var(--line);background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:var(--line)}
+      .nav-standalone,.sidebar-bottom{border-top-color:var(--line)}
+      .sidebar-toggle{border-color:var(--line);background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:var(--line-2);background:#2b4058;color:#fff}
+      .sidebar .nav .nav-child-link{color:#c3cfdb}
+      .connection{color:#c3cfdb}.connection:before{background:var(--blue)}
+      .sidebar.is-collapsed .brand:after{color:#7fe0e8}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{border-color:var(--line);background:#17212d;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar.is-collapsed .nav-children:before,.nav-standalone:before{color:#a3b2c1}
+      .sidebar :focus-visible,.report-button:focus-visible,.report-control:focus-visible,.report-tab:focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+      .topbar{background:var(--canvas);border-color:var(--line)}
+      .topbar-title,.topbar a[href*="support"]{color:var(--muted)!important}
+      .admin{border-left-color:var(--line)}
+      .avatar{background:#1d4a52;color:#a9eaf0;border:1px solid #3f7a82}
+      .admin-name{color:var(--ink)}.admin-role,.breadcrumb,.subtitle,.report-field>span,.report-note,.empty{color:var(--muted)}
+      h1,.report-panel h2{color:var(--ink);letter-spacing:-.03em}
+      .notice{color:#a3b2c1}
+      .badge{border-color:#8a6a26;border-radius:6px;background:#4a3a17;color:var(--amber)}
+      .badge:before{border-radius:2px;background:var(--amber)}
+      .report-controls,.report-toolbar,.report-tabs,.report-panel{border-color:var(--line);background:var(--panel)}
+      .report-controls{border-radius:10px}
+      .report-toolbar{border-radius:10px 10px 0 0}
+      .report-panel{border-radius:0 0 10px 10px}
+      #materials-panel .report-toolbar{border:0;background:transparent}
+      .report-control{border-color:var(--line-2);border-radius:8px;background:var(--field);color:var(--ink);color-scheme:dark}
+      .report-control::placeholder{color:#94a3b3}
+      .report-control:focus-visible{border-color:var(--blue);box-shadow:0 0 0 3px rgba(92,199,209,.3)}
+      .report-button{border-color:var(--blue);border-radius:8px;background:var(--blue);color:#0b2328}
+      .report-button:hover{filter:none;border-color:#86dae1;background:#86dae1}
+      .report-button.secondary{border-color:var(--line-2);background:transparent;color:#dbe4ed}
+      .report-button.secondary:hover{border-color:#637b97;background:#38506b;color:#fff}
+      .report-meta{border-color:#3f7a82;border-radius:8px;background:#1d3a48;color:#c9eef2}
+      .report-tab{color:var(--muted)}.report-tab:hover{background:#2f4259;color:#fff}
+      .report-tab[aria-selected="true"]{border-bottom-color:var(--blue);background:transparent;color:var(--blue)}
+      .report-sheet{border-color:var(--line);border-radius:8px;background:var(--panel)}
+      .report-sheet th{background:var(--panel-2);color:#dbe4ed}
+      .report-sheet td{border-top-color:var(--line);color:#dbe4ed}
+      .report-sheet tbody tr:nth-child(even) td{background:#2a3b50}
+      .report-sheet tbody tr:hover td{background:#2f4259;color:#fff}
+      .report-sheet tr.report-total td{background:#34495f;color:#fff}
+      #incident-table th:first-child,#incident-table td:first-child,#incident-table th:nth-child(2),#incident-table td:nth-child(2){background:var(--panel-2)}
+      #incident-table th:nth-child(2),#incident-table td:nth-child(2){box-shadow:3px 0 8px rgba(0,0,0,.3)}
+      #incident-table tbody td:first-child,#incident-table tbody td:nth-child(2){background:var(--panel)}
+      #incident-table tbody tr:nth-child(even) td:first-child,#incident-table tbody tr:nth-child(even) td:nth-child(2){background:#2a3b50}
+      #incident-table tbody tr:hover td:first-child,#incident-table tbody tr:hover td:nth-child(2){background:#2f4259}
+      #incident-table tr.report-total td:first-child,#incident-table tr.report-total td:nth-child(2){background:#34495f}
+      @media(max-width:850px){.sidebar{border-color:var(--line)}.nav-children{border-color:var(--line);background:#17212d;box-shadow:0 12px 28px rgba(0,0,0,.4)}}
+    </style>
+      <style>[data-admin-only][hidden] { display: none !important; }</style>
+    <script src="/staging/staging-access.js?v=github-d-20261012-r2" defer></script>
+      <meta name="hp-ui-release" content="github-d-20261012" />
   </head>
   <body>
     <aside class="sidebar">
       <div class="brand-header">
-        <a class="brand" href="/" aria-label="HP Telecom, trang chủ">
+        <a class="brand" href="/staging/" aria-label="HP Telecom, trang chủ">
           <svg class="brand-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 303 64" role="img" aria-label="HP Telecom — Điều hành hiện trường">
             <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
               <path d="M30 7a23 23 0 0 0-22 16" />
@@ -184,9 +247,9 @@
             <span>Tổng hợp</span><span class="nav-group-chevron" aria-hidden="true"></span>
           </button>
           <div class="nav-children" id="summary-menu" data-label="Tổng hợp">
-            <a class="nav-child-link" href="/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
+            <a class="nav-child-link" href="/staging/tonghop/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
             <a class="nav-child-link" href="./" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
-            <a class="nav-child-link" href="/tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
+            <a class="nav-child-link" href="/staging/tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
           </div>
         </div>
         <div class="nav-group">
@@ -195,21 +258,21 @@
             <span>Báo cáo</span><span class="nav-group-chevron" aria-hidden="true"></span>
           </button>
           <div class="nav-children" id="reports-menu" data-label="Báo cáo" hidden>
-            <a class="nav-child-link" href="/baocao/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
-            <a class="nav-child-link" href="/baocao/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
-            <a class="nav-child-link" href="/baocao/tuantuyen/" aria-label="Báo cáo Tuần Tuyến" title="Báo cáo Tuần Tuyến"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
+            <a class="nav-child-link" href="/staging/baocao/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
+            <a class="nav-child-link" href="/staging/baocao/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
+            <a class="nav-child-link" href="/staging/baocao/tuantuyen/" aria-label="Báo cáo Tuần Tuyến" title="Báo cáo Tuần Tuyến"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
           </div>
         </div>
         <div class="nav-standalone">
-          <a class="nav-link" href="/thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
-          <a class="nav-link" href="/nhom/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.4-3.6 2.6-5.5 6-5.5s5.6 1.9 6 5.5m1-5c3.1 0 4.7 1.8 5 5"/></svg></span>Team/Đội của tôi</a>
-          <a class="nav-link" href="/nguoidung/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
+          <a class="nav-link" href="/staging/thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
+          <a class="nav-link" href="/staging/nhom/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.4-3.6 2.6-5.5 6-5.5s5.6 1.9 6 5.5m1-5c3.1 0 4.7 1.8 5 5"/></svg></span>Team/Đội của tôi</a>
+          <a class="nav-link" href="/staging/nguoidung/" data-admin-only hidden><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
         </div>
       </nav>
       <div class="sidebar-bottom"><div class="connection">Bản xem trước độc lập</div><p class="version">HP Telecom · Giao diện demo</p></div>
     </aside>
     <div class="main">
-      <header class="topbar"><span class="topbar-title">Tổng hợp Sự cố</span><div style="display:flex;align-items:center;gap:18px"><a href="https://hptelecom.id.vn/support" style="color:#53647a;font-size:11px;font-weight:700">Hỗ trợ</a><div class="admin"><span class="avatar" aria-hidden="true">QT</span><span><span class="admin-name">Quản trị viên</span><span class="admin-role">Tài khoản demo</span></span></div></div></header>
+      <header class="topbar"><span class="topbar-title">Tổng hợp Sự cố</span><div style="display:flex;align-items:center;gap:18px"><a href="/staging/support" style="color:#53647a;font-size:11px;font-weight:700">Hỗ trợ</a><div class="admin"><span class="avatar" aria-hidden="true">QT</span><span><span class="admin-name">Quản trị viên</span><span class="admin-role">Tài khoản demo</span></span></div></div></header>
       <main class="content">
         <section class="heading">
           <div><p class="breadcrumb"><a href="../">Tổng hợp</a> <span aria-hidden="true">/</span> Sự cố</p><h1>Tổng hợp Sự cố</h1><p class="subtitle">Xem báo cáo sự cố theo tháng, Team/Đội và nội dung ghi nhận.</p></div>
@@ -293,11 +356,11 @@
           toggle.setAttribute("aria-label", shouldCollapse ? "Mở rộng menu" : "Thu gọn menu");
           toggle.title = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
           if (persist) {
-            try { localStorage.setItem("hp-sidebar-collapsed", String(shouldCollapse)); }
+            try { localStorage.setItem("hp-staging-sidebar-collapsed", String(shouldCollapse)); }
             catch (error) { console.warn("Không lưu được tùy chọn menu trên thiết bị này.", error); }
           }
         };
-        try { setSidebarCollapsed(localStorage.getItem("hp-sidebar-collapsed") === "true", false); }
+        try { setSidebarCollapsed(localStorage.getItem("hp-staging-sidebar-collapsed") === "true", false); }
         catch (error) {
           console.warn("Không đọc được tùy chọn menu trên thiết bị này.", error);
           setSidebarCollapsed(false, false);
@@ -307,45 +370,54 @@
           if (event.matches && sidebar.classList.contains("is-collapsed")) setSidebarCollapsed(false);
         });
         nav.querySelectorAll("a").forEach(link => { if (!link.title) link.title = link.textContent.trim(); });
-        nav.querySelectorAll("[data-nav-toggle]").forEach(button => {
+        nav.querySelectorAll("[data-nav-toggle]").forEach((button) => {
           const group = button.closest(".nav-group");
           const submenu = document.getElementById(button.getAttribute("aria-controls"));
           if (!group || !submenu) return;
-          const hasCurrentPage = Boolean(submenu.querySelector('[aria-current="page"]'));
-          group.classList.toggle("has-current", hasCurrentPage);
-          const setGroupOpen = open => {
+          group.classList.toggle("has-current", Boolean(submenu.querySelector('[aria-current="page"]')));
+          let closeTimer;
+          let pointerPress = false;
+          let lastPointer = "";
+          function setOpen(open) {
+            clearTimeout(closeTimer);
             button.setAttribute("aria-expanded", String(open));
             button.setAttribute("aria-label", `${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
             submenu.hidden = !open;
             group.classList.toggle("is-open", open);
-          };
-          if (hasCurrentPage) group.dataset.pinned = "true";
-          setGroupOpen(hasCurrentPage);
-          button.addEventListener("pointerenter", event => {
-            if (event.pointerType === "mouse" && !group.dataset.pinned) setGroupOpen(true);
+          }
+          setOpen(group.matches(":hover"));
+          group.addEventListener("pointerenter", (event) => {
+            if (event.pointerType === "mouse") setOpen(true);
           });
-          group.addEventListener("pointerleave", event => {
-            if (event.pointerType === "mouse" && !group.dataset.pinned && !group.contains(document.activeElement)) setGroupOpen(false);
+          group.addEventListener("pointerleave", (event) => {
+            if (event.pointerType !== "mouse") return;
+            // Mouse focus must not keep the current page's menu pinned open.
+            clearTimeout(closeTimer);
+            closeTimer = setTimeout(() => setOpen(false), 140);
           });
-          group.addEventListener("focusin", () => setGroupOpen(true));
-          group.addEventListener("focusout", event => {
-            if (!group.contains(event.relatedTarget) && !group.dataset.pinned) setGroupOpen(false);
+          group.addEventListener("pointerdown", (event) => {
+            lastPointer = event.pointerType;
+            pointerPress = true;
           });
-          button.addEventListener("click", () => {
-            if (group.dataset.pinned === "true") {
-              delete group.dataset.pinned;
-              setGroupOpen(false);
-            } else {
-              group.dataset.pinned = "true";
-              setGroupOpen(true);
-            }
+          group.addEventListener("pointerup", () => { pointerPress = false; });
+          group.addEventListener("pointercancel", () => { pointerPress = false; });
+          group.addEventListener("focusin", () => { if (!pointerPress) setOpen(true); });
+          group.addEventListener("focusout", (event) => {
+            if (!group.contains(event.relatedTarget) && !group.matches(":hover")) setOpen(false);
           });
-          group.addEventListener("keydown", event => {
-            if (event.key === "Escape" && group.classList.contains("is-open")) {
-              delete group.dataset.pinned;
-              setGroupOpen(false);
+          button.addEventListener("click", (event) => {
+            if (event.detail > 0 && lastPointer === "mouse") setOpen(true);
+            else setOpen(submenu.hidden);
+          });
+          group.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
               button.focus();
+              setOpen(false);
             }
+          });
+          new MutationObserver(() => setOpen(false)).observe(sidebar, {
+            attributes: true, attributeFilter: ["class"]
           });
         });
       })();

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#102a3e" />
+    <meta name="theme-color" content="#17212d" />
     <title>Quản lý người dùng | HP Telecom</title>
     <meta name="description" content="Quản lý tài khoản người dùng HP Telecom." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -124,7 +124,7 @@
         border: 1px solid var(--line);
         border-radius: 10px;
         background: #fff;
-        box-shadow: 0 12px 30px rgba(16, 42, 62, .16);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .35);
         opacity: 0;
         pointer-events: none;
         transition: opacity .14s ease, transform .14s ease, visibility .14s;
@@ -193,7 +193,7 @@
         margin-bottom: 26px;
       }
       .crumb { margin: 0 0 9px; color: var(--muted); font-size: 11px; }
-      h1 { margin: 0; font-size: 30px; letter-spacing: -.055em; }
+      h1 { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -.035em; text-wrap: balance; }
       .subtitle { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
       .demo-badge {
         display: inline-flex;
@@ -259,8 +259,8 @@
         padding: 17px 20px;
       }
       .stat:not(:last-child)::after { position: absolute; top: 16px; right: 0; bottom: 16px; width: 1px; background: var(--line); content: ""; }
-      .stat-label { color: var(--muted); font-size: 11px; font-weight: 700; }
-      .stat-value { display: block; margin-top: 8px; font-size: 28px; font-weight: 800; letter-spacing: -.055em; }
+      .stat-label { color: var(--muted); font-size: 12px; font-weight: 700; }
+      .stat-value { display: block; margin-top: 8px; font-size: 30px; font-weight: 800; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
       .table-panel {
         overflow: hidden;
         border: 1px solid var(--line);
@@ -311,7 +311,7 @@
         font-size: 11px;
       }
       .search-input { width: min(220px, 25vw); padding: 0 12px 0 34px; }
-      .search-input::placeholder { color: #758298; }
+      .search-input::placeholder { color: #66758a; }
       .filter-control { min-width: 118px; padding: 0 26px 0 10px; }
       .team-search { width: 190px; padding-right: 10px; }
       .table-scroll { overflow-x: auto; }
@@ -331,20 +331,21 @@
         padding: 9px 18px;
         border-top: 1px solid #edf0f4;
         color: #34445b;
-        font-size: 11px;
+        font-size: 12px;
       }
-      tbody tr:hover { background: #fbfcfe; }
+      tbody tr { transition: background-color .14s ease; }
+      tbody tr:hover { background: #f4faf9; }
       .person { display: flex; align-items: center; gap: 10px; }
       .person .avatar { width: 34px; height: 34px; font-size: 10px; }
-      .person-name { display: block; color: var(--ink); font-size: 11px; font-weight: 800; }
-      .person-id { display: block; margin-top: 3px; color: #77859a; font-size: 10px; }
+      .person-name { display: block; color: var(--ink); font-size: 12px; font-weight: 800; }
+      .person-id { display: block; margin-top: 3px; color: #5f6e82; font-size: 11px; }
       .role-pill, .status-pill {
         display: inline-flex;
         align-items: center;
         min-height: 23px;
         padding: 0 9px;
         border-radius: 999px;
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
       }
       .role-pill { background: #e4f4f4; color: #315c63; }
@@ -364,14 +365,15 @@
       .icon-button:hover { border-color: var(--line); background: #f7f9fc; }
       .row-actions { display: flex; justify-content: flex-end; gap: 4px; }
       .status-action {
-        padding: 6px 8px;
+        padding: 7px 10px;
         border: 1px solid var(--line);
         border-radius: 6px;
         background: #fff;
         color: #53647b;
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
         white-space: nowrap;
+        transition: background-color .14s ease, border-color .14s ease;
       }
       .status-action:hover { background: #f7f9fc; }
       .status-action.delete { border-color: #f0d3d1; color: var(--red); }
@@ -466,20 +468,32 @@
       .dialog-header p { margin: 6px 0 0; color: var(--muted); font-size: 11px; }
       .dialog-form { padding: 8px 24px 22px; }
       .dialog-field { margin-top: 14px; }
-      .dialog-field label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 800; }
-      .dialog-label { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 800; }
+      .dialog-field label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 800; }
+      .dialog-label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 800; }
       .dialog-field input, .dialog-field select {
         width: 100%;
-        height: 40px;
+        height: 42px;
         padding: 0 11px;
-        border: 1px solid #dfe5ed;
+        border: 1px solid #cfd8e3;
         border-radius: 7px;
         background: #fff;
         color: var(--ink);
-        font-size: 11px;
+        font-size: 13px;
+        transition: border-color .14s ease, box-shadow .14s ease;
       }
+      .dialog-field input:focus-visible, .dialog-field select:focus-visible {
+        border-color: var(--blue);
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(0, 109, 119, .22);
+      }
+      .dialog-field input:disabled, .dialog-field select:disabled { background: #f1f4f7; color: #66758a; cursor: not-allowed; }
       .dialog-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 20px; }
-      .dialog-button { min-height: 38px; padding: 0 14px; border: 1px solid var(--line); border-radius: 7px; background: #fff; color: #41516a; font-size: 11px; font-weight: 800; }
+      .dialog-button { min-height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: 7px; background: #fff; color: #41516a; font-size: 12px; font-weight: 800; transition: background-color .14s ease, border-color .14s ease; }
+      .dialog-button:hover { background: #f7f9fc; }
+      .dialog-button.confirm:hover { border-color: #005861; background: #005861; }
+      .dialog-button:disabled { opacity: .55; cursor: not-allowed; }
+      dialog[open] { animation: dialog-in .18s cubic-bezier(.16, 1, .3, 1); }
+      @keyframes dialog-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }
       .dialog-button.confirm { border-color: var(--blue); background: var(--blue); color: #fff; }
       .dialog-button.danger { border-color: var(--red); background: var(--red); color: #fff; }
       .dialog-button.danger:hover { border-color: #8d2e2b; background: #8d2e2b; }
@@ -571,61 +585,167 @@
       .sidebar .nav .nav-child-link,.sidebar .nav .nav-child-disabled,.sidebar.is-collapsed .nav-group.is-open .nav-child-link,.sidebar.is-collapsed .nav-group.is-open .nav-child-disabled{min-height:40px;justify-content:flex-start;gap:8px;padding:0 8px;font-size:10px}.sidebar.is-collapsed .nav-icon{width:25px;height:25px;flex-basis:25px}.nav-standalone{display:contents}.nav-standalone:before{grid-column:1/-1;margin:9px 3px 2px;color:#9bb0bd;content:"QUẢN TRỊ";font-size:9px;font-weight:800;letter-spacing:.1em}.sidebar.is-collapsed+.main-column,.main-column{margin-left:0}}
       @media(prefers-reduced-motion:reduce){.sidebar-toggle-icon,.nav-group-chevron:before{transition-duration:.01ms}}
     </style>
-      <style id="white-black-theme">
+      <style id="noc-dark-theme">
       :root {
-        color-scheme: light;
-        --canvas: #f1f5f6;
-        --ink: #102a3e;
-        --muted: #536b77;
-        --blue: #006d77;
-        --line: #dce6ea;
-        --green: #16774e;
-        --amber: #94620a;
-        --red: #a83734;
+        color-scheme: dark;
+        --canvas: #1e2a38;
+        --panel: #26364a;
+        --panel-2: #2d3f55;
+        --field: #1a2431;
+        --ink: #f3f6fa;
+        --muted: #b8c5d3;
+        --blue: #5cc7d1;
+        --line: #3d516a;
+        --line-2: #4c627c;
+        --green: #6ad39a;
+        --amber: #f0b955;
+        --red: #ff8078;
       }
-      .dialog-checkboxes { display: grid; gap: 8px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 7px; }
-      .dialog-checkboxes label { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 11px; font-weight: 600; }
+      .dialog-checkboxes { display: grid; gap: 8px; padding: 11px 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--field); }
+      .dialog-checkboxes label { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 12px; font-weight: 600; color: var(--ink); }
       .dialog-checkboxes input { width: 16px; height: 16px; margin: 0; accent-color: var(--blue); }
       .inline-checkbox { display: flex !important; align-items: center; gap: 8px; }
       .inline-checkbox input { width: 16px !important; height: 16px !important; margin: 0; accent-color: var(--blue); }
+
       body { background: var(--canvas); color: var(--ink); }
-      .sidebar { background: var(--ink); color: #d2dfe5; border-color: #1c4052; }
-      .sidebar.is-collapsed .nav-group.is-open .nav-children { background: var(--ink); }
-      .sidebar .nav-label, .sidebar .version, .sidebar .nav-coming-soon { color: #9bb0bd; }
+      ::selection { background: #3b8f98; color: #fff; }
+      .sidebar { background: #17212d; color: #d3dde7; border-color: var(--line); }
+      .sidebar.is-collapsed .nav-group.is-open .nav-children { background: #17212d; border-color: var(--line); box-shadow: 0 12px 28px rgba(0, 0, 0, .4); }
+      .sidebar .nav-label, .sidebar .version, .sidebar .nav-coming-soon { color: #a3b2c1; border-color: var(--line); }
       .sidebar .nav a, .sidebar .nav .nav-group-trigger, .sidebar .nav .nav-child-link,
-      .sidebar .nav .nav-child-disabled, .sidebar .sidebar-toggle,
-      .sidebar .nav-group-chevron { color: #d2dfe5; }
-      .sidebar .connection-state { color: #c6d4dc; }
-      .sidebar .nav a[aria-current="page"],
-      .sidebar .nav .nav-group.has-current > .nav-group-trigger { color: #8ce4e4; }
-      .sidebar.is-collapsed .brand:after { color: #d2dfe5; }
-      .topbar { background: #ffffff; border-color: var(--line); }
-      .topbar-title { color: #58687d; }
-      .top-link { color: #53647a; }
-      .user-name, h1, .table-title, .stat-value, .approval-header h2,
-      .dialog-header h2, .team-name, .person-name { color: var(--ink); }
-      .user-role, .crumb, .subtitle, .stat-label, .table-count,
-      .approval-header p, .approval-empty, .empty-state, .regional-note,
-      .table-footer, .dialog-header p { color: var(--muted); }
-      .avatar { background: #e3f4f4; color: var(--blue); }
-      .demo-badge { color: #34445b; }
-      .stats, .stats .stat { background: #ffffff !important; color: var(--ink); border-color: var(--line); }
-      .table-panel, .approval-panel, .table-toolbar, .table-footer { background: #ffffff; border-color: var(--line); }
-      .table-panel thead th, .approval-panel thead th { background: #f8fafc; color: #627187; }
-      .table-panel tbody td, .approval-panel tbody td { background: #ffffff; color: #394a61; }
-      .table-panel tbody tr:hover td, .approval-panel tbody tr:hover td { background: #eef7f7 !important; color: #394a61; }
-      .person-id { color: #77859a; }
-      .role-pill { color: var(--blue); }
-      .search-input, .filter-control, .dialog-field input, .dialog-field select { color: #34445b; }
-      .search-input::placeholder { color: #77859a; }
-      .filters label, .dialog-field label { color: var(--muted); }
-      .icon-button, .status-action, .approval-action, .dialog-button { color: #41516a; }
-      .status-action.delete, .dialog-button.danger { color: var(--red); }
-      .approval-action.approve, .primary-button, .dialog-button.confirm,
-      .dialog-button.danger { color: #ffffff; }
-      .approval-count { color: var(--amber); }
+      .sidebar .nav .nav-child-disabled, .sidebar .sidebar-toggle, .sidebar .nav-group-chevron { color: #d3dde7; }
+      .sidebar .nav .nav-group-trigger:hover, .sidebar .nav .nav-group-trigger[aria-expanded=true],
+      .sidebar .nav .nav-link:hover, .sidebar .nav .nav-child-link:hover { border-color: var(--line); background: #233245; color: #fff; }
+      .sidebar .nav .nav-group.has-current > .nav-group-trigger,
+      .sidebar .nav .nav-link[aria-current=page], .sidebar .nav .nav-child-link[aria-current=page] {
+        border-color: var(--line-2); background: #2b4058; color: #fff; box-shadow: inset 2px 0 var(--blue);
+      }
+      .nav-icon { border-color: var(--line); background: #1f2d3d; color: #b8c5d3; }
+      .nav-link[aria-current=page] .nav-icon, .nav-child-link[aria-current=page] .nav-icon { border-color: #3f8e97; background: #1d4a52; color: #9be6ee; }
+      .nav-children { border-left-color: var(--line); }
+      .sidebar .sidebar-toggle { border-color: var(--line); background: #1f2d3d; }
+      .sidebar .sidebar-toggle:hover { border-color: var(--line-2); background: #2b4058; }
+      .sidebar-bottom, .nav-standalone { border-top-color: var(--line); }
+      .sidebar .connection-state { color: #c3cfdb; }
+      .sidebar.is-collapsed .brand:after { color: #f3f6fa; }
+
+      .topbar { background: var(--canvas); border-color: var(--line); }
+      .topbar-title, .top-link { color: var(--muted); }
+      .top-link:hover { color: var(--ink); }
+      .user-menu { border-left-color: var(--line); }
+      .account-trigger { color: var(--ink); }
+      .account-trigger:hover, .account-menu[data-open="true"] .account-trigger { border-color: var(--line); background: var(--panel); }
+      .account-chevron { border-color: var(--muted); }
+      .account-dropdown { border-color: var(--line-2); background: var(--panel-2); box-shadow: 0 14px 32px rgba(0, 0, 0, .4); }
+      .account-dropdown button { color: #dbe4ed; }
+      .account-dropdown button:hover { background: #38506b; color: #fff; }
+      .account-dropdown button[data-account-action="logout"] { border-top-color: var(--line); color: var(--red); }
+      .account-dropdown button[data-account-action="logout"]:hover { background: #4a2f35; }
+      .user-name, h1, .table-title, .stat-value, .approval-header h2, .dialog-header h2, .team-name, .person-name { color: var(--ink); }
+      .user-role, .crumb, .subtitle, .stat-label, .table-count, .approval-header p, .approval-empty,
+      .empty-state, .regional-note, .table-footer, .dialog-header p { color: var(--muted); }
+      h1 { font-size: 34px; }
+      .subtitle { font-size: 14px; }
+
+      .demo-badge { border-color: var(--line-2); background: var(--panel); color: #dbe4ed; border-radius: 8px; }
+      .demo-badge::before { border-radius: 2px; }
+      .demo-badge.is-connected::before { background: var(--green); }
+      .demo-badge.is-error::before { background: var(--red); }
+
+      /* Stats become three separate tiles, each topped with a fiber-code rule */
+      .stats { gap: 14px; padding: 0; border: 0; border-radius: 0; background: transparent !important; overflow: visible; }
+      .stats .stat { padding: 20px 22px 18px; border: 1px solid var(--line); border-top: 3px solid var(--fc, #6aa8e8); border-radius: 10px; background: var(--panel) !important; color: var(--ink); }
+      .stats .stat:nth-child(1) { --fc: #6aa8e8; }
+      .stats .stat:nth-child(2) { --fc: #f0a35a; }
+      .stats .stat:nth-child(3) { --fc: #6fcf8f; }
+      .stat:not(:last-child)::after { display: none; }
+      .stat-label { font-size: 12px; font-weight: 700; }
+      .stat-value { margin-top: 10px; font-size: 40px; font-weight: 800; letter-spacing: -.03em; }
+
+      /* Toolbar is its own card; each user row is a separate card */
+      .table-panel { border: 0; border-radius: 0; background: transparent; overflow: visible; }
+      .approval-panel { border-color: var(--line); border-radius: 10px; background: var(--panel); }
+      .table-toolbar { margin-bottom: 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+      .approval-header, .table-footer { background: transparent; border-color: var(--line); }
+      .table-footer { padding-right: 4px; padding-left: 4px; border-top: 0; }
+      table { border-collapse: separate; border-spacing: 0 8px; }
+      .table-panel thead th, .approval-panel thead th { height: 30px; border: 0; background: transparent; color: #a3b2c1; }
+      .approval-panel thead th { border-bottom: 1px solid var(--line); }
+      .table-panel tbody td { border: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--panel); color: #dbe4ed; transition: background-color .14s ease; }
+      .table-panel tbody td:first-child { border-left: 1px solid var(--line); border-radius: 10px 0 0 10px; }
+      .table-panel tbody td:last-child { border-right: 1px solid var(--line); border-radius: 0 10px 10px 0; }
+      .table-panel tbody tr:hover td { background: #2f4259 !important; color: #fff; border-color: var(--line-2); }
+      .approval-panel tbody td { background: transparent; border-top-color: var(--line); color: #dbe4ed; }
+      .approval-panel tbody tr:hover td { background: #2f4259 !important; color: #fff; }
+      .person-id { color: #a3b2c1; font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 11px; letter-spacing: 0; }
+
+      /* Fiber colour code (TIA-598) drives avatar tint per row */
+      .avatar { --fc: #6aa8e8; border: 1px solid color-mix(in srgb, var(--fc) 60%, transparent); border-radius: 10px; background: color-mix(in srgb, var(--fc) 20%, #26364a); color: var(--fc); }
+      tbody tr:nth-child(12n+1) .avatar { --fc: #7db4ee; }
+      tbody tr:nth-child(12n+2) .avatar { --fc: #f5ae6a; }
+      tbody tr:nth-child(12n+3) .avatar { --fc: #7fd89c; }
+      tbody tr:nth-child(12n+4) .avatar { --fc: #d2a77d; }
+      tbody tr:nth-child(12n+5) .avatar { --fc: #b9c6d2; }
+      tbody tr:nth-child(12n+6) .avatar { --fc: #eef2f6; }
+      tbody tr:nth-child(12n+7) .avatar { --fc: #ff8a82; }
+      tbody tr:nth-child(12n+8) .avatar { --fc: #9aa7b3; }
+      tbody tr:nth-child(12n+9) .avatar { --fc: #f0dc63; }
+      tbody tr:nth-child(12n+10) .avatar { --fc: #c4a9f5; }
+      tbody tr:nth-child(12n+11) .avatar { --fc: #f7aecb; }
+      tbody tr:nth-child(12n+12) .avatar { --fc: #70dfdc; }
+      .user-menu .avatar { --fc: #70dfdc; }
+
+      .role-pill { border: 1px solid #3f7a82; border-radius: 6px; background: #1d4a52; color: #a9eaf0; }
+      .status-pill { border: 1px solid #3f8a62; border-radius: 6px; background: #1f4a35; color: var(--green); }
+      .status-pill.inactive { border-color: var(--line-2); background: #34475e; color: #c3cfdb; }
+      .approval-count { border: 1px solid #8a6a26; background: #4a3a17; color: var(--amber); border-radius: 6px; }
+
+      .search-input, .filter-control, .dialog-field input, .dialog-field select { border-color: var(--line-2); background: var(--field); color: var(--ink); border-radius: 8px; }
+      .search-input::placeholder { color: #94a3b3; }
+      .search-wrap::before { border-color: #a3b2c1; }
+      .search-wrap::after { background: #a3b2c1; }
+      .filters label, .dialog-field label, .dialog-label { color: #d3dde7; }
+      .dialog-field input:focus-visible, .dialog-field select:focus-visible, .search-input:focus-visible, .filter-control:focus-visible {
+        border-color: var(--blue); outline: 0; box-shadow: 0 0 0 3px rgba(92, 199, 209, .3);
+      }
+      .dialog-field input:disabled, .dialog-field select:disabled { background: #222f3f; color: #94a3b3; }
+
+      .primary-button, .dialog-button.confirm, .approval-action.approve { border-color: var(--blue); background: var(--blue); color: #0b2328; font-weight: 800; }
+      .primary-button:hover, .dialog-button.confirm:hover, .approval-action.approve:hover { border-color: #86dae1; background: #86dae1; color: #0b2328; }
+      .primary-button { border-radius: 8px; }
+      .secondary-button, .icon-button, .status-action, .approval-action, .dialog-button { border-color: var(--line-2); background: transparent; color: #dbe4ed; border-radius: 8px; }
+      .secondary-button:hover, .icon-button:hover, .status-action:hover, .approval-action:hover, .dialog-button:hover { border-color: #637b97; background: #38506b; color: #fff; }
+      .status-action.delete, .dialog-button.danger { border-color: #8a4a4d; color: var(--red); }
+      .status-action.delete:hover { border-color: #b56469; background: #4a2f35; color: #ffa59f; }
+      .dialog-button.danger { background: #b3413f; border-color: #b3413f; color: #fff; }
+      .dialog-button.danger:hover { background: #c9514e; border-color: #c9514e; color: #fff; }
+      .primary-button:focus-visible, .icon-button:focus-visible, .status-action:focus-visible, .approval-action:focus-visible,
+      .dialog-button:focus-visible, .top-link:focus-visible, .account-trigger:focus-visible { outline: 3px solid rgba(92, 199, 209, .5); outline-offset: 2px; }
+
+      dialog { border: 1px solid var(--line-2); border-radius: 12px; background: var(--panel); color: var(--ink); box-shadow: 0 28px 80px rgba(0, 0, 0, .5); }
+      dialog::backdrop { background: rgba(10, 16, 24, .6); }
+      .dialog-header { border-bottom-color: var(--line); }
+      .toast { border: 1px solid var(--line-2); background: #38506b; color: var(--ink); box-shadow: 0 12px 30px rgba(0, 0, 0, .4); }
+      .account-info { display: grid; grid-template-columns: 130px 1fr; gap: 0; margin: 0; padding: 4px 24px 8px; }
+      .account-info dt, .account-info dd { margin: 0; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+      .account-info dt { color: var(--muted); font-weight: 700; }
+      .account-info dd { color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+      #account-dialog .dialog-actions { padding: 14px 24px 20px; }
+      #account-dialog [hidden] { display: none !important; }
+      #account-form { padding-bottom: 0; }
+      @media (max-width: 760px) {
+        h1 { font-size: 28px; }
+        .stats { gap: 10px; }
+        .stat-value { font-size: 30px; }
+      }
+      @media (max-width: 400px) {
+        .stats { grid-template-columns: 1fr; }
+        .stats .stat { padding: 14px 18px; }
+        .stat-value { font-size: 28px; }
+      }
       </style>
-</head>
+    <meta name="hp-ui-release" content="github-d-20261012" />
+  </head>
   <body>
     <div class="app">
       <aside class="sidebar">
@@ -686,7 +806,7 @@
         <header class="topbar">
           <span class="topbar-title">Quản lý người dùng</span>
           <div class="top-actions">
-            <a class="top-link" href="https://hptelecom.id.vn/support">Hỗ trợ</a>
+            <a class="top-link" href="/staging/support">Hỗ trợ</a>
             <div class="user-menu account-menu" id="account-menu">
               <button class="account-trigger" id="account-trigger" type="button" aria-label="Tài khoản quản trị" aria-haspopup="menu" aria-expanded="false">
                 <span class="avatar" aria-hidden="true">QT</span>
@@ -824,6 +944,26 @@
         </div>
       </form>
     </dialog>
+    <dialog id="account-dialog" aria-labelledby="account-dialog-title">
+      <div class="dialog-header">
+        <h2 id="account-dialog-title">Thông tin tài khoản</h2>
+        <p id="account-dialog-note">Thông tin đang đăng nhập. Chỉ xem, không sửa tại đây.</p>
+      </div>
+      <dl class="account-info" id="account-info"></dl>
+      <form class="dialog-form" id="account-form" hidden>
+        <div class="dialog-field"><label for="account-fullname">Họ và tên</label><input id="account-fullname" autocomplete="name" minlength="2" maxlength="120" required /></div>
+        <div class="dialog-field"><label for="account-email">Email</label><input id="account-email" type="email" autocomplete="email" maxlength="254" required /></div>
+        <div class="dialog-field"><label for="account-phone">Số điện thoại</label><input id="account-phone" type="tel" autocomplete="tel" maxlength="30" /></div>
+        <div class="dialog-actions">
+          <button class="dialog-button" id="cancel-account-edit" type="button">Hủy</button>
+          <button class="dialog-button confirm" id="save-account" type="submit">Lưu thay đổi</button>
+        </div>
+      </form>
+      <div class="dialog-actions" id="account-view-actions">
+        <button class="dialog-button" id="edit-account" type="button">Sửa thông tin</button>
+        <button class="dialog-button confirm" id="close-account-dialog" type="button">Đóng</button>
+      </div>
+    </dialog>
     <dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
       <div class="dialog-header">
         <h2 id="delete-title">Xóa tài khoản?</h2>
@@ -844,7 +984,7 @@
         <script type="text/plain" id="legacy-demo-user-management">
 (() => {
   "use strict";
-  const storageKey = "hptelecom-demo-user-management";
+  const storageKey = "hptelecom-staging-demo-user-management";
   const legacyTeamNames = new Set(["Hà Nội", "Đà Nẵng", "Đội Hà Nội 01", "Đội Đà Nẵng 01", "Đội TP.HCM 01"]);
   const normalizeTeam = (team) => {
     const name = String(team || "").trim();
@@ -1186,11 +1326,46 @@
     const action = event.target.closest("[data-account-action]")?.dataset.accountAction;
     if (!action) return;
     if (action === "info") {
-      document.querySelector("#toast").textContent = "Đây là tài khoản minh họa. Thông tin tài khoản thật sẽ hiển thị khi kết nối hệ thống.";
+      setOpen(false);
+      const accountDialog = document.querySelector("#account-dialog");
+      const roles = { admin: "Quản trị viên", coordinator: "Điều phối viên", operator: "Kỹ thuật viên" };
+      const statuses = { active: "Đang hoạt động", disabled: "Đã tạm dừng", pending: "Chờ duyệt" };
+      const account = window.hpAccount;
+      const format = (key, value) => {
+        if (value == null || value === "") return "—";
+        if (key === "status") return statuses[value] || value;
+        return String(value);
+      };
+      const rows = account ? [
+        ["Họ và tên", format("fullName", account.fullName || account.username)],
+        ["Email", format("email", account.email)],
+        ["Số điện thoại", format("phone", account.phone)],
+        ["Trạng thái", format("status", account.status)]
+      ] : [
+        ["Họ và tên", document.querySelector("#account-name")?.textContent || "—"],
+        ["Vai trò", document.querySelector("#account-role")?.textContent || "—"],
+        ["Ghi chú", "Chưa kết nối máy chủ nên chưa có thêm thông tin."]
+      ];
+      const info = document.querySelector("#account-info");
+      info.replaceChildren();
+      for (const [label, value] of rows) {
+        const term = document.createElement("dt");
+        const detail = document.createElement("dd");
+        term.textContent = label;
+        detail.textContent = value;
+        info.append(term, detail);
+      }
+      document.querySelector("#account-dialog-note").textContent = account
+        ? "Bấm Sửa thông tin để đổi họ tên, email hoặc số điện thoại."
+        : "Chưa kết nối máy chủ nên chưa thể sửa thông tin.";
+      document.querySelector("#edit-account").hidden = !account;
+      showAccountView();
+      accountDialog.showModal();
+      return;
     } else if (action === "password") {
       document.querySelector("#toast").textContent = "Đổi mật khẩu sẽ khả dụng khi trang kết nối với hệ thống.";
     } else if (action === "logout") {
-      window.location.assign("../dangnhap/");
+      window.location.assign("/staging/dangnhap");
       return;
     }
     document.querySelector("#toast").hidden = false;
@@ -1198,6 +1373,65 @@
     toastTimer = window.setTimeout(() => {
       document.querySelector("#toast").hidden = true;
     }, 3200);
+  });
+  const accountDialog = document.querySelector("#account-dialog");
+  const accountForm = document.querySelector("#account-form");
+  const accountInfo = document.querySelector("#account-info");
+  const accountViewActions = document.querySelector("#account-view-actions");
+  const showAccountView = () => {
+    accountForm.hidden = true;
+    accountInfo.hidden = false;
+    accountViewActions.hidden = false;
+  };
+  const showToast = (message) => {
+    const box = document.querySelector("#toast");
+    box.textContent = message;
+    box.hidden = false;
+    window.clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => { box.hidden = true; }, 3800);
+  };
+  document.querySelector("#close-account-dialog")?.addEventListener("click", () => accountDialog.close());
+  accountDialog?.addEventListener("click", (event) => { if (event.target === accountDialog) accountDialog.close(); });
+  document.querySelector("#edit-account")?.addEventListener("click", () => {
+    const account = window.hpAccount;
+    if (!account) return;
+    document.querySelector("#account-fullname").value = account.fullName || "";
+    document.querySelector("#account-email").value = account.email || "";
+    document.querySelector("#account-phone").value = account.phone || "";
+    accountInfo.hidden = true;
+    accountViewActions.hidden = true;
+    accountForm.hidden = false;
+    document.querySelector("#account-dialog-note").textContent = "Sửa thông tin rồi bấm Lưu thay đổi.";
+    document.querySelector("#account-fullname").focus();
+  });
+  document.querySelector("#cancel-account-edit")?.addEventListener("click", () => {
+    showAccountView();
+    document.querySelector("#account-dialog-note").textContent = "Bấm Sửa thông tin để đổi họ tên, email hoặc số điện thoại.";
+  });
+  accountForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const save = document.querySelector("#save-account");
+    save.disabled = true;
+    try {
+      const response = await fetch(new URL("/staging/api/auth/me", location.origin), {
+        method: "PATCH", credentials: "same-origin", cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: document.querySelector("#account-fullname").value.trim(),
+          email: document.querySelector("#account-email").value.trim(),
+          phone: document.querySelector("#account-phone").value.trim()
+        })
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error && body.error.message || "Không lưu được thông tin.");
+      window.hpAccount = body.user;
+      document.querySelector("#account-name").textContent = body.user.fullName || body.user.username;
+      document.querySelector(".user-menu .avatar").textContent = (body.user.fullName || body.user.username).split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase("vi");
+      accountDialog.close();
+      showToast("Đã cập nhật thông tin tài khoản.");
+    } catch (error) {
+      showToast(error.message);
+    } finally { save.disabled = false; }
   });
   menu.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && trigger.getAttribute("aria-expanded") === "true") {
@@ -1220,7 +1454,7 @@
 (() => {
   "use strict";
   const $ = (selector) => document.querySelector(selector);
-  const apiRoot = new URL("/api/", location.origin);
+  const apiRoot = new URL("/staging/api/", location.origin);
   const roleNames = { admin: "Quản trị viên", coordinator: "Điều phối viên", operator: "Kỹ thuật viên" };
   let me = null;
   let users = [];
@@ -1281,12 +1515,11 @@
       const isEnabled = user.status === "active";
       const state = isEnabled ? "Đang hoạt động" : "Đã tạm dừng";
       const initials = (user.fullName || user.username).split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase("vi");
-      const actions = String(user.id) === String(me.id)
-        ? '<span class="person-id">Đang sử dụng</span>'
-        : '<button class="status-action" type="button" data-admin-action="' + (isEnabled ? "disable" : "enable") +
+      const isSelf = String(user.id) === String(me.id);
+      const actions = '<button class="status-action" type="button" data-admin-action="' + (isEnabled ? "disable" : "enable") +
           '" data-id="' + esc(user.id) + '">' + (isEnabled ? "Tạm dừng" : "Kích hoạt") +
           '</button><button class="status-action delete" type="button" data-admin-action="delete" data-id="' +
-          esc(user.id) + '">Xóa</button>';
+          esc(user.id) + '">Xóa</button>' + (isSelf ? '<span class="person-id">Tài khoản của bạn</span>' : "");
       return '<tr><td><div class="person"><span class="avatar">' + esc(initials) +
         '</span><span><span class="person-name">' + esc(user.fullName || user.username) +
         '</span><span class="person-id">@' + esc(user.username) + '</span></span></div></td><td>' +
@@ -1336,19 +1569,29 @@
     if (!action) return;
     const target = users.find((user) => String(user.id) === action.dataset.id);
     if (!target) return;
-    if (action.dataset.adminAction === "delete" && !window.confirm("Xóa tài khoản " + (target.fullName || target.username) + "?")) return;
+    const isSelf = String(target.id) === String(me.id);
+    const adminAction = action.dataset.adminAction;
+    const targetName = target.fullName || target.username;
+    if (adminAction === "delete" && !window.confirm(isSelf
+      ? "Xóa tài khoản của chính bạn? Bạn sẽ bị đăng xuất và không thể hoàn tác."
+      : "Xóa tài khoản " + targetName + "?")) return;
+    if (adminAction === "disable" && isSelf && !window.confirm("Tạm dừng tài khoản của chính bạn? Bạn sẽ bị đăng xuất và cần quản trị viên khác kích hoạt lại.")) return;
     action.disabled = true;
     try {
-      if (action.dataset.adminAction === "delete") {
+      if (adminAction === "delete") {
         await api("users/" + encodeURIComponent(target.id), "DELETE", {});
       } else {
         await api("users/" + encodeURIComponent(target.id), "PATCH", {
-          status: action.dataset.adminAction === "disable" ? "disabled" : "active",
+          status: adminAction === "disable" ? "disabled" : "active",
           role: target.role
         });
       }
+      if (isSelf && adminAction !== "enable") {
+        location.assign("/staging/dangnhap");
+        return;
+      }
       await load();
-      toast(action.dataset.adminAction === "delete" ? "Đã xóa tài khoản." : "Đã cập nhật trạng thái tài khoản.");
+      toast(adminAction === "delete" ? "Đã xóa tài khoản." : "Đã cập nhật trạng thái tài khoản.");
     } catch (error) { action.disabled = false; toast(error.message); }
   });
   $("#refresh-users").addEventListener("click", async () => {
@@ -1368,14 +1611,15 @@
     try {
       const result = await api("auth/me");
       me = result.user;
-      if (me.role !== "admin") throw new Error("Tài khoản này không có quyền quản lý người dùng.");
+      window.hpAccount = me;
+      if (me.role !== "admin") { location.replace("/staging/tonghop/tongquan/"); return; }
       $("#account-name").textContent = me.fullName || me.username;
       $("#account-role").textContent = roleNames[me.role];
       $(".user-menu .avatar").textContent = (me.fullName || me.username).split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase("vi");
       await load();
     } catch (error) {
       if (/đăng nhập|phiên|không hợp lệ/i.test(error.message)) {
-        location.replace("/dangnhap/?next=" + encodeURIComponent("/nguoidung/"));
+        location.replace("/staging/dangnhap?next=" + encodeURIComponent("/staging/nguoidung/"));
         return;
       }
       $("#data-badge").textContent = error.message;
@@ -1388,8 +1632,8 @@
       <script type="text/plain" id="legacy-api-integration">
 (() => {
   "use strict";
-  const apiRoot = location.protocol === "https:" || location.protocol === "http:" ? new URL("/api/", location.origin).toString() : "";
-  const sessionKey = "hp-server-session";
+  const apiRoot = location.protocol === "https:" || location.protocol === "http:" ? new URL("/staging/api/", location.origin).toString() : "";
+  const sessionKey = "hp-staging-server-session";
   const roleNames = {admin:"Quản trị viên",staff:"Kỹ thuật viên",viewer:"Xem và tải dữ liệu",dispatcher:"Điều phối viên"};
   const moduleNames = {incident:"Sự cố",cable:"Tuần Tuyến",relocation:"Di dời"};
   const $ = (selector) => document.querySelector(selector);
@@ -1497,7 +1741,7 @@
     if(!editId&&password.length<10){$("#new-password").setCustomValidity("Mật khẩu phải có ít nhất 10 ký tự.");$("#new-password").reportValidity();return;}
     const data={username:$("#new-username").value.trim(),display_name:$("#new-name").value.trim(),team,password,role:$("#new-role").value,enabled:$("#new-enabled").checked,modules:selected};
     try{await api(editId?"users/"+encodeURIComponent(editId):"users",editId?"PATCH":"POST",data);$("#user-dialog").close();
-      if(editId&&String(editId)===String(me.id)){try{sessionStorage.removeItem(sessionKey)}catch{}location.assign("/dangnhap?account=updated");return;}
+      if(editId&&String(editId)===String(me.id)){try{sessionStorage.removeItem(sessionKey)}catch{}location.assign("/staging/dangnhap?account=updated");return;}
       await load();toast(editId?"Đã cập nhật tài khoản trên máy chủ.":"Đã tạo tài khoản trên máy chủ.");
     }catch(error){toast(error.message)}
   });
@@ -1575,11 +1819,11 @@
             toggle.title = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
             toggle.querySelector(".sidebar-toggle-label").textContent = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
             if (persist) {
-              try { window.localStorage.setItem("hp-sidebar-collapsed", String(shouldCollapse)); }
+              try { window.localStorage.setItem("hp-staging-sidebar-collapsed", String(shouldCollapse)); }
               catch (error) { console.warn("Không lưu được tùy chọn menu trên thiết bị này.", error); }
             }
           }
-          try { setSidebarCollapsed(window.localStorage.getItem("hp-sidebar-collapsed") === "true", false); }
+          try { setSidebarCollapsed(window.localStorage.getItem("hp-staging-sidebar-collapsed") === "true", false); }
           catch (error) {
             console.warn("Không đọc được tùy chọn menu trên thiết bị này.", error);
             setSidebarCollapsed(false, false);
@@ -1593,37 +1837,49 @@
             const submenu = document.getElementById(button.getAttribute("aria-controls"));
             if (!group || !submenu) return;
             group.classList.toggle("has-current", Boolean(submenu.querySelector('[aria-current="page"]')));
-            function setGroupOpen(open) {
+            let closeTimer;
+            let pointerPress = false;
+            let lastPointer = "";
+            function setOpen(open) {
+              clearTimeout(closeTimer);
               button.setAttribute("aria-expanded", String(open));
               button.setAttribute("aria-label", `${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
               submenu.hidden = !open;
               group.classList.toggle("is-open", open);
             }
-            button.addEventListener("pointerenter", (event) => {
-              if (event.pointerType === "mouse" && !group.dataset.pinned) setGroupOpen(true);
+            setOpen(group.matches(":hover"));
+            group.addEventListener("pointerenter", (event) => {
+              if (event.pointerType === "mouse") setOpen(true);
             });
             group.addEventListener("pointerleave", (event) => {
-              if (event.pointerType === "mouse" && !group.dataset.pinned && !group.contains(document.activeElement)) setGroupOpen(false);
+              if (event.pointerType !== "mouse") return;
+              // Mouse focus must not keep the current page's menu pinned open.
+              clearTimeout(closeTimer);
+              closeTimer = setTimeout(() => setOpen(false), 140);
             });
-            group.addEventListener("focusin", () => setGroupOpen(true));
+            group.addEventListener("pointerdown", (event) => {
+              lastPointer = event.pointerType;
+              pointerPress = true;
+            });
+            group.addEventListener("pointerup", () => { pointerPress = false; });
+            group.addEventListener("pointercancel", () => { pointerPress = false; });
+            group.addEventListener("focusin", () => { if (!pointerPress) setOpen(true); });
             group.addEventListener("focusout", (event) => {
-              if (!group.contains(event.relatedTarget) && !group.dataset.pinned) setGroupOpen(false);
+              if (!group.contains(event.relatedTarget) && !group.matches(":hover")) setOpen(false);
             });
-            button.addEventListener("click", () => {
-              if (group.dataset.pinned === "true") {
-                delete group.dataset.pinned;
-                setGroupOpen(false);
-              } else {
-                group.dataset.pinned = "true";
-                setGroupOpen(true);
-              }
+            button.addEventListener("click", (event) => {
+              if (event.detail > 0 && lastPointer === "mouse") setOpen(true);
+              else setOpen(submenu.hidden);
             });
             group.addEventListener("keydown", (event) => {
-              if (event.key === "Escape" && group.classList.contains("is-open")) {
-                delete group.dataset.pinned;
-                setGroupOpen(false);
+              if (event.key === "Escape") {
+                event.preventDefault();
                 button.focus();
+                setOpen(false);
               }
+            });
+            new MutationObserver(() => setOpen(false)).observe(sidebar, {
+              attributes: true, attributeFilter: ["class"]
             });
           });
         })();

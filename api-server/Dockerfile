@@ -9,6 +9,8 @@ WORKDIR /app
 COPY server.py /app/server.py
 
 RUN mkdir -p /data \
+    && chmod 755 /app \
+    && chmod 644 /app/server.py \
     && chown -R 10001:10001 /app /data
 
 USER 10001:10001

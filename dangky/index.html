@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#102a3e" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Tạo tài khoản | HP Telecom</title>
     <meta name="description" content="Tạo tài khoản HP Telecom." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -93,11 +93,39 @@
         *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
       }
     </style>
+    <style id="noc-dark-theme">
+      :root { color-scheme: dark; --canvas: #1e2a38; --panel: #26364a; --field: #1a2431; --ink: #f3f6fa; --muted: #b8c5d3; --blue: #5cc7d1; --border: #3d516a; }
+      body { background: var(--canvas); color: var(--ink); }
+      .register-shell { border-color: #3d516a; border-radius: 14px; background: var(--panel); box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+      .welcome-panel { background: #17212d; color: #f3f6fa; }
+      .welcome-panel::before, .welcome-panel::after { border-color: rgba(92,199,209,.18); }
+      .welcome-copy .overline { color: #86dae1; }
+      .welcome-copy h1, .form-content h2 { letter-spacing: -.04em; }
+      .welcome-copy p { color: #b8c5d3; }
+      .panel-note { color: #a3b2c1; }
+      .field label { color: #d3dde7; }
+      .field input, .field select { border-color: #4c627c; border-radius: 8px; background: var(--field); color: var(--ink); }
+      .field select option { background: #1a2431; color: #f3f6fa; }
+      .field input::placeholder { color: #94a3b3; }
+      .field input:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(92,199,209,.3); }
+      .password-toggle { color: #b8c5d3; }
+      .password-toggle:hover { color: #86dae1; }
+      .terms, .demo-notice, .login-prompt, .footer-links { color: #b8c5d3; }
+      .terms a, .login-prompt a { color: #5cc7d1; }
+      .submit-button { border-radius: 8px; background: #5cc7d1; color: #0b2328; box-shadow: none; }
+      .submit-button:hover { background: #86dae1; box-shadow: none; }
+      .submit-button:focus-visible, .password-toggle:focus-visible, .brand:focus-visible,
+      .footer-links a:focus-visible, .terms a:focus-visible, .login-prompt a:focus-visible { outline-color: rgba(92,199,209,.5); }
+      .demo-notice[data-state="error"] { color: #ff8078; }
+      .demo-notice[data-state="success"] { color: #6ad39a; }
+      @media (max-width: 760px) { body { background: var(--canvas); } .register-shell { background: var(--panel); } }
+    </style>
+      <meta name="hp-ui-release" content="github-d-20261012" />
   </head>
   <body>
     <main class="register-shell">
       <section class="welcome-panel" aria-label="HP Telecom">
-        <a class="brand" href="/" aria-label="Về trang chủ HP Telecom">
+        <a class="brand" href="/staging/" aria-label="Về trang chủ HP Telecom">
           <svg class="brand-logo" viewBox="0 0 303 64" role="img" aria-label="HP Telecom — Điều hành hiện trường" xmlns="http://www.w3.org/2000/svg">
             <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
               <path d="M30 7a23 23 0 0 0-22 16"/><path d="M7 32a23 23 0 0 0 17 22"/>
@@ -161,15 +189,15 @@
             </div>
             <label class="terms">
               <input id="terms" name="terms" type="checkbox" required />
-              <span>Tôi đồng ý với <a href="https://hptelecom.id.vn/" target="_blank" rel="noreferrer">điều khoản sử dụng</a> và chính sách bảo mật.</span>
+              <span>Tôi đồng ý với <a href="/staging/" target="_blank" rel="noreferrer">điều khoản sử dụng</a> và chính sách bảo mật.</span>
             </label>
             <button class="submit-button" type="submit">Tạo tài khoản</button>
             <p class="demo-notice" id="demo-notice" role="status" aria-live="polite">Tài khoản mới cần quản trị viên duyệt trước khi đăng nhập.</p>
           </form>
-          <p class="login-prompt">Đã có tài khoản? <a href="/dangnhap/">Đăng nhập</a></p>
+          <p class="login-prompt">Đã có tài khoản? <a href="/staging/dangnhap">Đăng nhập</a></p>
           <nav class="footer-links" aria-label="Liên kết hỗ trợ">
-            <a href="https://hptelecom.id.vn/support">Hỗ trợ</a>
-            <a href="/">Trang chủ HP Telecom</a>
+            <a href="/staging/support">Hỗ trợ</a>
+            <a href="/staging/">Trang chủ HP Telecom</a>
           </nav>
         </div>
       </section>
@@ -218,7 +246,7 @@
           if (!/^https?:$/.test(location.protocol)) {
             throw new Error("Bản file demo không kết nối máy chủ. Hãy mở trang đăng ký trên website HP Telecom.");
           }
-          const response = await fetch(new URL("/api/auth/register", location.origin), {
+          const response = await fetch(new URL("/staging/api/auth/register", location.origin), {
             method: "POST",
             credentials: "same-origin",
             headers: { "Content-Type": "application/json" },

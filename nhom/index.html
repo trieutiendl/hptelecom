@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f1f5f6" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#1e2a38" />
+    <meta name="color-scheme" content="dark" />
     <title>Nhóm của tôi | HP Telecom</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -160,6 +160,68 @@
       @media(prefers-reduced-motion:reduce){.nav-group-trigger .nav-chevron{transition-duration:.01ms}}
       .team-path{display:inline-block;margin-top:8px;color:#006d77;font-size:12px;font-weight:700;text-decoration:none}.team-path:hover{text-decoration:underline}.team-back{display:inline-flex;margin-bottom:14px;color:#006d77;font-size:13px;font-weight:700;text-decoration:none}.team-back:hover{text-decoration:underline}
     </style>
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;color:#f3f6fa;background:#1e2a38;--canvas:#1e2a38;--panel:#26364a;--panel-2:#2d3f55;--field:#1a2431;--ink:#f3f6fa;--muted:#b8c5d3;--blue:#5cc7d1;--line:#3d516a;--line-2:#4c627c;--red:#ff8078}
+      body{background:#1e2a38;color:#f3f6fa}
+      ::selection{background:#3b8f98;color:#fff}
+      .sidebar{background:#17212d;color:#d3dde7;border-color:#3d516a}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{background:#17212d;border-color:#3d516a;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar-toggle{border-color:#3d516a;background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:#4c627c;background:#2b4058;color:#fff}
+      .sidebar.is-collapsed .brand:after{color:#f3f6fa}
+      .nav-label,.sidebar-bottom span,.sidebar.is-collapsed .nav-children:before,.nav-standalone:before{color:#a3b2c1}
+      .nav-group-trigger,.nav-link,.nav-child-link{color:#d3dde7}
+      .nav-child-link{color:#c3cfdb}
+      .nav-group-trigger:hover,.nav-group-trigger[aria-expanded=true],.nav-link:hover,.nav-child-link:hover{border-color:#3d516a;background:#233245;color:#fff}
+      .nav-icon{border-color:#3d516a;background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:#3d516a}
+      .nav-child-link[aria-current=page],.nav-link[aria-current=page]{border-color:#4c627c;background:#2b4058;color:#fff;box-shadow:inset 2px 0 #5cc7d1}
+      .nav-standalone,.sidebar-bottom{border-top-color:#3d516a}
+      .sidebar-bottom{color:#c3cfdb}
+      .topbar{background:#1e2a38;border-bottom-color:#3d516a}
+      .topbar-title,.topbar-right{color:#b8c5d3}
+      .topbar a.simple-link{color:#86dae1}
+      .user-menu{border-left-color:#3d516a}
+      .account-trigger:hover,.account-menu[data-open=true] .account-trigger{border-color:#3d516a;background:#26364a}
+      .account-chevron{border-color:#b8c5d3}
+      .account-dropdown{border-color:#4c627c;background:#2d3f55;box-shadow:0 14px 32px rgba(0,0,0,.4)}
+      .account-dropdown button{color:#dbe4ed}
+      .account-dropdown button:hover{background:#38506b;color:#fff}
+      .account-dropdown button[data-account-action=logout]{border-top-color:#3d516a;color:#ff8078}
+      .account-dropdown button[data-account-action=logout]:hover{background:#4a2f35}
+      .account-avatar{border:1px solid #3f8e97;background:#1d4a52;color:#a9eaf0}
+      .account-trigger:focus-visible,.account-dropdown button:focus-visible,.sidebar :focus-visible,.topbar :focus-visible,.shell :focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+      .eyebrow,.subtitle,.panel-intro,.meta,.member-sub,.member-date,.notice,.loading{color:#b8c5d3}
+      .heading h1,.panel h2,.team-title h3,.members-title,.member-main{color:#f3f6fa}
+      .panel{background:#26364a;border-color:#3d516a;border-radius:10px}
+      .field label{color:#d3dde7}
+      .field input,.field select{border-color:#4c627c;background:#1a2431;color:#f3f6fa;border-radius:8px}
+      .field input::placeholder{color:#94a3b3}
+      .field input:focus,.field select:focus{outline:3px solid rgba(92,199,209,.3);border-color:#5cc7d1}
+      .button{border-color:#4c627c;background:transparent;color:#dbe4ed;border-radius:8px}
+      .button:hover{filter:none;border-color:#637b97;background:#38506b;color:#fff}
+      .button.primary{border-color:#5cc7d1;background:#5cc7d1;color:#0b2328;font-weight:800}
+      .button.primary:hover{border-color:#86dae1;background:#86dae1;color:#0b2328}
+      .button.danger{border-color:#8a4a4d;color:#ff8078}
+      .button.danger:hover{border-color:#b56469;background:#4a2f35;color:#ffa59f}
+      .status{background:#4a3a17 !important;color:#f0b955 !important;border:1px solid #8a6a26}
+      .status[style*="255, 241, 240"]{background:#4a2f35 !important;color:#ffa59f !important;border-color:#8a4a4d}
+      .status[style*="234, 246, 239"]{background:#1f4a35 !important;color:#6ad39a !important;border-color:#3f8a62}
+      .team-card{background:#26364a;border-color:#3d516a;border-radius:10px}
+      .team-head{border-bottom-color:#3d516a;background:#2d3f55}
+      .badge{border:1px solid #3f7a82;border-radius:6px;background:#1d4a52;color:#a9eaf0}
+      .member-row{border-top-color:#3d516a}
+      .member-role{color:#86dae1}
+      .add-member{border-top-color:#3d516a}
+      .empty{border-color:#4c627c;background:#2d3f55;color:#b8c5d3}
+      .team-path,.team-back{color:#86dae1}
+      .team-path{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+      @media(max-width:760px){.sidebar,.sidebar.is-collapsed{border-bottom-color:#3d516a}}
+    </style>
+      <style>[data-admin-only][hidden] { display: none !important; }</style>
+    <script src="/staging/staging-access.js?v=github-d-20261012-r2" defer></script>
+      <meta name="hp-ui-release" content="github-d-20261012" />
   </head>
   <body>
     <div class="app">
@@ -186,23 +248,23 @@
           <div class="nav-group">
             <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="summary-menu" aria-label="Mở thư mục Tổng hợp" title="Tổng hợp" data-nav-toggle><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span>Tổng hợp</span><span class="nav-chevron" aria-hidden="true"></span></button>
             <div class="nav-children" id="summary-menu" data-label="Tổng hợp" hidden>
-              <a class="nav-child-link" href="/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
-              <a class="nav-child-link" href="/tonghop/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
-              <a class="nav-child-link" href="/tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
+              <a class="nav-child-link" href="/staging/tonghop/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
+              <a class="nav-child-link" href="/staging/tonghop/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
+              <a class="nav-child-link" href="/staging/tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
             </div>
           </div>
           <div class="nav-group">
             <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="reports-menu" aria-label="Mở thư mục Báo cáo" title="Báo cáo" data-nav-toggle><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3.5h9l5 5v12H5z"/><path d="M14 3.5v5h5m-10 4h6m-6 4h6"/></svg></span><span>Báo cáo</span><span class="nav-chevron" aria-hidden="true"></span></button>
             <div class="nav-children" id="reports-menu" data-label="Báo cáo" hidden>
-              <a class="nav-child-link" href="/baocao/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
-              <a class="nav-child-link" href="/baocao/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
-              <a class="nav-child-link" href="/baocao/tuantuyen/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
+              <a class="nav-child-link" href="/staging/baocao/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
+              <a class="nav-child-link" href="/staging/baocao/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
+              <a class="nav-child-link" href="/staging/baocao/tuantuyen/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
             </div>
           </div>
           <div class="nav-standalone">
-            <a class="nav-link" href="/thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
-            <a class="nav-link" href="/nguoidung/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
-            <a class="nav-link" href="/nhom/" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3.5 19c.4-3.2 2.3-5 5.5-5s5.1 1.8 5.5 5"/><path d="M15 14c2.8-.1 4.6 1.4 5.1 4"/></svg></span>Team/Đội của tôi</a>
+            <a class="nav-link" href="/staging/thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
+            <a class="nav-link" href="/staging/nguoidung/" data-admin-only hidden><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
+            <a class="nav-link" href="/staging/nhom/" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3.5 19c.4-3.2 2.3-5 5.5-5s5.1 1.8 5.5 5"/><path d="M15 14c2.8-.1 4.6 1.4 5.1 4"/></svg></span>Team/Đội của tôi</a>
           </div>
         </nav>
         <div class="sidebar-bottom">Quản lý nhóm và thành viên<span>HP Telecom · Không gian làm việc</span></div>
@@ -211,7 +273,7 @@
         <header class="topbar">
           <span class="topbar-title">Quản lý nhóm</span>
           <div class="topbar-right">
-            <a class="simple-link" href="https://hptelecom.id.vn/support">Hỗ trợ</a>
+            <a class="simple-link" href="/staging/support">Hỗ trợ</a>
             <div class="user-menu account-menu" id="account-menu">
               <button class="account-trigger" id="account-trigger" type="button" aria-label="Tài khoản" aria-haspopup="menu" aria-expanded="false">
                 <span class="account-avatar" id="account-avatar" aria-hidden="true">QT</span>
@@ -272,11 +334,11 @@
             toggle.setAttribute("aria-label", shouldCollapse ? "Mở rộng menu" : "Thu gọn menu");
             toggle.title = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
             if (persist) {
-              try { window.localStorage.setItem("hp-sidebar-collapsed", String(shouldCollapse)); }
+              try { window.localStorage.setItem("hp-staging-sidebar-collapsed", String(shouldCollapse)); }
               catch (error) { console.warn("Không lưu được tùy chọn menu trên thiết bị này.", error); }
             }
           };
-          try { setSidebarCollapsed(window.localStorage.getItem("hp-sidebar-collapsed") === "true", false); }
+          try { setSidebarCollapsed(window.localStorage.getItem("hp-staging-sidebar-collapsed") === "true", false); }
           catch (error) {
             console.warn("Không đọc được tùy chọn menu trên thiết bị này.", error);
             setSidebarCollapsed(false, false);
@@ -287,44 +349,61 @@
           });
           nav.querySelectorAll("a").forEach((link) => { if (!link.title) link.title = link.textContent.trim(); });
         }
-        nav && nav.querySelectorAll("[data-nav-toggle]").forEach((trigger) => {
-          const group = trigger.closest(".nav-group");
-          const submenu = document.getElementById(trigger.getAttribute("aria-controls"));
+        nav.querySelectorAll("[data-nav-toggle]").forEach((button) => {
+          const group = button.closest(".nav-group");
+          const submenu = document.getElementById(button.getAttribute("aria-controls"));
           if (!group || !submenu) return;
-          const setOpen = (open) => {
-            trigger.setAttribute("aria-expanded", String(open));
-            trigger.setAttribute("aria-label", `${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
+          group.classList.toggle("has-current", Boolean(submenu.querySelector('[aria-current="page"]')));
+          let closeTimer;
+          let pointerPress = false;
+          let lastPointer = "";
+          function setOpen(open) {
+            clearTimeout(closeTimer);
+            button.setAttribute("aria-expanded", String(open));
+            button.setAttribute("aria-label", `${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
             submenu.hidden = !open;
             group.classList.toggle("is-open", open);
-          };
+          }
+          setOpen(group.matches(":hover"));
           group.addEventListener("pointerenter", (event) => {
-            if (event.pointerType === "mouse" && group.dataset.pinned !== "true") setOpen(true);
+            if (event.pointerType === "mouse") setOpen(true);
           });
           group.addEventListener("pointerleave", (event) => {
-            if (event.pointerType === "mouse" && group.dataset.pinned !== "true" && !group.contains(document.activeElement)) setOpen(false);
+            if (event.pointerType !== "mouse") return;
+            // Mouse focus must not keep the current page's menu pinned open.
+            clearTimeout(closeTimer);
+            closeTimer = setTimeout(() => setOpen(false), 140);
           });
-          group.addEventListener("focusin", () => setOpen(true));
+          group.addEventListener("pointerdown", (event) => {
+            lastPointer = event.pointerType;
+            pointerPress = true;
+          });
+          group.addEventListener("pointerup", () => { pointerPress = false; });
+          group.addEventListener("pointercancel", () => { pointerPress = false; });
+          group.addEventListener("focusin", () => { if (!pointerPress) setOpen(true); });
           group.addEventListener("focusout", (event) => {
-            if (!group.contains(event.relatedTarget) && group.dataset.pinned !== "true") setOpen(false);
+            if (!group.contains(event.relatedTarget) && !group.matches(":hover")) setOpen(false);
           });
-          trigger.addEventListener("click", () => {
-            const pinned = group.dataset.pinned !== "true";
-            group.dataset.pinned = String(pinned);
-            setOpen(pinned);
+          button.addEventListener("click", (event) => {
+            if (event.detail > 0 && lastPointer === "mouse") setOpen(true);
+            else setOpen(submenu.hidden);
           });
-          trigger.addEventListener("keydown", (event) => {
+          group.addEventListener("keydown", (event) => {
             if (event.key === "Escape") {
-              group.dataset.pinned = "false";
+              event.preventDefault();
+              button.focus();
               setOpen(false);
-              trigger.focus();
             }
           });
+          new MutationObserver(() => setOpen(false)).observe(sidebar, {
+            attributes: true, attributeFilter: ["class"]
+          });
         });
-        const apiRoot = new URL("/api/", location.origin);
+        const apiRoot = new URL("/staging/api/", location.origin);
         const list = document.querySelector("#team-list");
         const status = document.querySelector("#status");
         const slugFromLocation = () => {
-          const match = location.pathname.match(/^\/nhom\/([^/]+)\/?$/);
+          const match = location.pathname.match(/^\/staging\/nhom\/([^/]+)\/?$/);
           if (!match) return "";
           try { return decodeURIComponent(match[1]); }
           catch { return match[1]; }
@@ -369,11 +448,11 @@
           if (requestedSlug) {
             visibleTeams = teams.filter((team) => team.slug === requestedSlug);
             const back = el("a", "team-back", "← Tất cả Team/Đội");
-            back.href = "/nhom/";
+            back.href = "/staging/nhom/";
             back.addEventListener("click", (event) => {
               if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
               event.preventDefault();
-              history.pushState({}, "", "/nhom/");
+              history.pushState({}, "", "/staging/nhom/");
               requestedSlug = "";
               render(teamsCache);
             });
@@ -395,8 +474,8 @@
             title.append(el("h3", "", team.name), el("span", "badge", team.kind === "organization" ? "Tổ chức" : "Cá nhân"));
             details.append(title, el("p", "meta", "Chủ nhóm: " + (team.ownerName || "—") + " · " + team.members.length + " thành viên"));
             if (team.slug) {
-              const teamPath = el("a", "team-path", "/nhom/" + team.slug);
-              teamPath.href = "/nhom/" + encodeURIComponent(team.slug);
+              const teamPath = el("a", "team-path", "/staging/nhom/" + team.slug);
+              teamPath.href = "/staging/nhom/" + encodeURIComponent(team.slug);
               teamPath.setAttribute("aria-label", "Mở Team/Đội " + team.name);
               teamPath.addEventListener("click", (event) => {
                 if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -542,7 +621,7 @@
           const action = event.target.closest("[data-account-action]")?.dataset.accountAction;
           if (!action) return;
           if (action === "logout") {
-            try { await api("auth/logout", "POST", {}); } finally { location.assign("/dangnhap/"); }
+            try { await api("auth/logout", "POST", {}); } finally { location.assign("/staging/dangnhap"); }
             return;
           }
           setAccountMenuOpen(false);
@@ -585,7 +664,7 @@
             document.querySelector("#account-avatar").textContent = (me.fullName || me.username).trim().split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase("vi");
             await load();
           } catch {
-            location.replace("/dangnhap/?next=" + encodeURIComponent("/nhom/"));
+            location.replace("/staging/dangnhap?next=" + encodeURIComponent("/staging/nhom/"));
           }
         })();
       })();

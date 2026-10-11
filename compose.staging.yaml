@@ -1,43 +1,41 @@
-name: hptelecom-staging
+name: hptelecom-staging-independent
 
 services:
-  hptelecom-staging-api:
+  hptelecom-staging-independent-api:
     build:
       context: ./api-server
       dockerfile: Dockerfile
-    container_name: hptelecom-staging-api
+    container_name: hptelecom-staging-independent-api
     restart: unless-stopped
     environment:
       DATA_DIR: /data
       PORT: "8080"
-      PUBLIC_ORIGIN: ${STAGING_PUBLIC_ORIGIN:-https://staging.hptelecom.id.vn}
+      PUBLIC_ORIGIN: ${STAGING_PUBLIC_ORIGIN:-https://hptelecom.id.vn}
       COOKIE_SECURE: ${STAGING_COOKIE_SECURE:-1}
       SESSION_HOURS: "8"
       TRUST_PROXY: "1"
     volumes:
-      - hptelecom-staging-api-data:/data
+      - hptelecom-staging-independent-api-data:/data
     healthcheck:
-      test:
-        - CMD
-        - python
-        - -c
-        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3)"
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3)"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
 
-  hptelecom-staging-web:
+  hptelecom-staging-independent-web:
+    image: hptelecom-staging-web:filters-20261012-r4
     build:
       context: .
       dockerfile: Dockerfile.staging
-    container_name: hptelecom-staging-web
+    container_name: hptelecom-staging-independent-web
     restart: unless-stopped
     depends_on:
-      hptelecom-staging-api:
+      hptelecom-staging-independent-api:
         condition: service_healthy
     ports:
-      - "127.0.0.1:${STAGING_WEB_PORT:-18082}:8080"
+      - "127.0.0.1:${STAGING_WEB_PORT:-18083}:8080"
 
 volumes:
-  hptelecom-staging-api-data:
+  hptelecom-staging-independent-api-data:
+    name: hptelecom-staging-independent_hptelecom-staging-independent-api-data
