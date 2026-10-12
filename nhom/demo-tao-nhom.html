@@ -79,7 +79,7 @@
     <p class="eyebrow">Không gian quản trị / Team/Đội</p>
     <div class="heading"><div><h1>Tạo Team/Đội</h1><p class="subtitle">Đặt tên nhóm cá nhân hoặc tổ chức, sau đó thêm thành viên vào nhóm.</p></div><span class="demo-tag">Bản xem trước — dữ liệu minh họa</span></div>
     <section class="card" aria-labelledby="create-heading">
-      <div class="card-head"><h2 id="create-heading">Thông tin Team/Đội</h2><p>Tên nhóm được tự động viết liền, không dấu. Ví dụ: Đắk Lắk → DakLak.</p></div>
+      <div class="card-head"><h2 id="create-heading">Thông tin Team/Đội</h2><p>Tên nhóm giữ nguyên dấu, khoảng trắng và cách viết bạn nhập. Chỉ đường dẫn viết liền, không dấu: Đắk Lắk → /nhom/daklak.</p></div>
       <form class="form" id="create-form">
         <div><label for="team-name">Tên Team/Đội</label><input id="team-name" name="name" maxlength="100" value="demo" placeholder="Ví dụ: demo" required minlength="2" /></div>
         <div><label for="team-kind">Loại nhóm</label><select id="team-kind" name="kind"><option value="individual">Nhóm cá nhân</option><option value="organization">Nhóm tổ chức</option></select></div>
@@ -155,7 +155,7 @@
       form.addEventListener("submit", (event) => {
         event.preventDefault();
         const data = new FormData(form);
-        const teamName = normalizeTeamName(data.get("name"));
+        const teamName = String(data.get("name") || "").trim();
         if (!teamName) {
           status.textContent = "Vui lòng nhập tên nhóm có chữ hoặc số.";
           return;

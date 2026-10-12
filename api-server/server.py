@@ -636,6 +636,19 @@ class ApiHandler(BaseHTTPRequestHandler):
                     actor_role = actor_membership["membership_role"] if actor_membership else None
                     is_member = actor_membership is not None
                     can_manage_members = is_owner or is_admin or actor_role == "coordinator"
+                    if len(parts) == 2 and method == "PATCH":
+                        if not (is_owner or is_admin):
+                            raise ApiError(403, "team_owner_required", "Chỉ chủ nhóm hoặc quản trị viên mới được đổi tên Team/Đội.")
+                        data = self._read_json()
+                        name = data.get("name")
+                        if not isinstance(name, str) or not 2 <= len(name.strip()) <= 100:
+                            raise ApiError(400, "invalid_team_name", "Tên Team/Đội phải có từ 2 đến 100 ký tự.")
+                        try:
+                            db.execute("UPDATE teams SET name=? WHERE id=?", (name.strip(), team_id))
+                        except sqlite3.IntegrityError as exc:
+                            raise ApiError(409, "team_exists", "Bạn đã tạo Team/Đội trùng tên.") from exc
+                        self._send_json(200, {"team": {"id": team_id, "name": name.strip(), "slug": team["slug"]}})
+                        return
                     if len(parts) == 3 and parts[2] == "members" and method == "POST":
                         if not can_manage_members:
                             raise ApiError(403, "team_coordinator_required", "Chỉ Điều phối viên của nhóm mới được thêm thành viên.")

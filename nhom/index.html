@@ -295,9 +295,9 @@
       </div>
       <section class="panel" aria-labelledby="create-title">
         <h2 id="create-title">Tạo Team/Đội</h2>
-        <p class="panel-intro">Tên nhóm được tự động viết liền, không dấu. Ví dụ: Đắk Lắk → DakLak. Không cần chọn tỉnh/thành.</p>
+        <p class="panel-intro">Tên nhóm giữ nguyên dấu, khoảng trắng và cách viết bạn nhập. Chỉ đường dẫn viết liền, không dấu: Đắk Lắk → /nhom/daklak. Không cần chọn tỉnh/thành.</p>
         <form id="create-form" class="form-grid">
-          <div class="field"><label for="team-name">Tên Team/Đội</label><input id="team-name" name="name" maxlength="100" placeholder="Ví dụ: DakLak" required /></div>
+          <div class="field"><label for="team-name">Tên Team/Đội</label><input id="team-name" name="name" maxlength="100" placeholder="Ví dụ: Đắk Lắk" required /></div>
           <div class="field"><label for="team-kind">Loại nhóm</label><select id="team-kind" name="kind"><option value="individual">Nhóm cá nhân</option><option value="organization">Nhóm tổ chức</option></select></div>
           <button class="button primary" type="submit">+ Tạo nhóm</button>
         </form>
@@ -442,7 +442,6 @@
           node.addEventListener("click", action);
           return node;
         };
-        const normalizeTeamName = (value) => String(value).trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[đĐ]/g, (letter) => letter === "Đ" ? "D" : "d").replace(/\s+/g, "");
         const render = (teams) => {
           list.replaceChildren();
           let visibleTeams = teams;
@@ -490,6 +489,17 @@
             head.append(details);
             const canManage = me.role === "admin" || team.ownerId === me.id || team.membershipRole === "coordinator";
             const canPromote = me.role === "admin" || team.ownerId === me.id;
+            if (me.role === "admin" || team.ownerId === me.id) head.append(button("Đổi tên", "", async () => {
+              const entered = window.prompt("Tên Team/Đội (giữ nguyên dấu và khoảng trắng):", team.name);
+              if (entered === null || entered.trim() === team.name) return;
+              const name = entered.trim();
+              if (name.length < 2 || name.length > 100) { message("Tên Team/Đội phải có từ 2 đến 100 ký tự.", true); return; }
+              try {
+                await api("teams/" + encodeURIComponent(team.id), "PATCH", { name });
+                message("Đã đổi tên Team/Đội. Đường dẫn và thành viên được giữ nguyên.");
+                await load();
+              } catch (error) { message(error.message, true); }
+            }));
             if (me.role === "admin" || team.ownerId === me.id) head.append(button("Xóa nhóm", "danger", async () => {
               if (!window.confirm("Xóa nhóm “" + team.name + "” và danh sách thành viên?")) return;
               try { await api("teams/" + encodeURIComponent(team.id), "DELETE", {}); message("Đã xóa nhóm."); await load(); }
@@ -571,7 +581,7 @@
           const submit = form.querySelector("button[type=submit]");
           submit.disabled = true;
           try {
-            const teamName = normalizeTeamName(form.elements.name.value);
+            const teamName = form.elements.name.value.trim();
             if (!teamName) { message("Vui lòng nhập tên nhóm có chữ hoặc số.", true); return; }
             form.elements.name.value = teamName;
             await api("teams", "POST", { name: teamName, kind: form.elements.kind.value });
