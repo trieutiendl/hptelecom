@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="dark" />
   <title>Demo tạo Team/Đội | HP Telecom</title>
   <style>
     :root{font-family:"Segoe UI",Arial,sans-serif;color:#102a3e;background:#f1f5f6;font-synthesis:none}
@@ -34,6 +34,42 @@
     .actions{display:flex;gap:7px}.actions button{min-height:33px;padding:0 10px;font-size:11px}.actions .remove{border-color:#e4c8c8;background:#fff;color:#973e3e}
     .add-member{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:12px;padding:18px;border-top:1px solid #e5ecef;background:#fbfdfd}.note{margin:15px 2px 0;color:#536b77;font-size:13px;line-height:1.6}.status{min-height:20px;margin:0 24px 18px;color:#14684d;font-size:13px;font-weight:650}.hidden{display:none!important}
     @media(max-width:700px){main{margin-top:28px}.heading{align-items:flex-start;flex-direction:column}.demo-tag{align-self:flex-start}.form{grid-template-columns:1fr;padding:18px}.card-head,.groups{padding-right:18px;padding-left:18px}.member{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:12px 0}.member .actions{grid-column:1/-1;justify-content:flex-end}.role{font-size:11px}.add-member{grid-template-columns:1fr;padding:16px}}
+  </style>
+  <style id="noc-dark-theme">
+    :root{color-scheme:dark;color:#f3f6fa;background:#1e2a38}
+    body{background:#1e2a38;color:#f3f6fa}
+    ::selection{background:#3b8f98;color:#fff}
+    .topbar{background:#17212d;border-bottom-color:#3d516a}
+    .brand{color:#f3f6fa}.brand span{color:#5cc7d1}
+    .profile{color:#dbe4ed}
+    .avatar,.person-icon{background:#1d4a52;border:1px solid #3f7a82;color:#a9eaf0}
+    .eyebrow,.subtitle,.card-head p,.count,.person-id,.note{color:#b8c5d3}
+    .demo-tag{border-color:#8a6a26;background:#4a3a17;color:#f0b955;border-radius:6px}
+    .card{border-color:#3d516a;border-radius:10px;background:#26364a;box-shadow:none}
+    .card-head{border-bottom-color:#3d516a}
+    label{color:#d3dde7}
+    input,select{border-color:#4c627c;background:#1a2431;color:#f3f6fa}
+    input::placeholder{color:#94a3b3}
+    input:focus,select:focus{outline:3px solid rgba(92,199,209,.3);border-color:#5cc7d1}
+    button{border-color:#5cc7d1;background:#5cc7d1;color:#0b2328;font-weight:800}
+    button:hover{background:#86dae1;border-color:#86dae1}
+    button.secondary{border-color:#4c627c;background:transparent;color:#dbe4ed}
+    button.secondary:hover{background:#38506b;color:#fff;border-color:#637b97}
+    button:focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+    .empty{border-color:#4c627c;color:#b8c5d3}
+    .team-card{border-color:#3d516a;border-radius:10px}
+    .team-head{background:#2d3f55;border-bottom-color:#3d516a}
+    .kind{border:1px solid #3f7a82;border-radius:6px;background:#1d4a52;color:#a9eaf0}
+    .team-path{color:#5cc7d1;font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+    .member{border-bottom-color:#3d516a}
+    .member-toggle{border-color:#4c627c;background:transparent;color:#86dae1;font-weight:700}
+    .member-toggle:hover{background:#38506b;color:#fff}
+    .role{border:1px solid #3f7a82;border-radius:6px;background:#1d4a52;color:#a9eaf0}
+    .role.owner{border-color:#3f8a62;background:#1f4a35;color:#6ad39a}
+    .actions .remove{border-color:#8a4a4d;background:transparent;color:#ff8078}
+    .actions .remove:hover{border-color:#b56469;background:#4a2f35;color:#ffa59f}
+    .add-member{border-top-color:#3d516a;background:#2d3f55}
+    .status{color:#6ad39a}
   </style>
 </head>
 <body>

@@ -10,7 +10,7 @@ FORM: Read-mode technical document; persistent section navigation supports direc
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#071721" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Chính sách quyền riêng tư | HP Telecom</title>
     <meta name="description" content="Tìm hiểu dữ liệu HP Telecom Server xử lý, quyền thiết bị, lưu giữ, truy cập và xóa dữ liệu." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -121,6 +121,43 @@ FORM: Read-mode technical document; persistent section navigation supports direc
       }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
+      }
+    </style>
+    <style id="noc-dark-theme">
+      :root {
+        color-scheme: dark;
+        --bg: #1e2a38; --header: #17212d; --surface: #26364a; --surface-raised: #2d3f55;
+        --line: #3d516a; --text: #f3f6fa; --muted: #b8c5d3; --quiet: #b0bfcd;
+        --cyan: #5cc7d1; --link: #86dae1; --focus: #86dae1;
+      }
+      .skip-link { border-color: #4c627c; }
+      .site-header { border-bottom-color: #3d516a; }
+      .header-nav { color: #d3dde7; }
+      .header-nav .nav-action { border-color: #4c627c; border-radius: 8px; }
+      h1 { letter-spacing: -.04em; }
+      .breadcrumb a { color: #d3dde7; }
+      .document-deck { color: #c3cfdb; }
+      .meta-tag { border-color: #4c627c; border-radius: 6px; color: #d3dde7; background: #2d3f55; }
+      .meta-tag::before { background: #5cc7d1; }
+      .contents h2 { color: #c3cfdb; }
+      .contents a { color: #c3cfdb; border-radius: 8px; }
+      .contents a:hover { background: #2d3f55; color: #fff; }
+      .policy { border-color: #3d516a; border-radius: 10px; }
+      .policy-section { border-bottom-color: #3d516a; }
+      .policy-section h2, .policy-section strong { color: #f3f6fa; }
+      .policy-section p, .policy-section li { color: #c9d4df; }
+      .policy-section li::marker { color: #5cc7d1; }
+      .contact-link { border-color: #4c627c; border-radius: 8px; color: #f3f6fa; }
+      .contact-link:hover { border-color: #5cc7d1; background: #38506b; }
+      .contact-link-primary { border-color: #5cc7d1; background: #5cc7d1; color: #0b2328; }
+      .contact-link-primary:hover { border-color: #86dae1; background: #86dae1; color: #0b2328; }
+      footer { border-top-color: #3d516a; background: #17212d; }
+      .footer-inner { color: #b8c5d3; }
+      .footer-inner a { color: #d3dde7; }
+      @media (max-width: 760px) {
+        .contents nav { scrollbar-color: #4c627c #17212d; }
+        .contents a { border-color: #4c627c; }
+        .contents .contents-contact a { border-color: #4c627c; }
       }
     </style>
   </head>

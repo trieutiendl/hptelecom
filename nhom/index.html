@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f1f5f6" />
-    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#1e2a38" />
+    <meta name="color-scheme" content="dark" />
     <title>Nhóm của tôi | HP Telecom</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -160,6 +160,65 @@
       @media(prefers-reduced-motion:reduce){.nav-group-trigger .nav-chevron{transition-duration:.01ms}}
       .team-path{display:inline-block;margin-top:8px;color:#006d77;font-size:12px;font-weight:700;text-decoration:none}.team-path:hover{text-decoration:underline}.team-back{display:inline-flex;margin-bottom:14px;color:#006d77;font-size:13px;font-weight:700;text-decoration:none}.team-back:hover{text-decoration:underline}
     </style>
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;color:#f3f6fa;background:#1e2a38;--canvas:#1e2a38;--panel:#26364a;--panel-2:#2d3f55;--field:#1a2431;--ink:#f3f6fa;--muted:#b8c5d3;--blue:#5cc7d1;--line:#3d516a;--line-2:#4c627c;--red:#ff8078}
+      body{background:#1e2a38;color:#f3f6fa}
+      ::selection{background:#3b8f98;color:#fff}
+      .sidebar{background:#17212d;color:#d3dde7;border-color:#3d516a}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{background:#17212d;border-color:#3d516a;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar-toggle{border-color:#3d516a;background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:#4c627c;background:#2b4058;color:#fff}
+      .sidebar.is-collapsed .brand:after{color:#f3f6fa}
+      .nav-label,.sidebar-bottom span,.sidebar.is-collapsed .nav-children:before,.nav-standalone:before{color:#a3b2c1}
+      .nav-group-trigger,.nav-link,.nav-child-link{color:#d3dde7}
+      .nav-child-link{color:#c3cfdb}
+      .nav-group-trigger:hover,.nav-group-trigger[aria-expanded=true],.nav-link:hover,.nav-child-link:hover{border-color:#3d516a;background:#233245;color:#fff}
+      .nav-icon{border-color:#3d516a;background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:#3d516a}
+      .nav-child-link[aria-current=page],.nav-link[aria-current=page]{border-color:#4c627c;background:#2b4058;color:#fff;box-shadow:inset 2px 0 #5cc7d1}
+      .nav-standalone,.sidebar-bottom{border-top-color:#3d516a}
+      .sidebar-bottom{color:#c3cfdb}
+      .topbar{background:#1e2a38;border-bottom-color:#3d516a}
+      .topbar-title,.topbar-right{color:#b8c5d3}
+      .topbar a.simple-link{color:#86dae1}
+      .user-menu{border-left-color:#3d516a}
+      .account-trigger:hover,.account-menu[data-open=true] .account-trigger{border-color:#3d516a;background:#26364a}
+      .account-chevron{border-color:#b8c5d3}
+      .account-dropdown{border-color:#4c627c;background:#2d3f55;box-shadow:0 14px 32px rgba(0,0,0,.4)}
+      .account-dropdown button{color:#dbe4ed}
+      .account-dropdown button:hover{background:#38506b;color:#fff}
+      .account-dropdown button[data-account-action=logout]{border-top-color:#3d516a;color:#ff8078}
+      .account-dropdown button[data-account-action=logout]:hover{background:#4a2f35}
+      .account-avatar{border:1px solid #3f8e97;background:#1d4a52;color:#a9eaf0}
+      .account-trigger:focus-visible,.account-dropdown button:focus-visible,.sidebar :focus-visible,.topbar :focus-visible,.shell :focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+      .eyebrow,.subtitle,.panel-intro,.meta,.member-sub,.member-date,.notice,.loading{color:#b8c5d3}
+      .heading h1,.panel h2,.team-title h3,.members-title,.member-main{color:#f3f6fa}
+      .panel{background:#26364a;border-color:#3d516a;border-radius:10px}
+      .field label{color:#d3dde7}
+      .field input,.field select{border-color:#4c627c;background:#1a2431;color:#f3f6fa;border-radius:8px}
+      .field input::placeholder{color:#94a3b3}
+      .field input:focus,.field select:focus{outline:3px solid rgba(92,199,209,.3);border-color:#5cc7d1}
+      .button{border-color:#4c627c;background:transparent;color:#dbe4ed;border-radius:8px}
+      .button:hover{filter:none;border-color:#637b97;background:#38506b;color:#fff}
+      .button.primary{border-color:#5cc7d1;background:#5cc7d1;color:#0b2328;font-weight:800}
+      .button.primary:hover{border-color:#86dae1;background:#86dae1;color:#0b2328}
+      .button.danger{border-color:#8a4a4d;color:#ff8078}
+      .button.danger:hover{border-color:#b56469;background:#4a2f35;color:#ffa59f}
+      .status{background:#4a3a17 !important;color:#f0b955 !important;border:1px solid #8a6a26}
+      .status[style*="255, 241, 240"]{background:#4a2f35 !important;color:#ffa59f !important;border-color:#8a4a4d}
+      .status[style*="234, 246, 239"]{background:#1f4a35 !important;color:#6ad39a !important;border-color:#3f8a62}
+      .team-card{background:#26364a;border-color:#3d516a;border-radius:10px}
+      .team-head{border-bottom-color:#3d516a;background:#2d3f55}
+      .badge{border:1px solid #3f7a82;border-radius:6px;background:#1d4a52;color:#a9eaf0}
+      .member-row{border-top-color:#3d516a}
+      .member-role{color:#86dae1}
+      .add-member{border-top-color:#3d516a}
+      .empty{border-color:#4c627c;background:#2d3f55;color:#b8c5d3}
+      .team-path,.team-back{color:#86dae1}
+      .team-path{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+      @media(max-width:760px){.sidebar,.sidebar.is-collapsed{border-bottom-color:#3d516a}}
+    </style>
   </head>
   <body>
     <div class="app">
@@ -186,7 +245,7 @@
           <div class="nav-group">
             <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="summary-menu" aria-label="Mở thư mục Tổng hợp" title="Tổng hợp" data-nav-toggle><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span>Tổng hợp</span><span class="nav-chevron" aria-hidden="true"></span></button>
             <div class="nav-children" id="summary-menu" data-label="Tổng hợp" hidden>
-              <a class="nav-child-link" href="/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
+              <a class="nav-child-link" href="/tonghop/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
               <a class="nav-child-link" href="/tonghop/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
               <a class="nav-child-link" href="/tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
             </div>
@@ -542,7 +601,7 @@
           const action = event.target.closest("[data-account-action]")?.dataset.accountAction;
           if (!action) return;
           if (action === "logout") {
-            try { await api("auth/logout", "POST", {}); } finally { location.assign("/dangnhap/"); }
+            try { await api("auth/logout", "POST", {}); } finally { location.assign("https://hptelecom.id.vn/dangnhap"); }
             return;
           }
           setAccountMenuOpen(false);
@@ -585,7 +644,7 @@
             document.querySelector("#account-avatar").textContent = (me.fullName || me.username).trim().split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase("vi");
             await load();
           } catch {
-            location.replace("/dangnhap/?next=" + encodeURIComponent("/nhom/"));
+            location.replace("https://hptelecom.id.vn/dangnhap?next=" + encodeURIComponent("/nhom/"));
           }
         })();
       })();

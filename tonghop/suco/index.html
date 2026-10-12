@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f3f7f8" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Tổng hợp Sự cố | HP Telecom</title>
     <meta name="description" content="Tổng hợp báo cáo sự cố theo Team/Đội và thời gian." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -156,6 +156,66 @@
       }
       @media(prefers-reduced-motion:reduce){.sidebar-toggle-icon,.nav-group-chevron:before{transition-duration:.01ms}}
     </style>
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;--ink:#f3f6fa;--muted:#b8c5d3;--blue:#5cc7d1;--line:#3d516a;--canvas:#1e2a38;--amber:#f0b955;--panel:#26364a;--panel-2:#2d3f55;--field:#1a2431;--line-2:#4c627c}
+      body{background:var(--canvas);color:var(--ink)}
+      ::selection{background:#3b8f98;color:#fff}
+      .sidebar{background:#17212d;color:#d3dde7;border-color:var(--line)}
+      .brand-wordmark{color:#f3f6fa}
+      .nav-label,.version,.nav-group>summary:after,.nav-group-chevron{color:#a3b2c1}
+      .nav a,.nav-group>summary,.sidebar .nav .nav-group-trigger,.sidebar .nav .nav-link,.sidebar .nav .nav-child-link{color:#d3dde7}
+      .nav a:hover,.nav-group[open]>summary,.nav-group>summary:hover,.sidebar .nav .nav-group-trigger:hover,.sidebar .nav .nav-group-trigger[aria-expanded=true],.sidebar .nav .nav-link:hover,.sidebar .nav .nav-child-link:hover{border-color:var(--line);background:#233245;color:#fff}
+      .nav a[aria-current=page],.sidebar .nav .nav-group.has-current>.nav-group-trigger,.sidebar .nav .nav-link[aria-current=page],.sidebar .nav .nav-child-link[aria-current=page]{border-color:var(--line-2);background:#2b4058;color:#fff;box-shadow:inset 2px 0 var(--blue)}
+      .sidebar .nav .nav-icon{border-color:var(--line);background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:var(--line)}
+      .nav-standalone,.sidebar-bottom{border-top-color:var(--line)}
+      .sidebar-toggle{border-color:var(--line);background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:var(--line-2);background:#2b4058;color:#fff}
+      .sidebar .nav .nav-child-link{color:#c3cfdb}
+      .connection{color:#c3cfdb}.connection:before{background:var(--blue)}
+      .sidebar.is-collapsed .brand:after{color:#7fe0e8}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{border-color:var(--line);background:#17212d;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar.is-collapsed .nav-children:before,.nav-standalone:before{color:#a3b2c1}
+      .sidebar :focus-visible,.report-button:focus-visible,.report-control:focus-visible,.report-tab:focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+      .topbar{background:var(--canvas);border-color:var(--line)}
+      .topbar-title,.topbar a[href*="support"]{color:var(--muted)!important}
+      .admin{border-left-color:var(--line)}
+      .avatar{background:#1d4a52;color:#a9eaf0;border:1px solid #3f7a82}
+      .admin-name{color:var(--ink)}.admin-role,.breadcrumb,.subtitle,.report-field>span,.report-note,.empty{color:var(--muted)}
+      h1,.report-panel h2{color:var(--ink);letter-spacing:-.03em}
+      .notice{color:#a3b2c1}
+      .badge{border-color:#8a6a26;border-radius:6px;background:#4a3a17;color:var(--amber)}
+      .badge:before{border-radius:2px;background:var(--amber)}
+      .report-controls,.report-toolbar,.report-tabs,.report-panel{border-color:var(--line);background:var(--panel)}
+      .report-controls{border-radius:10px}
+      .report-toolbar{border-radius:10px 10px 0 0}
+      .report-panel{border-radius:0 0 10px 10px}
+      #materials-panel .report-toolbar{border:0;background:transparent}
+      .report-control{border-color:var(--line-2);border-radius:8px;background:var(--field);color:var(--ink);color-scheme:dark}
+      .report-control::placeholder{color:#94a3b3}
+      .report-control:focus-visible{border-color:var(--blue);box-shadow:0 0 0 3px rgba(92,199,209,.3)}
+      .report-button{border-color:var(--blue);border-radius:8px;background:var(--blue);color:#0b2328}
+      .report-button:hover{filter:none;border-color:#86dae1;background:#86dae1}
+      .report-button.secondary{border-color:var(--line-2);background:transparent;color:#dbe4ed}
+      .report-button.secondary:hover{border-color:#637b97;background:#38506b;color:#fff}
+      .report-meta{border-color:#3f7a82;border-radius:8px;background:#1d3a48;color:#c9eef2}
+      .report-tab{color:var(--muted)}.report-tab:hover{background:#2f4259;color:#fff}
+      .report-tab[aria-selected="true"]{border-bottom-color:var(--blue);background:transparent;color:var(--blue)}
+      .report-sheet{border-color:var(--line);border-radius:8px;background:var(--panel)}
+      .report-sheet th{background:var(--panel-2);color:#dbe4ed}
+      .report-sheet td{border-top-color:var(--line);color:#dbe4ed}
+      .report-sheet tbody tr:nth-child(even) td{background:#2a3b50}
+      .report-sheet tbody tr:hover td{background:#2f4259;color:#fff}
+      .report-sheet tr.report-total td{background:#34495f;color:#fff}
+      #incident-table th:first-child,#incident-table td:first-child,#incident-table th:nth-child(2),#incident-table td:nth-child(2){background:var(--panel-2)}
+      #incident-table th:nth-child(2),#incident-table td:nth-child(2){box-shadow:3px 0 8px rgba(0,0,0,.3)}
+      #incident-table tbody td:first-child,#incident-table tbody td:nth-child(2){background:var(--panel)}
+      #incident-table tbody tr:nth-child(even) td:first-child,#incident-table tbody tr:nth-child(even) td:nth-child(2){background:#2a3b50}
+      #incident-table tbody tr:hover td:first-child,#incident-table tbody tr:hover td:nth-child(2){background:#2f4259}
+      #incident-table tr.report-total td:first-child,#incident-table tr.report-total td:nth-child(2){background:#34495f}
+      @media(max-width:850px){.sidebar{border-color:var(--line)}.nav-children{border-color:var(--line);background:#17212d;box-shadow:0 12px 28px rgba(0,0,0,.4)}}
+    </style>
   </head>
   <body>
     <aside class="sidebar">
@@ -184,7 +244,7 @@
             <span>Tổng hợp</span><span class="nav-group-chevron" aria-hidden="true"></span>
           </button>
           <div class="nav-children" id="summary-menu" data-label="Tổng hợp">
-            <a class="nav-child-link" href="/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
+            <a class="nav-child-link" href="/tonghop/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
             <a class="nav-child-link" href="./" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
             <a class="nav-child-link" href="/tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
           </div>

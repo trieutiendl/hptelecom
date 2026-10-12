@@ -37,7 +37,7 @@
       .empty-state{padding:34px 16px;color:var(--muted);font-size:13px;text-align:center}.empty-state[hidden],tr[hidden]{display:none}
       dialog{width:min(520px,calc(100% - 28px));max-height:min(80vh,700px);padding:0;overflow:auto;border:1px solid #46717b;background:var(--surface);color:var(--text)}dialog::backdrop{background:rgb(1 9 13 / 76%)}.dialog-inner{padding:22px}
       .dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-bottom:16px;border-bottom:1px solid var(--line)}.dialog-heading h2{margin:0;font-size:20px;letter-spacing:-.03em}.dialog-close{width:34px;height:34px;border:1px solid #52717a;background:transparent;color:var(--text);font-size:18px}
-      .details-list{display:grid;grid-template-columns:132px 1fr;gap:0;margin:8px 0 0}.details-list dt,.details-list dd{margin:0;padding:11px 0;border-bottom:1px solid #244650;font-size:12px;line-height:1.5}.details-list dt{color:var(--muted)}.dialog-foot{display:flex;justify-content:flex-end;padding-top:18px}
+      .details-list{display:grid;grid-template-columns:132px 1fr;gap:0;margin:8px 0 0}.details-list[hidden]{display:none}.details-list dt,.details-list dd{margin:0;padding:11px 0;border-bottom:1px solid #244650;font-size:12px;line-height:1.5}.details-list dt{color:var(--muted)}.dialog-foot{display:flex;justify-content:flex-end;padding-top:18px}
       .edit-form{display:grid;gap:13px;padding-top:14px}.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.edit-field{display:grid;gap:6px;color:var(--muted);font-size:11px;font-weight:700}.edit-field--wide{grid-column:1/-1}.edit-field input,.edit-field textarea{width:100%;min-height:38px;padding:8px 10px;border:1px solid #42636b;border-radius:6px;background:#081e28;color:var(--text);font:inherit;font-weight:500}.edit-field textarea{min-height:84px;resize:vertical;line-height:1.5}.edit-error{margin:0;color:#ffb4ad;font-size:11px;line-height:1.45}.edit-actions{display:flex;justify-content:flex-end;gap:9px;padding-top:3px}.edit-actions button{min-height:36px;padding:0 12px;border:1px solid #42636b;border-radius:6px;background:transparent;color:var(--text);font-size:11px;font-weight:750}.edit-actions button[type=submit]{border-color:var(--cyan);background:var(--cyan);color:#062b35}.edit-actions button:hover{border-color:var(--cyan)}.edit-actions button[aria-label="Xóa vĩnh viễn"]{border-color:#b42318;background:#b42318;color:#fff}.detail-actions{flex-wrap:wrap}.detail-actions .delete-report-button{border-color:#b42318;background:#b42318;color:#fff}.detail-actions .delete-report-button:hover{border-color:#8e1b12;background:#8e1b12}.edit-form[hidden],.detail-actions[hidden],.delete-confirm[hidden]{display:none}.delete-confirm{padding-top:16px}.delete-confirm p{margin:0 0 10px;color:var(--text);font-size:12px;line-height:1.55}.delete-warning{color:var(--muted)!important}.delete-error{color:#ffb4ad!important}
       :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
       @media(max-width:760px){.header-inner,.page-shell{width:min(100% - 32px,620px)}.header-inner{min-height:68px}.brand-mark{width:34px;height:34px}.brand{gap:10px}.brand-name{font-size:14px}.brand-meta{font-size:9px}.preview-label{display:none}.user-chip{padding-left:10px}.user-name{font-size:11px}.user-role{font-size:9px}.page-shell{padding-top:26px}.page-heading{align-items:flex-start;margin-bottom:19px}.report-nav{margin-bottom:14px}.report-tab{flex:1;justify-content:center;padding-inline:8px}.filter-panel{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;padding:12px}.field-search,.action-button{grid-column:1/-1}.table-wrap{overflow:visible}table,tbody{display:block}thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}tbody tr{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px 12px;padding:14px;border-top:1px solid #244650}tbody tr:first-child{border-top:0}td{display:block;height:auto;min-width:0;padding:0;border:0}td.select-cell{grid-column:1;grid-row:1;padding-top:2px}td:nth-child(2){grid-column:2;grid-row:1;padding-bottom:2px}td:nth-child(2)::before{display:none}td::before{display:block;margin-bottom:5px;color:var(--muted);content:attr(data-label);font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}td:first-child::before{display:none}.record-link{width:100%;grid-template-columns:minmax(0,1fr) 30px;align-items:center}.record-summary{grid-column:1}.row-open{grid-column:2;grid-row:1/span 2}}
@@ -108,6 +108,91 @@
       @media(prefers-reduced-motion:reduce){.sidebar-toggle-icon,.nav-group-chevron:before{transition-duration:.01ms}}
     </style>
     <link rel="stylesheet" href="../../server-theme.css" />
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;--canvas:#1e2a38;--bg:#1e2a38;--panel:#26364a;--panel-2:#2d3f55;--surface:#26364a;--field:#1a2431;--ink:#f3f6fa;--text:#f3f6fa;--muted:#b8c5d3;--line:#3d516a;--line-2:#4c627c;--cyan:#5cc7d1;--teal:#5cc7d1;--blue:#5cc7d1;--focus:rgba(92,199,209,.5);--green:#6ad39a;--amber:#f0b955;--red:#ff8078}
+      body{background:var(--canvas);color:var(--ink)}
+      ::selection{background:#3b8f98;color:#fff}
+      .skip-link{background:#5cc7d1;color:#0b2328}
+      .sidebar{background:#17212d;border-color:var(--line);box-shadow:none;color:#d3dde7}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{background:#17212d;border-color:var(--line);box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar .nav-label,.sidebar .version,.sidebar .nav-coming-soon,.nav-group-chevron,.nav-standalone:before,.sidebar.is-collapsed .nav-children:before{color:#a3b2c1;border-color:var(--line)}
+      .nav a,.sidebar .nav .nav-group-trigger,.sidebar .nav .nav-link,.sidebar .nav .nav-child-link{color:#d3dde7}
+      .sidebar .nav .nav-child-disabled{color:#94a3b3}
+      .nav a:hover,.sidebar .nav .nav-group-trigger:hover,.sidebar .nav .nav-group-trigger[aria-expanded=true],.sidebar .nav .nav-link:hover,.sidebar .nav .nav-child-link:hover{border-color:var(--line);background:#233245;color:#fff}
+      .nav a[aria-current=page],.sidebar .nav .nav-group.has-current>.nav-group-trigger,.sidebar .nav .nav-link[aria-current=page],.sidebar .nav .nav-child-link[aria-current=page]{border-color:var(--line-2);background:#2b4058;color:#fff;box-shadow:inset 2px 0 var(--cyan)}
+      .nav-icon{border-color:var(--line);background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:var(--line)}
+      .sidebar-toggle,.sidebar .sidebar-toggle{border-color:var(--line);background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:var(--line-2);background:#2b4058;color:#fff}
+      .sidebar-bottom,.nav-standalone{border-top-color:var(--line)}
+      .connection-state,.sidebar .connection-state{color:#c3cfdb}
+      .connection-state::before{background:var(--green)}
+      .sidebar.is-collapsed .brand:after{color:#f3f6fa}
+      .sidebar :focus-visible,.topbar :focus-visible,.filter-panel :focus-visible,.report-nav :focus-visible,.table-wrap :focus-visible,.dialog-inner :focus-visible,:focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+
+      .topbar{background:var(--canvas);border-color:var(--line);box-shadow:none}
+      .topbar-title,.top-link,.support-link,.admin-role{color:var(--muted)}
+      .admin,.admin-name{border-left-color:var(--line);color:var(--ink)}
+      .avatar{border:1px solid #3f8e97;background:#1d4a52;color:#9be6ee;border-radius:10px}
+      h1,.list-title,.dialog-heading h2,.edit-photo-heading,.detail-images-title{color:var(--ink)}
+      .page-description,.breadcrumb,.list-count,.empty-state,.record-summary,.record-muted,.export-status,.selection-hint{color:var(--muted)}
+      .demo-badge,.preview-label{border-color:#8a6a26;border-radius:6px;background:#4a3a17;color:var(--amber)}
+      .demo-badge::before{background:var(--amber);border-radius:2px}
+
+      .report-nav{border-color:var(--line);border-radius:10px;background:var(--panel);box-shadow:none}
+      .report-tab{color:var(--muted)}
+      .report-tab:hover{background:#2f4259;color:#fff}
+      .report-tab[aria-current=page]{border-color:transparent;border-bottom-color:var(--cyan);background:var(--panel);color:var(--cyan)}
+      .tab-count{border-radius:6px;background:#1f2d3d;color:#c3cfdb}
+      .preview-notice,.notice{border-color:#8a6a26;border-radius:10px;background:#4a3a17;color:#f6dca0}
+      .notice-symbol{border-color:var(--amber);color:var(--amber)}
+      .filter-panel,.list-toolbar,.table-wrap,.selection-hint{border-color:var(--line);background:var(--panel);box-shadow:none;color:var(--ink)}
+      .filter-panel{border-radius:10px}
+      .list-toolbar{border-radius:10px 10px 0 0}
+      .table-wrap{border-radius:0 0 10px 10px}
+      .selection-count{color:var(--ink)}
+      .clear-selection{color:var(--cyan)}
+      .selection-checkbox,.route-select{accent-color:var(--cyan)}
+      .field label,.edit-field,label{color:#d3dde7}
+      .field select,.field input,.field textarea,.edit-field input,.edit-field select,.edit-field textarea,.edit-photo-card input[type=text],input,select,textarea{border-color:var(--line-2);border-radius:8px;background:var(--field);color:var(--ink)}
+      .field input::placeholder,input::placeholder,textarea::placeholder{color:#94a3b3}
+      .field select:focus-visible,.field input:focus-visible,.edit-field input:focus-visible,.edit-field select:focus-visible,.edit-field textarea:focus-visible{border-color:var(--cyan);outline:3px solid rgba(92,199,209,.4);outline-offset:0}
+      select option{background:var(--field);color:var(--ink)}
+      .action-button,.edit-actions button[type=submit],.primary-button{border-color:var(--cyan);border-radius:8px;background:var(--cyan);color:#0b2328;font-weight:800}
+      .action-button:hover,.edit-actions button[type=submit]:hover{border-color:#86dae1;background:#86dae1;color:#0b2328;transform:none}
+      .export-button,.edit-actions button,.dialog-close{border-color:var(--line-2);border-radius:8px;background:transparent;color:#dbe4ed}
+      .export-button:hover,.edit-actions button:hover,.dialog-close:hover{border-color:#637b97;background:#38506b;color:#fff}
+      .edit-actions button[aria-label="Xóa vĩnh viễn"],.detail-actions .delete-report-button{border-color:#b3413f;background:#b3413f;color:#fff}
+      .edit-actions button[aria-label="Xóa vĩnh viễn"]:hover,.detail-actions .delete-report-button:hover{border-color:#c9514e;background:#c9514e;color:#fff}
+      .edit-error,.delete-error{color:var(--red)!important}
+      .delete-confirm p{color:var(--ink)}.delete-warning{color:var(--muted)!important}
+
+      th,table th{background:#1f2d3d;color:#b8c5d3}
+      td,table td{border-color:var(--line);color:#dbe4ed}
+      tbody tr:nth-child(even){background:#2a3b50}
+      tbody tr:hover,tbody tr:nth-child(even):hover{background:#2f4259;color:#fff}
+      tbody tr.is-selected,tbody tr.is-selected:hover{background:#25525a}
+      td.sequence-cell,.record-code,.text-link{color:var(--cyan)}
+      .record-link:hover .record-code{color:#86dae1}
+      .record-code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+      .row-open{border-color:var(--line-2);border-radius:8px;color:var(--cyan)}
+      .record-photo-count{border-color:#3f7a82;border-radius:6px;background:#1d4a52;color:#a9eaf0}
+
+      dialog{border:1px solid var(--line-2);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:0 28px 80px rgba(0,0,0,.5)}
+      dialog::backdrop{background:rgba(10,16,24,.6)}
+      .dialog-heading,.dialog-heading h2,.edit-photo-fields{border-color:var(--line)}
+      .details-list dt,.details-list dd{border-color:var(--line)}
+      .details-list dt,.edit-photo-note,.edit-photo-filename,.photo-card figcaption,.edit-photo-card label{color:var(--muted)}
+      .details-list dd{color:var(--ink)}
+      .photo-group-title,.edit-photo-group-title{color:#d3dde7}
+      .photo-card,.edit-photo-card{border-color:var(--line);background:var(--panel-2)}
+      .photo-card a,.photo-card img,.edit-photo-card img{background:#141d28}
+      .edit-photo-card input[type=file]{color:var(--ink)}
+      .inline-editable{cursor:text}.inline-editable:hover{background:var(--panel-2)}.inline-edit{width:100%;min-width:140px;min-height:34px;padding:6px 8px;border:1px solid var(--accent);border-radius:6px;background:var(--field);color:var(--ink);font:inherit}
+      @media(max-width:850px){.sidebar,.sidebar.is-collapsed{background:#17212d;border-color:var(--line)}}
+      @media(max-width:720px){.sidebar{border-bottom-color:var(--line)}tbody tr{border-top-color:var(--line)}}
+    </style>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
@@ -365,6 +450,30 @@
       document.querySelector("#cancel-delete").addEventListener("click",()=>{deleteConfirm.hidden=true;deleteError.hidden=true;details.hidden=false;detailActions.hidden=false});
       document.querySelector("#confirm-delete").addEventListener("click",()=>{if(!activeReport)return;const id=activeReport.dataset.editId,nextDeleted=[...new Set([...deletedReportIds,id])];try{localStorage.setItem(deleteStorageKey,JSON.stringify(nextDeleted))}catch(error){console.warn("Không thể lưu việc xóa báo cáo trên trình duyệt.",error);deleteError.textContent="Không thể lưu thao tác xóa trên trình duyệt. Báo cáo chưa bị xóa.";deleteError.hidden=false;return}deletedReportIds=nextDeleted;selectedReportKeys.delete(activeReport.dataset.selectionKey);const index=rows.indexOf(activeReport);activeReport.remove();if(index>=0)rows.splice(index,1);document.querySelector('.report-tab[aria-current="page"] .tab-count').textContent=String(rows.length);document.querySelector(".preview-notice span:last-child").textContent=document.querySelector(".preview-notice span:last-child").textContent.replace(/Danh sách gồm \d+ báo cáo mẫu/,`Danh sách gồm ${rows.length} báo cáo mẫu`);updateSelectionUI();filter();status.textContent="Đã xóa báo cáo khỏi bản xem trước trên trình duyệt.";dialog.close()});
       document.querySelector("#close-dialog").addEventListener("click",()=>dialog.close());document.querySelector("#done-dialog").addEventListener("click",()=>dialog.close());dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close()});dialog.addEventListener("close",()=>{setEditMode(false);activeReport=null});
+      const inlineFields={"Khu vực":"location","Team / Đội":"team","Ngày thi công":"date"};
+      rows.forEach(row=>row.querySelectorAll("td[data-label]").forEach(cell=>{if(inlineFields[cell.dataset.label]){cell.classList.add("inline-editable");cell.title="Bấm để sửa"}}));
+      document.querySelector("#report-list").addEventListener("click",event=>{
+        const cell=event.target.closest("td.inline-editable");if(!cell||cell.querySelector("input"))return;
+        const key=inlineFields[cell.dataset.label],row=cell.closest("[data-report-row]"),data=currentReportData(row),input=document.createElement("input");
+        input.className="inline-edit";input.maxLength=200;input.setAttribute("aria-label",cell.dataset.label);
+        if(key==="date"){input.type="date";input.value=toEditorDate(data.date)}else{input.type="text";input.value=data[key]}
+        cell.replaceChildren(input);input.focus();
+        let finished=false;
+        const finish=save=>{
+          if(finished)return;finished=true;
+          let value=input.value.trim();
+          try{if(key==="date"&&value)value=fromEditorDate(value)}catch(error){value=""}
+          if(!save||!value||value===data[key]){applyReportData(row,data);return}
+          const next={...data,[key]:value};
+          try{
+            const nextEdits={...savedEdits,[row.dataset.editId]:{...savedEdits[row.dataset.editId],...next}};
+            localStorage.setItem(editStorageKey,JSON.stringify(nextEdits));savedEdits=nextEdits;
+            applyReportData(row,next);status.textContent="Đã lưu thay đổi trên trình duyệt.";filter();
+          }catch(error){console.warn("Không thể lưu thay đổi.",error);applyReportData(row,data);status.textContent="Không thể lưu thay đổi trên trình duyệt."}
+        };
+        input.addEventListener("keydown",keyEvent=>{if(keyEvent.key==="Enter"){keyEvent.preventDefault();finish(true)}else if(keyEvent.key==="Escape"){keyEvent.preventDefault();finish(false)}});
+        input.addEventListener("blur",()=>finish(true));
+      });
       document.querySelector("#refresh-reports").addEventListener("click",()=>{status.textContent="Danh sách mẫu đã được làm mới.";filter()});filter();
     </script>
     </div>

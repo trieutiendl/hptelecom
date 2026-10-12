@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HP Telecom</string>
+    <string name="offline_title">Không có kết nối mạng</string>
+    <string name="offline_hint">Kiểm tra Wi-Fi hoặc 4G rồi kéo xuống để tải lại.</string>
+</resources>

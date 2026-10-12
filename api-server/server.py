@@ -538,6 +538,28 @@ class ApiHandler(BaseHTTPRequestHandler):
                 self._send_json(200, {"user": public_user(user)})
                 return
 
+            if path == "/auth/me" and method == "PATCH":
+                data = self._read_json()
+                allowed = {"fullName", "email", "phone"}
+                if not isinstance(data, dict) or not data or set(data) - allowed:
+                    raise ApiError(400, "invalid_profile_update", "Chỉ có thể cập nhật họ tên, email hoặc số điện thoại.")
+                full_name = data.get("fullName", user["full_name"])
+                email = data.get("email", user["email"])
+                phone = data.get("phone", user["phone"])
+                if not isinstance(full_name, str) or not 2 <= len(full_name.strip()) <= 120:
+                    raise ApiError(400, "invalid_full_name", "Họ tên phải có từ 2 đến 120 ký tự.")
+                if not isinstance(email, str) or len(email) > 254 or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email.strip()):
+                    raise ApiError(400, "invalid_email", "Địa chỉ email không hợp lệ.")
+                if not isinstance(phone, str) or len(phone) > 30:
+                    raise ApiError(400, "invalid_phone", "Số điện thoại không hợp lệ.")
+                db.execute(
+                    "UPDATE users SET full_name=?, email=?, phone=?, updated_at=? WHERE id=?",
+                    (full_name.strip(), email.strip(), phone.strip(), now_iso(), user["id"]),
+                )
+                updated = db.execute("SELECT * FROM users WHERE id=?", (user["id"],)).fetchone()
+                self._send_json(200, {"user": public_user(updated)})
+                return
+
             if path == "/teams" and method == "GET":
                 if user["role"] == "admin":
                     rows = db.execute(
@@ -734,8 +756,8 @@ class ApiHandler(BaseHTTPRequestHandler):
                     raise ApiError(400, "invalid_status", "Trạng thái không hợp lệ.")
                 if role not in {"admin", "coordinator", "operator"}:
                     raise ApiError(400, "invalid_role", "Vai trò không hợp lệ.")
-                if target_id == user["id"] and (status != "active" or role != "admin"):
-                    raise ApiError(409, "cannot_demote_self", "Không thể vô hiệu hóa hoặc hạ quyền tài khoản đang đăng nhập.")
+                if target_id == user["id"] and role != "admin":
+                    raise ApiError(409, "cannot_demote_self", "Không thể hạ quyền tài khoản đang đăng nhập.")
                 if target["role"] == "admin" and target["status"] == "active" and (role != "admin" or status != "active"):
                     admins = db.execute("SELECT COUNT(*) FROM users WHERE role='admin' AND status='active'").fetchone()[0]
                     if admins <= 1:
@@ -751,8 +773,6 @@ class ApiHandler(BaseHTTPRequestHandler):
                 target = db.execute("SELECT * FROM users WHERE id=?", (target_id,)).fetchone()
                 if not target:
                     raise ApiError(404, "user_not_found", "Không tìm thấy tài khoản.")
-                if target_id == user["id"]:
-                    raise ApiError(409, "cannot_delete_self", "Không thể xóa tài khoản đang đăng nhập.")
                 if target["role"] == "admin" and target["status"] == "active":
                     admins = db.execute("SELECT COUNT(*) FROM users WHERE role='admin' AND status='active'").fetchone()[0]
                     if admins <= 1:

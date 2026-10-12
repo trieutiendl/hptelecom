@@ -37,7 +37,7 @@
       .empty-state{padding:34px 16px;color:var(--muted);font-size:13px;text-align:center}.empty-state[hidden],tr[hidden]{display:none}
       dialog{width:min(520px,calc(100% - 28px));max-height:min(80vh,700px);padding:0;overflow:auto;border:1px solid #46717b;background:var(--surface);color:var(--text)}dialog::backdrop{background:rgb(1 9 13 / 76%)}.dialog-inner{padding:22px}
       .dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-bottom:16px;border-bottom:1px solid var(--line)}.dialog-heading h2{margin:0;font-size:20px;letter-spacing:-.03em}.dialog-close{width:34px;height:34px;border:1px solid #52717a;background:transparent;color:var(--text);font-size:18px}
-      .details-list{display:grid;grid-template-columns:132px 1fr;gap:0;margin:8px 0 0}.details-list dt,.details-list dd{margin:0;padding:11px 0;border-bottom:1px solid #244650;font-size:12px;line-height:1.5}.details-list dt{color:var(--muted)}.dialog-foot{display:flex;justify-content:flex-end;padding-top:18px}
+      .details-list{display:grid;grid-template-columns:132px 1fr;gap:0;margin:8px 0 0}.details-list[hidden]{display:none}.details-list dt,.details-list dd{margin:0;padding:11px 0;border-bottom:1px solid #244650;font-size:12px;line-height:1.5}.details-list dt{color:var(--muted)}.dialog-foot{display:flex;justify-content:flex-end;padding-top:18px}
       :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
       @media(max-width:760px){.header-inner,.page-shell{width:min(100% - 32px,620px)}.header-inner{min-height:68px}.brand-mark{width:34px;height:34px}.brand{gap:10px}.brand-name{font-size:14px}.brand-meta{font-size:9px}.preview-label{display:none}.user-chip{padding-left:10px}.user-name{font-size:11px}.user-role{font-size:9px}.page-shell{padding-top:26px}.page-heading{align-items:flex-start;margin-bottom:19px}.report-nav{margin-bottom:14px}.report-tab{flex:1;justify-content:center;padding-inline:8px}.filter-panel{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;padding:12px}.field-search,.action-button{grid-column:1/-1}.table-wrap{overflow:visible}table,tbody{display:block}thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}tbody tr{display:grid;grid-template-columns:24px 36px minmax(0,1fr);gap:12px 10px;padding:14px;border-top:1px solid #244650}tbody tr:first-child{border-top:0}td{display:block;height:auto;min-width:0;padding:0;border:0}td.select-cell{grid-column:1;grid-row:1;padding-top:2px}td.sequence-cell{grid-column:2;grid-row:1;width:auto;padding-top:1px;text-align:left}td:nth-child(3){grid-column:3;grid-row:1}td:nth-child(3)::before{display:none}td::before{display:block;margin-bottom:5px;color:var(--muted);content:attr(data-label);font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}td:first-child::before{display:none}.record-link{width:100%;grid-template-columns:minmax(0,1fr) 30px;align-items:center}.record-summary{grid-column:1}.row-open{grid-column:2;grid-row:1/span 2}}
       @media(max-width:760px){.list-toolbar{align-items:flex-start;flex-direction:column}.list-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}.export-status{flex-basis:100%}.list-status{text-align:left}.selection-hint{margin:0 0 9px;padding:0 14px 10px;border:1px solid var(--line);border-top:0;background:var(--surface)}}
@@ -116,6 +116,93 @@
       @media(max-width:480px){.photo-grid{grid-template-columns:1fr}.photo-card a{min-height:160px}}
     </style>
     <link rel="stylesheet" href="../../server-theme.css" />
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;--canvas:#1e2a38;--bg:#1e2a38;--panel:#26364a;--panel-2:#2d3f55;--surface:#26364a;--field:#1a2431;--ink:#f3f6fa;--text:#f3f6fa;--muted:#b8c5d3;--line:#3d516a;--line-2:#4c627c;--cyan:#5cc7d1;--teal:#5cc7d1;--blue:#5cc7d1;--focus:rgba(92,199,209,.5);--green:#6ad39a;--amber:#f0b955;--red:#ff8078}
+      body{background:var(--canvas);color:var(--ink)}
+      ::selection{background:#3b8f98;color:#fff}
+      .skip-link{background:#5cc7d1;color:#0b2328}
+      .sidebar{background:#17212d;border-color:var(--line);box-shadow:none;color:#d3dde7}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{background:#17212d;border-color:var(--line);box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar .nav-label,.sidebar .version,.sidebar .nav-coming-soon,.nav-group-chevron,.nav-standalone:before,.sidebar.is-collapsed .nav-children:before{color:#a3b2c1;border-color:var(--line)}
+      .nav a,.sidebar .nav .nav-group-trigger,.sidebar .nav .nav-link,.sidebar .nav .nav-child-link{color:#d3dde7}
+      .sidebar .nav .nav-child-disabled{color:#94a3b3}
+      .nav a:hover,.sidebar .nav .nav-group-trigger:hover,.sidebar .nav .nav-group-trigger[aria-expanded=true],.sidebar .nav .nav-link:hover,.sidebar .nav .nav-child-link:hover{border-color:var(--line);background:#233245;color:#fff}
+      .nav a[aria-current=page],.sidebar .nav .nav-group.has-current>.nav-group-trigger,.sidebar .nav .nav-link[aria-current=page],.sidebar .nav .nav-child-link[aria-current=page]{border-color:var(--line-2);background:#2b4058;color:#fff;box-shadow:inset 2px 0 var(--cyan)}
+      .nav-icon{border-color:var(--line);background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:var(--line)}
+      .sidebar-toggle,.sidebar .sidebar-toggle{border-color:var(--line);background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:var(--line-2);background:#2b4058;color:#fff}
+      .sidebar-bottom,.nav-standalone{border-top-color:var(--line)}
+      .connection-state,.sidebar .connection-state{color:#c3cfdb}
+      .connection-state::before{background:var(--green)}
+      .sidebar.is-collapsed .brand:after{color:#f3f6fa}
+      .sidebar :focus-visible,.topbar :focus-visible,.filter-panel :focus-visible,.report-nav :focus-visible,.table-wrap :focus-visible,.dialog-inner :focus-visible,:focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+
+      .topbar{background:var(--canvas);border-color:var(--line);box-shadow:none}
+      .topbar-title,.top-link,.support-link,.admin-role{color:var(--muted)}
+      .admin,.admin-name{border-left-color:var(--line);color:var(--ink)}
+      .avatar{border:1px solid #3f8e97;background:#1d4a52;color:#9be6ee;border-radius:10px}
+      h1,.list-title,.dialog-heading h2,.edit-photo-heading,.detail-images-title{color:var(--ink)}
+      .page-description,.breadcrumb,.list-count,.empty-state,.record-summary,.record-muted,.export-status,.selection-hint{color:var(--muted)}
+      .demo-badge,.preview-label{border-color:#8a6a26;border-radius:6px;background:#4a3a17;color:var(--amber)}
+      .demo-badge::before{background:var(--amber);border-radius:2px}
+
+      .report-nav{border-color:var(--line);border-radius:10px;background:var(--panel);box-shadow:none}
+      .report-tab{color:var(--muted)}
+      .report-tab:hover{background:#2f4259;color:#fff}
+      .report-tab[aria-current=page]{border-color:transparent;border-bottom-color:var(--cyan);background:var(--panel);color:var(--cyan)}
+      .tab-count{border-radius:6px;background:#1f2d3d;color:#c3cfdb}
+      .preview-notice,.notice{border-color:#8a6a26;border-radius:10px;background:#4a3a17;color:#f6dca0}
+      .notice-symbol{border-color:var(--amber);color:var(--amber)}
+      .filter-panel,.list-toolbar,.table-wrap,.selection-hint{border-color:var(--line);background:var(--panel);box-shadow:none;color:var(--ink)}
+      .filter-panel{border-radius:10px}
+      .list-toolbar{border-radius:10px 10px 0 0}
+      .table-wrap{border-radius:0 0 10px 10px}
+      .selection-count{color:var(--ink)}
+      .clear-selection{color:var(--cyan)}
+      .selection-checkbox,.route-select{accent-color:var(--cyan)}
+      .field label,.edit-field,label{color:#d3dde7}
+      .field select,.field input,.field textarea,.edit-field input,.edit-field select,.edit-field textarea,.edit-photo-card input[type=text],input,select,textarea{border-color:var(--line-2);border-radius:8px;background:var(--field);color:var(--ink)}
+      .field input::placeholder,input::placeholder,textarea::placeholder{color:#94a3b3}
+      .field select:focus-visible,.field input:focus-visible,.edit-field input:focus-visible,.edit-field select:focus-visible,.edit-field textarea:focus-visible{border-color:var(--cyan);outline:3px solid rgba(92,199,209,.4);outline-offset:0}
+      select option{background:var(--field);color:var(--ink)}
+      .action-button,.edit-actions button[type=submit],.primary-button{border-color:var(--cyan);border-radius:8px;background:var(--cyan);color:#0b2328;font-weight:800}
+      .action-button:hover,.edit-actions button[type=submit]:hover{border-color:#86dae1;background:#86dae1;color:#0b2328;transform:none}
+      .export-button,.edit-actions button,.dialog-close{border-color:var(--line-2);border-radius:8px;background:transparent;color:#dbe4ed}
+      .export-button:hover,.edit-actions button:hover,.dialog-close:hover{border-color:#637b97;background:#38506b;color:#fff}
+      .edit-actions button[aria-label="Xóa vĩnh viễn"],.detail-actions .delete-report-button{border-color:#b3413f;background:#b3413f;color:#fff}
+      .edit-actions button[aria-label="Xóa vĩnh viễn"]:hover,.detail-actions .delete-report-button:hover{border-color:#c9514e;background:#c9514e;color:#fff}
+      .edit-error,.delete-error{color:var(--red)!important}
+      .delete-confirm p{color:var(--ink)}.delete-warning{color:var(--muted)!important}
+
+      th,table th{background:#1f2d3d;color:#b8c5d3}
+      td,table td{border-color:var(--line);color:#dbe4ed}
+      tbody tr:nth-child(even){background:#2a3b50}
+      tbody tr:hover,tbody tr:nth-child(even):hover{background:#2f4259;color:#fff}
+      tbody tr.is-selected,tbody tr.is-selected:hover{background:#25525a}
+      td.sequence-cell,.record-code,.text-link{color:var(--cyan)}
+      .record-link:hover .record-code{color:#86dae1}
+      .record-code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+      .row-open{border-color:var(--line-2);border-radius:8px;color:var(--cyan)}
+      .record-photo-count{border-color:#3f7a82;border-radius:6px;background:#1d4a52;color:#a9eaf0}
+
+      dialog{border:1px solid var(--line-2);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:0 28px 80px rgba(0,0,0,.5)}
+      dialog::backdrop{background:rgba(10,16,24,.6)}
+      .dialog-heading,.dialog-heading h2,.edit-photo-fields{border-color:var(--line)}
+      .details-list dt,.details-list dd{border-color:var(--line)}
+      .details-list dt,.edit-photo-note,.edit-photo-filename,.photo-card figcaption,.edit-photo-card label{color:var(--muted)}
+      .details-list dd{color:var(--ink)}
+      .photo-group-title,.edit-photo-group-title{color:#d3dde7}
+      .photo-card,.edit-photo-card{border-color:var(--line);background:var(--panel-2)}
+      .edit-photo-remove{min-height:30px;border:1px solid #8a4a52;border-radius:6px;background:transparent;color:#f0a9b0;font:inherit;font-size:11px;font-weight:700;cursor:pointer}.edit-photo-remove:hover{background:#4a2a30}.edit-photo-card.is-removed{opacity:.45}.edit-photo-card.is-removed .edit-photo-remove{opacity:1;color:var(--ink)}
+      .photo-card a,.photo-card img,.edit-photo-card img{background:#141d28}
+      .edit-photo-card input[type=file]{color:var(--ink)}
+      .edit-photo-adder{border-style:dashed;border-color:var(--accent);color:var(--ink);font-weight:800}
+      .inline-editable{cursor:text}.inline-editable:hover{background:var(--panel-2)}.inline-edit{width:100%;min-width:140px;min-height:34px;padding:6px 8px;border:1px solid var(--accent);border-radius:6px;background:var(--field);color:var(--ink);font:inherit}
+      @media(max-width:850px){.sidebar,.sidebar.is-collapsed{background:#17212d;border-color:var(--line)}}
+      @media(max-width:720px){.sidebar{border-bottom-color:var(--line)}tbody tr{border-top-color:var(--line)}}
+    </style>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
@@ -184,13 +271,13 @@
       </section>
 
       <nav class="report-nav" aria-label="Loại báo cáo">
-        <a class="report-tab" href="./" aria-current="page">Sự cố <span class="tab-count">7</span></a>
+        <a class="report-tab" href="./" aria-current="page">Sự cố <span class="tab-count">8</span></a>
         <a class="report-tab" href="../didoi/">Di dời <span class="tab-count">4</span></a>
       </nav>
 
       <div class="preview-notice" role="note">
         <span class="notice-symbol" aria-hidden="true">i</span>
-        <span>Bản xem trước độc lập gồm 7 báo cáo. DLKP32-DLKP22 và 8 ảnh hiện trường lấy từ file Excel bạn gửi; 6 báo cáo còn lại là dữ liệu mẫu. Chỉnh sửa và xóa hoạt động cục bộ, chưa kết nối máy chủ HP Telecom.</span>
+        <span>Bản xem trước độc lập gồm 8 báo cáo. DLKP32-DLKP22 (8 ảnh) và DLKN02-DLKN27 (9 ảnh) lấy từ file Excel bạn gửi; 6 báo cáo còn lại là dữ liệu mẫu. Chỉnh sửa và xóa hoạt động cục bộ, chưa kết nối máy chủ HP Telecom.</span>
       </div>
 
       <form class="filter-panel" id="report-filters" role="search" onsubmit="return false">
@@ -203,6 +290,7 @@
           <select id="month-filter" name="month">
             <option value="">Tất cả tháng</option>
             <option value="2026-10">Tháng 10/2026</option>
+            <option value="2026-09">Tháng 09/2026</option>
           </select>
         </div>
         <div class="field field-search">
@@ -238,33 +326,37 @@
               <tr><th class="select-cell" scope="col"><input class="selection-checkbox" id="select-visible-reports" type="checkbox" aria-label="Chọn tất cả báo cáo đang hiển thị" title="Chọn tất cả báo cáo đang hiển thị"></th><th scope="col">STT</th><th scope="col">Tuyến báo cáo</th><th scope="col">Khu vực</th><th scope="col">Team / Đội</th><th scope="col">Ngày tiếp nhận</th></tr>
             </thead>
             <tbody>
-              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Đắk Phơi, Đắk Lắk" data-date="07/10/2026 · 06:11" data-summary="Sóc cắn · Cắt đoạn cáp và hàn lại măng xông." data-extra-label="Thời lượng xử lý" data-extra="356 phút">
+              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Đắk Phơi, Đắk Lắk" data-date="07/10/2026 · 06:11" data-summary="Sóc cắn · Cắt đoạn cáp và hàn lại măng xông." data-extra-label="Thời gian xử lý" data-extra="356 phút">
                 <td class="select-cell" data-label="Chọn"><input class="selection-checkbox" type="checkbox" data-select-report aria-label="Chọn báo cáo DLBT09-LDDR02"></td><td class="sequence-cell" data-sequence data-label="STT"></td><td data-label="Tuyến báo cáo"><button class="record-link" type="button" data-open-report><span class="record-code">DLBT09-LDDR02</span><span class="record-summary">Sóc cắn · Cắt đoạn cáp, hàn lại măng xông</span><span class="row-open" aria-hidden="true">›</span></button></td>
                 <td class="record-muted" data-label="Khu vực">Đắk Phơi, Đắk Lắk</td><td class="record-muted" data-label="Team / Đội">Tây Đắk Lắk</td><td class="record-muted" data-label="Ngày ghi nhận">07/10/2026<br />06:11</td>
               </tr>
-              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Ea Trang, Đắk Lắk" data-date="05/10/2026 · 18:03" data-summary="Sóc cắn · Thu hồi, kéo lại 20 m và hàn lại ODF." data-extra-label="Thời lượng xử lý" data-extra="103 phút">
+              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Ea Trang, Đắk Lắk" data-date="05/10/2026 · 18:03" data-summary="Sóc cắn · Thu hồi, kéo lại 20 m và hàn lại ODF." data-extra-label="Thời gian xử lý" data-extra="103 phút">
                 <td class="select-cell" data-label="Chọn"><input class="selection-checkbox" type="checkbox" data-select-report aria-label="Chọn báo cáo DLMD16-DLMD22"></td><td class="sequence-cell" data-sequence data-label="STT"></td><td data-label="Tuyến báo cáo"><button class="record-link" type="button" data-open-report><span class="record-code">DLMD16-DLMD22</span><span class="record-summary">Sóc cắn · Thu hồi, kéo lại cáp và hàn ODF</span><span class="row-open" aria-hidden="true">›</span></button></td>
                 <td class="record-muted" data-label="Khu vực">Ea Trang, Đắk Lắk</td><td class="record-muted" data-label="Team / Đội">Tây Đắk Lắk</td><td class="record-muted" data-label="Ngày ghi nhận">05/10/2026<br />18:03</td>
               </tr>
-              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Cư M'ta, Đắk Lắk" data-date="05/10/2026 · 14:23" data-summary="Cháy trụ điện · Kéo phủ cáp, hàn 2 măng xông." data-extra-label="Thời lượng xử lý" data-extra="105 phút">
+              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Cư M'ta, Đắk Lắk" data-date="05/10/2026 · 14:23" data-summary="Cháy trụ điện · Kéo phủ cáp, hàn 2 măng xông." data-extra-label="Thời gian xử lý" data-extra="105 phút">
                 <td class="select-cell" data-label="Chọn"><input class="selection-checkbox" type="checkbox" data-select-report aria-label="Chọn báo cáo DLMD05-DLMD20"></td><td class="sequence-cell" data-sequence data-label="STT"></td><td data-label="Tuyến báo cáo"><button class="record-link" type="button" data-open-report><span class="record-code">DLMD05-DLMD20</span><span class="record-summary">Cháy trụ điện · Kéo phủ cáp, hàn 2 măng xông</span><span class="row-open" aria-hidden="true">›</span></button></td>
                 <td class="record-muted" data-label="Khu vực">Cư M'ta, Đắk Lắk</td><td class="record-muted" data-label="Team / Đội">Tây Đắk Lắk</td><td class="record-muted" data-label="Ngày ghi nhận">05/10/2026<br />14:23</td>
               </tr>
-              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Ea Ktur, Đắk Lắk" data-date="05/10/2026 · 11:49" data-summary="Xe máng cáp · Kéo phủ cáp và hàn 2 măng xông." data-extra-label="Thời lượng xử lý" data-extra="246 phút">
+              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Ea Ktur, Đắk Lắk" data-date="05/10/2026 · 11:49" data-summary="Xe máng cáp · Kéo phủ cáp và hàn 2 măng xông." data-extra-label="Thời gian xử lý" data-extra="246 phút">
                 <td class="select-cell" data-label="Chọn"><input class="selection-checkbox" type="checkbox" data-select-report aria-label="Chọn báo cáo DLCK03-DLCK09"></td><td class="sequence-cell" data-sequence data-label="STT"></td><td data-label="Tuyến báo cáo"><button class="record-link" type="button" data-open-report><span class="record-code">DLCK03-DLCK09</span><span class="record-summary">Xe máng cáp · Kéo phủ cáp, hàn 2 măng xông</span><span class="row-open" aria-hidden="true">›</span></button></td>
                 <td class="record-muted" data-label="Khu vực">Ea Ktur, Đắk Lắk</td><td class="record-muted" data-label="Team / Đội">Tây Đắk Lắk</td><td class="record-muted" data-label="Ngày ghi nhận">05/10/2026<br />11:49</td>
               </tr>
-              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Ea Knuếc, Đắk Lắk" data-date="04/10/2026 · 09:08" data-summary="Bị chặt trúng cáp · Kéo phủ và hàn 2 măng xông." data-extra-label="Thời lượng xử lý" data-extra="223 phút">
+              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Ea Knuếc, Đắk Lắk" data-date="04/10/2026 · 09:08" data-summary="Bị chặt trúng cáp · Kéo phủ và hàn 2 măng xông." data-extra-label="Thời gian xử lý" data-extra="223 phút">
                 <td class="select-cell" data-label="Chọn"><input class="selection-checkbox" type="checkbox" data-select-report aria-label="Chọn báo cáo DLKP01-DLKP42"></td><td class="sequence-cell" data-sequence data-label="STT"></td><td data-label="Tuyến báo cáo"><button class="record-link" type="button" data-open-report><span class="record-code">DLKP01-DLKP42</span><span class="record-summary">Bị chặt trúng cáp · Kéo phủ, hàn 2 măng xông</span><span class="row-open" aria-hidden="true">›</span></button></td>
                 <td class="record-muted" data-label="Khu vực">Ea Knuếc, Đắk Lắk</td><td class="record-muted" data-label="Team / Đội">Tây Đắk Lắk</td><td class="record-muted" data-label="Ngày ghi nhận">04/10/2026<br />09:08</td>
               </tr>
-              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Ea Khăl, Đắk Lắk" data-date="03/10/2026 · 10:59" data-summary="Sóc cắn · Kéo phủ lại cáp, hàn 2 măng xông." data-extra-label="Thời lượng xử lý" data-extra="450 phút">
+              <tr data-report-row data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Ea Khăl, Đắk Lắk" data-date="03/10/2026 · 10:59" data-summary="Sóc cắn · Kéo phủ lại cáp, hàn 2 măng xông." data-extra-label="Thời gian xử lý" data-extra="450 phút">
                 <td class="select-cell" data-label="Chọn"><input class="selection-checkbox" type="checkbox" data-select-report aria-label="Chọn báo cáo DLEH70-DLEH08"></td><td class="sequence-cell" data-sequence data-label="STT"></td><td data-label="Tuyến báo cáo"><button class="record-link" type="button" data-open-report><span class="record-code">DLEH70-DLEH08</span><span class="record-summary">Sóc cắn · Kéo phủ lại cáp, hàn 2 măng xông</span><span class="row-open" aria-hidden="true">›</span></button></td>
                 <td class="record-muted" data-label="Khu vực">Ea Khăl, Đắk Lắk</td><td class="record-muted" data-label="Team / Đội">Tây Đắk Lắk</td><td class="record-muted" data-label="Ngày ghi nhận">03/10/2026<br />10:59</td>
               </tr>
-              <tr data-report-row data-photo-set="DLKP32-DLKP22" data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Trần Hưng Đạo, Krông Pắc, Đắk Lắk" data-date="02/10/2026 · 14:29" data-summary="Xe máng cáp · Kéo phủ, hàn lại 2 măng xông." data-extra-label="Khoảng cách đến trạm" data-extra="0,632 km">
+              <tr data-report-row data-photo-set="DLKP32-DLKP22" data-team="Tây Đắk Lắk" data-month="2026-10" data-location="Trần Hưng Đạo, Krông Pắc, Đắk Lắk" data-date="02/10/2026 · 14:29" data-summary="Xe máng cáp · Kéo phủ, hàn lại 2 măng xông." data-extra-label="Thời gian xử lý" data-extra="">
                 <td class="select-cell" data-label="Chọn"><input class="selection-checkbox" type="checkbox" data-select-report aria-label="Chọn báo cáo DLKP32-DLKP22"></td><td class="sequence-cell" data-sequence data-label="STT"></td><td data-label="Tuyến báo cáo"><button class="record-link" type="button" data-open-report><span class="record-code">DLKP32-DLKP22</span><span class="record-summary">Xe máng cáp · Kéo phủ, hàn lại 2 măng xông</span><span class="record-photo-count">8 ảnh hiện trường</span><span class="row-open" aria-hidden="true">›</span></button></td>
                 <td class="record-muted" data-label="Khu vực">Trần Hưng Đạo, Krông Pắc, Đắk Lắk</td><td class="record-muted" data-label="Team / Đội">Tây Đắk Lắk</td><td class="record-muted" data-label="Ngày ghi nhận">02/10/2026<br />14:29</td>
+              </tr>
+              <tr data-report-row data-photo-set="DLKN02-DLKN27" data-team="Tây Đắk Lắk" data-month="2026-09" data-location="Xã Phú Xuân, Đắk Lắk" data-date="14/09/2026" data-start-time="2026-09-09T10:07" data-end-time="2026-09-09T15:10" data-summary="Cháy trụ điện · Kéo cáp mới, hàn 2 MX 48." data-materials="179 m cáp 48FO, 2 măng xông 48FO, 2 bộ 2 hướng néo" data-extra-label="Thời gian xử lý" data-extra="303 phút">
+                <td class="select-cell" data-label="Chọn"><input class="selection-checkbox" type="checkbox" data-select-report aria-label="Chọn báo cáo DLKN02-DLKN27"></td><td class="sequence-cell" data-sequence data-label="STT"></td><td data-label="Tuyến báo cáo"><button class="record-link" type="button" data-open-report><span class="record-code">DLKN02-DLKN27</span><span class="record-summary">Cháy trụ điện · Kéo cáp mới, hàn 2 MX 48</span><span class="record-photo-count">9 ảnh hiện trường</span><span class="row-open" aria-hidden="true">›</span></button></td>
+                <td class="record-muted" data-label="Khu vực">Xã Phú Xuân, Đắk Lắk</td><td class="record-muted" data-label="Team / Đội">Tây Đắk Lắk</td><td class="record-muted" data-label="Ngày ghi nhận">14/09/2026</td>
               </tr>
             </tbody>
           </table>
@@ -282,12 +374,14 @@
         <form class="edit-form" id="edit-form" hidden>
           <div class="edit-grid">
             <label class="edit-field">Tuyến báo cáo<input name="code" required maxlength="80" /></label>
-            <label class="edit-field">Team/Đội<input name="team" required maxlength="120" placeholder="Nhập tên Team/Đội" /></label>
+            <label class="edit-field">Team/Đội<input name="team" maxlength="120" placeholder="Nhập tên Team/Đội" /></label>
             <label class="edit-field edit-field--wide">Khu vực<input name="location" required maxlength="160" /></label>
-            <label class="edit-field edit-field--wide">Ngày tiếp nhận<input name="date" type="datetime-local" required /></label>
-            <label class="edit-field edit-field--wide">Nội dung sự cố<textarea name="summary" required maxlength="1000"></textarea></label>
-            <label class="edit-field">Thông tin bổ sung<input name="extraLabel" required maxlength="80" /></label>
-            <label class="edit-field">Giá trị<input name="extra" required maxlength="120" /></label>
+            <label class="edit-field edit-field--wide">Ngày tiếp nhận<input name="date" type="date" required /></label>
+            <label class="edit-field">Thời gian bắt đầu<input name="startTime" type="datetime-local" /></label>
+            <label class="edit-field">Thời gian kết thúc<input name="endTime" type="datetime-local" /></label>
+            <input type="hidden" name="summary" /><label class="edit-field edit-field--wide">Nguyên nhân<textarea name="cause" required maxlength="500" rows="2"></textarea></label><label class="edit-field edit-field--wide">Phương án xử lý<textarea name="solution" required maxlength="500" rows="2"></textarea></label><label class="edit-field edit-field--wide">Vật tư<textarea name="materials" maxlength="500" rows="2" placeholder="Ví dụ: 179 m cáp 48FO, 2 măng xông 48FO"></textarea></label>
+            <input type="hidden" name="extraLabel" /><input type="hidden" name="extra" />
+            <label class="edit-field">Thời gian xử lý (phút)<input name="processing" readonly placeholder="Tự tính: kết thúc − bắt đầu" /></label>
           </div>
           <section class="edit-photo-fields" id="edit-photo-fields" aria-label="Chỉnh sửa ảnh hiện trường" hidden></section>
           <p class="edit-error" id="edit-error" role="alert" hidden></p>
@@ -304,8 +398,14 @@
       const form=document.querySelector("#report-filters"),rows=[...document.querySelectorAll("[data-report-row]")],search=document.querySelector("#report-search"),team=document.querySelector("#team-filter"),month=document.querySelector("#month-filter"),count=document.querySelector("#result-count"),empty=document.querySelector("#empty-state"),status=document.querySelector("#list-status"),dialog=document.querySelector("#report-dialog"),title=document.querySelector("#detail-title"),details=document.querySelector("#detail-list");
       const legacyTeamNames={"Tây Đắk Lắk":"Đắk Lắk"};
       const normalizeTeam=(value)=>legacyTeamNames[value]||String(value||"").trim();
+      const updateProcessing=()=>{const start=editForm.elements.namedItem("startTime").value,end=editForm.elements.namedItem("endTime").value,field=editForm.elements.namedItem("processing"),minutes=start&&end?Math.round((new Date(end)-new Date(start))/60000):null;field.value=minutes===null?(/phút/.test(editForm.elements.namedItem("extra").value)?editForm.elements.namedItem("extra").value:""):minutes<0?"Thời gian kết thúc phải sau thời gian bắt đầu":`${minutes} phút`};
+      ["startTime","endTime"].forEach(name=>document.querySelector(`#edit-form [name="${name}"]`).addEventListener("input",updateProcessing));
+      const teamOptions=document.createElement("datalist");teamOptions.id="team-options";document.body.append(teamOptions);
+      const fillTeamOptions=(extra=[])=>{const names=new Set([...extra,...rows.map(row=>row.dataset.team)].map(name=>String(name||"").trim()).filter(Boolean));teamOptions.replaceChildren(...[...names].sort((a,b)=>a.localeCompare(b,"vi")).map(name=>{const option=document.createElement("option");option.value=name;return option}))};
+      [document.querySelector("#team-filter"),document.querySelector('#edit-form [name="team"]')].forEach(input=>{input.setAttribute("list","team-options");input.placeholder="Chọn hoặc nhập tên Team/Đội"});document.querySelector('#edit-form [name="team"]').placeholder="Chọn team; để trống nếu là báo cáo cá nhân";
+      fetch("/api/teams",{credentials:"same-origin",cache:"no-store"}).then(response=>response.ok?response.json():{teams:[]}).then(result=>fillTeamOptions((result.teams||[]).map(team=>team.name))).catch(()=>{});
       const editTeam=document.querySelector('#edit-form [name="team"]');
-      rows.forEach(row=>{row.dataset.team=normalizeTeam(row.dataset.team);row.querySelector('[data-label="Team / Đội"]').textContent=row.dataset.team});
+      rows.forEach(row=>{const[firstPart,...restParts]=row.dataset.summary.split(" · ");row.dataset.cause=firstPart;row.dataset.solution=restParts.join(" · ");row.dataset.team=normalizeTeam(row.dataset.team);row.querySelector('[data-label="Team / Đội"]').textContent=row.dataset.team||"Cá nhân"});fillTeamOptions();
       const selectedReportKeys=new Set();
       const editStorageKey="hptelecom-report-edits-suco-v1";
       const deleteStorageKey="hptelecom-report-deleted-suco-v1";
@@ -315,12 +415,12 @@
       sortRows();
       const normalize=text=>text.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("vi");
       const xmlEscape=value=>String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
-      const exportHeaders=["STT","Tuyến báo cáo","Khu vực","Team / Đội","Ngày tiếp nhận","Nội dung sự cố","Thời lượng xử lý"];
+      const exportHeaders=["STT","Tuyến báo cáo","Khu vực","Team / Đội","Ngày tiếp nhận","Thời gian bắt đầu","Thời gian kết thúc","Nguyên nhân","Phương án xử lý","Vật tư","Thời gian xử lý (phút)"];
       const selectedOrVisibleRows=()=>selectedReportKeys.size?rows.filter(row=>selectedReportKeys.has(row.dataset.selectionKey)):rows.filter(row=>!row.hidden);
       const exportRows=()=>selectedOrVisibleRows().map(row=>[
         row.querySelector("[data-sequence]").textContent.trim(),
         row.querySelector(".record-code").textContent.trim(),
-        row.dataset.location,row.dataset.team,row.dataset.date,row.dataset.summary,
+        row.dataset.location,row.dataset.team,row.dataset.date,formatDateTime(row.dataset.startTime),formatDateTime(row.dataset.endTime),row.dataset.cause,row.dataset.solution,row.dataset.materials||"",
         `${row.dataset.extraLabel}: ${row.dataset.extra}`
       ]);
       const downloadBlob=(blob,filename)=>{const url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=filename;link.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000)};
@@ -357,7 +457,7 @@
       });
       document.querySelector("#export-kmz").addEventListener("click",()=>{
         const records=selectedOrVisibleRows(),placemarks=records.map(row=>{
-          const code=row.querySelector(".record-code").textContent.trim(),fields=[["Tuyến báo cáo",code],["Khu vực",row.dataset.location],["Team / Đội",row.dataset.team],["Ngày tiếp nhận",row.dataset.date],["Nội dung sự cố",row.dataset.summary],[row.dataset.extraLabel,row.dataset.extra]];
+          const code=row.querySelector(".record-code").textContent.trim(),fields=[["Tuyến báo cáo",code],["Khu vực",row.dataset.location],["Team / Đội",row.dataset.team],["Ngày tiếp nhận",row.dataset.date],["Nguyên nhân",row.dataset.cause],["Phương án xử lý",row.dataset.solution],["Vật tư",row.dataset.materials||"—"],[row.dataset.extraLabel,row.dataset.extra]];
           const description=fields.map(([label,value])=>`${label}: ${value}`).join("\n"),extended=fields.map(([label,value])=>`<Data name="${xmlEscape(label)}"><value>${xmlEscape(value)}</value></Data>`).join("");
           return `<Placemark><name>${xmlEscape(code)}</name><description>${xmlEscape(description)}</description><ExtendedData>${extended}</ExtendedData></Placemark>`;
         }).join("");
@@ -366,7 +466,7 @@
         document.querySelector("#export-status").textContent=`Đã xuất ${records.length} báo cáo${selectedReportKeys.size?" đã chọn":" đang hiển thị"}. Dữ liệu mẫu chưa có tọa độ để vẽ tuyến trong KMZ.`;
       });
       const updateSelectionUI=()=>{const visible=rows.filter(row=>!row.hidden),selectedVisible=visible.filter(row=>selectedReportKeys.has(row.dataset.selectionKey)).length;rows.forEach(row=>{const checkbox=row.querySelector("[data-select-report]");checkbox.checked=selectedReportKeys.has(row.dataset.selectionKey);row.classList.toggle("is-selected",checkbox.checked)});const selectAll=document.querySelector("#select-visible-reports");selectAll.checked=visible.length>0&&selectedVisible===visible.length;selectAll.indeterminate=selectedVisible>0&&selectedVisible<visible.length;document.querySelector("#selection-count").textContent=selectedReportKeys.size?`Đã chọn ${selectedReportKeys.size} báo cáo`:"Chưa chọn báo cáo";document.querySelector("#clear-selection").hidden=selectedReportKeys.size===0};
-      const filter=()=>{const query=normalize(search.value.trim()),teamQuery=normalize(team.value.trim());let shown=0;rows.forEach(row=>{const visible=(!query||normalize(row.textContent).includes(query))&&(!teamQuery||normalize(row.dataset.team).includes(teamQuery))&&(!month.value||row.dataset.month===month.value);row.hidden=!visible;if(visible)shown++});count.textContent=`${shown} / ${rows.length} bản ghi mẫu`;empty.hidden=shown>0;updateSelectionUI()};
+      const filter=()=>{const query=normalize(search.value.trim()),teamQuery=normalize(team.value.trim());let shown=0;rows.forEach(row=>{const visible=(!query||normalize(row.textContent).includes(query))&&(!teamQuery||!row.dataset.team||normalize(row.dataset.team).includes(teamQuery))&&(!month.value||row.dataset.month===month.value);row.hidden=!visible;if(visible)shown++});count.textContent=`${shown} / ${rows.length} bản ghi mẫu`;empty.hidden=shown>0;updateSelectionUI()};
       form.addEventListener("input",filter);form.addEventListener("change",filter);
       document.querySelector("#report-list").addEventListener("change",event=>{const checkbox=event.target.closest("[data-select-report]");if(!checkbox)return;const key=checkbox.closest("[data-report-row]").dataset.selectionKey;if(checkbox.checked)selectedReportKeys.add(key);else selectedReportKeys.delete(key);updateSelectionUI()});
       document.querySelector("#select-visible-reports").addEventListener("change",event=>{rows.filter(row=>!row.hidden).forEach(row=>{const key=row.dataset.selectionKey;if(event.target.checked)selectedReportKeys.add(key);else selectedReportKeys.delete(key)});updateSelectionUI()});
@@ -376,26 +476,44 @@
       let activeReport=null,savedEdits={},deletedReportIds=[];
       try{const stored=localStorage.getItem(editStorageKey);if(stored){const parsed=JSON.parse(stored);if(!parsed||typeof parsed!=="object"||Array.isArray(parsed))throw new Error("Dữ liệu chỉnh sửa không đúng định dạng.");savedEdits=parsed}}catch(error){console.warn("Không thể đọc các thay đổi báo cáo đã lưu trên trình duyệt.",error);document.querySelector("#export-status").textContent="Không đọc được dữ liệu sửa đã lưu trên trình duyệt."}
       try{const stored=localStorage.getItem(deleteStorageKey);if(stored){const parsed=JSON.parse(stored);if(!Array.isArray(parsed)||parsed.some(id=>typeof id!=="string"))throw new Error("Danh sách báo cáo đã xóa không đúng định dạng.");deletedReportIds=parsed}}catch(error){console.warn("Không thể đọc danh sách báo cáo đã xóa trên trình duyệt.",error);document.querySelector("#export-status").textContent="Không đọc được danh sách báo cáo đã xóa."}
-      const currentReportData=row=>({code:row.querySelector(".record-code").textContent.trim(),location:row.dataset.location,team:row.dataset.team,date:row.dataset.date,summary:row.dataset.summary,extraLabel:row.dataset.extraLabel,extra:row.dataset.extra});
+      const currentReportData=row=>({code:row.querySelector(".record-code").textContent.trim(),location:row.dataset.location,team:row.dataset.team,date:row.dataset.date,startTime:row.dataset.startTime||"",endTime:row.dataset.endTime||"",cause:row.dataset.cause||"",solution:row.dataset.solution||"",materials:row.dataset.materials||"",summary:row.dataset.summary,extraLabel:row.dataset.extraLabel,extra:row.dataset.extra});
+      const formatDateTime=value=>{const match=(value||"").match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2})$/);return match?`${match[4]} ${match[3]}/${match[2]}/${match[1]}`:""};
       const incidentPhotoGroups={
+        "DLKN02-DLKN27":[
+          {title:"Hiện trường sự cố",photos:[{src:"./assets/dlkn02-scene-01.jpg",caption:"Cháy trụ điện"}]},
+          {title:"Đầu số cáp",photos:[
+            {src:"./assets/dlkn02-cable-end-01.jpg",caption:"Đầu số cáp 3388-3209"},
+            {src:"./assets/dlkn02-cable-end-02.jpg",caption:"Đầu số cáp 3388-3209"}
+          ]},
+          {title:"Măng xông (MX)",photos:[
+            {src:"./assets/dlkn02-mx-01.jpg",caption:"MX · 12.920708, 108.367776"},
+            {src:"./assets/dlkn02-mx-02.jpg",caption:"MX · 12.921123, 108.366238"}
+          ]},
+          {title:"Vật tư",photos:[
+                      {src:"./assets/dlkn02-anchor-01.jpg",caption:"Thay treo néo"},
+                      {src:"./assets/dlkn02-anchor-02.jpg",caption:"Thay treo néo"}
+          ]},
+          {title:"Kết quả đo kiểm",photos:[
+            {src:"./assets/dlkn02-result-01.jpg",caption:"Hoàn công"},
+            {src:"./assets/dlkn02-result-02.jpg",caption:"Hoàn công"}
+          ]}
+        ],
         "DLKP32-DLKP22":[
-          {title:"Hiện trường sự cố · Xe máng",photos:[
+          {title:"Hiện trường sự cố",photos:[
             {src:"./assets/dlkp32-scene-01.jpg",caption:"Ảnh hiện trường sự cố"},
             {src:"./assets/dlkp32-scene-02.jpg",caption:"Thiết bị đo tại hiện trường"}
           ]},
-          {title:"Đầu số cáp · 2769–2694",photos:[
+          {title:"Đầu số cáp",photos:[
             {src:"./assets/dlkp32-cable-end-01.jpg",caption:"Đầu số cáp 2769–2694"},
             {src:"./assets/dlkp32-cable-end-02.jpg",caption:"Kiểm tra đầu số cáp"}
           ]},
-          {title:"Vật tư · Vị trí néo",photos:[
-            {src:"./assets/dlkp32-pole-location.jpg",caption:"Vị trí néo · 12.700209, 108.327232"}
-          ]},
-          {title:"Hình ảnh thi công · Hàn cáp",photos:[
-            {src:"./assets/dlkp32-splicing-work.jpg",caption:"Thi công hàn cáp tại hiện trường"}
-          ]},
           {title:"Măng xông (MX)",photos:[
             {src:"./assets/dlkp32-pole-location.jpg",caption:"MX · 12.700209, 108.327232"},
-            {src:"./assets/dlkp32-mx-location-02.jpg",caption:"MX · 12.700480, 108.326998"}
+            {src:"./assets/dlkp32-mx-location-02.jpg",caption:"MX · 12.700480, 108.326998"},
+            {src:"./assets/dlkp32-splicing-work.jpg",caption:"Thi công hàn cáp tại hiện trường"}
+          ]},
+          {title:"Vật tư",photos:[
+            {src:"./assets/dlkp32-pole-location.jpg",caption:"Vị trí néo · 12.700209, 108.327232"}
           ]}
         ]
       };
@@ -444,16 +562,18 @@
       const resolvedPhotoSrc=src=>src.startsWith("stored-photo:")?photoUrls.get(src.slice("stored-photo:".length))||"":src;
       const photoSlotKey=(groupIndex,photoIndex)=>`${groupIndex}:${photoIndex}`;
       const showPhotoError=message=>{editError.textContent=message;editError.hidden=false};
-      let addedPhotoGroupIndex=null,addedPhotoStartIndex=0,editPhotoHeading=null,addedPhotosCount=0;
+      let addedPhotoGroupIndex=null,addedPhotoStartIndex=0,editPhotoHeading=null,addedPhotosCount=0,editGroupTitles=[];
+      const standardPhotoTitles=["Hiện trường sự cố","Đầu số cáp","Măng xông (MX)","Vật tư","Kết quả đo kiểm"];
+      const withStandardGroups=groups=>{const list=[...groups];standardPhotoTitles.forEach(title=>{const key=title.split(" (")[0];if(!list.some(group=>group.title.startsWith(key)))list.push({title,photos:[]})});return list};
       const renderEditPhotos=row=>{
         editPhotoFields.replaceChildren();pendingPhotoFiles.clear();
-        const groups=photoGroupsFor(row)||[];
+        const groups=withStandardGroups(photoGroupsFor(row)||[]);editGroupTitles=groups.map(group=>group.title);
         editPhotoHeading=document.createElement("h3");const note=document.createElement("p");
         addedPhotosCount=0;editPhotoHeading.className="edit-photo-heading";editPhotoHeading.textContent=`Ảnh hiện trường (${groups.reduce((sum,group)=>sum+group.photos.length,0)})`;
         note.className="edit-photo-note";note.textContent="Chọn ảnh để thay ảnh cũ, sửa chú thích hoặc thêm nhiều ảnh. Mỗi ảnh tối đa 10 MB; số lượng tùy dung lượng trình duyệt. Thay đổi chỉ lưu trong trình duyệt này.";
         editPhotoFields.append(editPhotoHeading,note);
         const groupGrids=[];
-        const appendPhotoCard=(grid,photo,groupIndex,photoIndex)=>{
+        const appendPhotoCard=(grid,photo,groupIndex,photoIndex,before=null)=>{
           const card=document.createElement("div"),image=document.createElement("img"),captionLabel=document.createElement("label"),captionInput=document.createElement("input"),fileLabel=document.createElement("label"),fileInput=document.createElement("input"),filename=document.createElement("span");
           card.className="edit-photo-card";image.alt=photo.caption;image.src=resolvedPhotoSrc(photo.src);
           captionLabel.textContent="Chú thích";captionInput.type="text";captionInput.value=photo.caption;captionInput.maxLength=200;captionInput.required=true;captionInput.dataset.photoCaption="";captionInput.dataset.groupIndex=String(groupIndex);captionInput.dataset.photoIndex=String(photoIndex);
@@ -468,51 +588,87 @@
             const previewUrl=URL.createObjectURL(file);temporaryPhotoUrls.add(previewUrl);pendingPhotoFiles.set(slot,{file,url:previewUrl,isNew:Boolean(previous?.isNew)});
             image.src=previewUrl;filename.textContent=file.name;editError.hidden=true;
           });
-          captionLabel.append(captionInput);card.append(image,captionLabel,fileLabel);grid.append(card);
+          captionLabel.append(captionInput);
+          const removeButton=document.createElement("button");removeButton.type="button";removeButton.className="edit-photo-remove";removeButton.textContent="Xóa ảnh";
+          removeButton.addEventListener("click",()=>{const removed=captionInput.dataset.removed!=="1";captionInput.dataset.removed=removed?"1":"";captionInput.required=!removed;card.classList.toggle("is-removed",removed);removeButton.textContent=removed?"Hoàn tác xóa":"Xóa ảnh"});
+          card.append(image,captionLabel,fileLabel,removeButton);grid.insertBefore(card,before);
         };
+                  const readExifGps=async file=>{
+                    try{
+                      const v=new DataView(await file.slice(0,262144).arrayBuffer());if(v.getUint16(0)!==0xFFD8)return null;
+                      let p=2;while(p<v.byteLength-4){const m=v.getUint16(p),len=v.getUint16(p+2);if(m===0xFFE1&&v.getUint32(p+4)===0x45786966){
+                        const t=p+10,le=v.getUint16(t)===0x4949,u16=o=>v.getUint16(t+o,le),u32=o=>v.getUint32(t+o,le);
+                        const ifd=o=>{const n=u16(o),e={};for(let i=0;i<n;i++){const q=o+2+i*12;e[u16(q)]={type:u16(q+2),count:u32(q+4),off:q+8}}return e};
+                        const gpsPtr=ifd(u32(4))[0x8825];if(!gpsPtr)return null;const g=ifd(u32(gpsPtr.off));
+                        const ref=e=>e?String.fromCharCode(v.getUint8(t+e.off)):"";
+                        const rat=e=>{const b=u32(e.off),r=[];for(let i=0;i<3;i++)r.push(u32(b+i*8)/(u32(b+i*8+4)||1));return r[0]+r[1]/60+r[2]/3600};
+                        if(!g[2]||!g[4])return null;let lat=rat(g[2]),lng=rat(g[4]);if(ref(g[1])==="S")lat=-lat;if(ref(g[3])==="W")lng=-lng;
+                        return `${lat.toFixed(6)}, ${lng.toFixed(6)}`}
+                        p+=2+len}
+                    }catch{}
+                    return null;
+                  };
+                  let tesseractLoader=null;
+                  const loadTesseract=()=>tesseractLoader||(tesseractLoader=new Promise((resolve,reject)=>{
+                    if(window.Tesseract)return resolve(window.Tesseract);
+                    const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";s.onload=()=>resolve(window.Tesseract);s.onerror=()=>{tesseractLoader=null;reject(new Error("load"))};document.head.append(s);
+                  }));
+                  const parseCoords=text=>{
+                    const t=text.replace(/,/g,".").replace(/\s+/g," ");
+                    const m=t.match(/Lat\D{0,4}(-?\d{1,2}\.\d{3,})\D{1,8}Long\D{0,4}(-?\d{2,3}\.\d{3,})/i)||t.match(/\+?(\d{1,2}\.\d{4,})\D{1,3}\+?(\d{2,3}\.\d{4,})/);
+                    return m?`${m[1]}, ${m[2]}`:null;
+                  };
+                  const readOverlayCoords=async file=>{
+                    try{
+                      const T=await loadTesseract(),bmp=await createImageBitmap(file),h=Math.round(bmp.height*0.075),w=Math.round(bmp.width*0.54),c=document.createElement("canvas");
+                      c.width=w*2;c.height=h*2;
+                      const ctx=c.getContext("2d");ctx.filter="grayscale(1) contrast(1.6)";ctx.drawImage(bmp,0,bmp.height-h,w,h,0,0,c.width,c.height);
+                      const result=await T.recognize(c,"eng");
+                      return parseCoords(result.data.text);
+                    }catch{return null}
+                  };
+                  const addedCounts=new Map();
+                  const attachAdder=(grid,groupIndex,startIndex,groupTitle)=>{
+                    const label=document.createElement("label"),input=document.createElement("input"),hint=document.createElement("span");
+                    label.className="edit-photo-card edit-photo-adder";label.append(document.createTextNode(`+ Thêm ảnh vào mục "${groupTitle}"`));
+                    input.type="file";input.accept="image/*";input.multiple=true;input.setAttribute("aria-label",`Thêm ảnh vào mục ${groupTitle}`);
+                    hint.className="edit-photo-filename";hint.textContent="Có thể chọn nhiều tệp cùng lúc";label.append(input,hint);grid.append(label);
+                    input.addEventListener("change",async()=>{
+                      let added=0;
+                      const isMx=/^Măng xông/.test(groupTitle),files=[...input.files||[]];
+                      input.value="";
+                      for(const file of files){
+                        if(!file.type.startsWith("image/")||!file.size){showPhotoError(`${file.name} không phải là ảnh hợp lệ và đã được bỏ qua.`);continue}
+                        if(file.size>10*1024*1024){showPhotoError(`${file.name} vượt quá giới hạn 10 MB và đã được bỏ qua.`);continue}
+                        const photoIndex=startIndex+(addedCounts.get(groupIndex)||0),slot=photoSlotKey(groupIndex,photoIndex),url=URL.createObjectURL(file);let caption=file.name.replace(/\.[^.]+$/,"").slice(0,200)||groupTitle;
+                        addedCounts.set(groupIndex,(addedCounts.get(groupIndex)||0)+1);
+                        if(isMx){hint.textContent="Đang đọc tọa độ trên ảnh…";const gps=(await readExifGps(file))||(await readOverlayCoords(file));caption=gps?`MX · ${gps}`:"MX · nhập tọa độ (lat, long)"}
+                        temporaryPhotoUrls.add(url);pendingPhotoFiles.set(slot,{file,url,isNew:true});
+                        appendPhotoCard(grid,{src:url,caption},groupIndex,photoIndex,label);added++;addedPhotosCount++;
+                      }
+                      if(added){hint.textContent=`Đã thêm ${added} ảnh vào "${groupTitle}"; có thể sửa chú thích.${isMx?" Kiểm tra lại tọa độ.":""}`;editPhotoHeading.textContent=`Ảnh hiện trường (${groups.reduce((sum,group)=>sum+group.photos.length,0)+addedPhotosCount})`;editError.hidden=true}
+                    });
+                  };
         groups.forEach((group,groupIndex)=>{
           const section=document.createElement("section"),groupTitle=document.createElement("h4"),grid=document.createElement("div");
           section.className="edit-photo-group";groupTitle.className="edit-photo-group-title";groupTitle.textContent=group.title;grid.className="edit-photo-grid";
           group.photos.forEach((photo,photoIndex)=>appendPhotoCard(grid,photo,groupIndex,photoIndex));
-          section.append(groupTitle,grid);editPhotoFields.append(section);groupGrids[groupIndex]=grid;
-        });
-        const existingAdditionalIndex=groups.findIndex(group=>group.title==="Ảnh bổ sung");
-        addedPhotoGroupIndex=existingAdditionalIndex>=0?existingAdditionalIndex:groups.length;
-        addedPhotoStartIndex=existingAdditionalIndex>=0?groups[existingAdditionalIndex].photos.length:0;
-        let additionalGrid=existingAdditionalIndex>=0?groupGrids[existingAdditionalIndex]:null;
-        if(!additionalGrid){
-          const section=document.createElement("section"),groupTitle=document.createElement("h4");
-          section.className="edit-photo-group";groupTitle.className="edit-photo-group-title";groupTitle.textContent="Ảnh bổ sung";additionalGrid=document.createElement("div");additionalGrid.className="edit-photo-grid";section.append(groupTitle,additionalGrid);editPhotoFields.append(section);
-        }
-        const addPhotosLabel=document.createElement("label"),addPhotosInput=document.createElement("input"),addPhotosHint=document.createElement("span");
-        addPhotosLabel.className="edit-photo-card";addPhotosLabel.append(document.createTextNode("Thêm ảnh từ thiết bị"));
-        addPhotosInput.type="file";addPhotosInput.accept="image/*";addPhotosInput.multiple=true;addPhotosInput.setAttribute("aria-label","Chọn nhiều ảnh để thêm vào báo cáo");
-        addPhotosHint.className="edit-photo-filename";addPhotosHint.textContent="Có thể chọn nhiều tệp cùng lúc";addPhotosLabel.append(addPhotosInput,addPhotosHint);additionalGrid.append(addPhotosLabel);
-        addPhotosInput.addEventListener("change",()=>{
-          const files=[...addPhotosInput.files||[]];let added=0;
-          files.forEach(file=>{
-            if(!file.type.startsWith("image/")||!file.size){showPhotoError(`${file.name} không phải là ảnh hợp lệ và đã được bỏ qua.`);return}
-            if(file.size>10*1024*1024){showPhotoError(`${file.name} vượt quá giới hạn 10 MB và đã được bỏ qua.`);return}
-            const photoIndex=addedPhotoStartIndex+[...pendingPhotoFiles.values()].filter(item=>item.isNew).length,slot=photoSlotKey(addedPhotoGroupIndex,photoIndex),url=URL.createObjectURL(file),caption=file.name.replace(/\.[^.]+$/,"").slice(0,200)||"Ảnh bổ sung";
-            temporaryPhotoUrls.add(url);pendingPhotoFiles.set(slot,{file,url,isNew:true});
-            appendPhotoCard(additionalGrid,{src:url,caption},addedPhotoGroupIndex,photoIndex);added++;addedPhotosCount++;
-          });
-          if(added){addPhotosHint.textContent=`Đã thêm ${added} ảnh vào bản nháp; có thể sửa chú thích bên dưới.`;editPhotoHeading.textContent=`Ảnh hiện trường (${groups.reduce((sum,group)=>sum+group.photos.length,0)+addedPhotosCount})`;editError.hidden=true}
-          addPhotosInput.value="";
+          attachAdder(grid,groupIndex,group.photos.length,group.title);
+          section.append(groupTitle,grid);editPhotoFields.append(section);
         });
         editPhotoFields.hidden=false;
       };
       const renderDetails=row=>{
         const code=row.querySelector(".record-code").textContent.trim();
         title.textContent=code;details.replaceChildren();
-        [["Khu vực",row.dataset.location],["Team / Đội",row.dataset.team],["Ngày tiếp nhận",row.dataset.date],["Nội dung sự cố",row.dataset.summary],[row.dataset.extraLabel,row.dataset.extra]].forEach(([label,value])=>{const term=document.createElement("dt"),description=document.createElement("dd");term.textContent=label;description.textContent=value;details.append(term,description)});
+        [["Khu vực",row.dataset.location],["Team / Đội",row.dataset.team||"Cá nhân"],["Ngày tiếp nhận",row.dataset.date],...(row.dataset.startTime?[["Thời gian bắt đầu",formatDateTime(row.dataset.startTime)]]:[]),...(row.dataset.endTime?[["Thời gian kết thúc",formatDateTime(row.dataset.endTime)]]:[]),["Nguyên nhân",row.dataset.cause],["Phương án xử lý",row.dataset.solution],["Vật tư",row.dataset.materials||"—"],[row.dataset.extraLabel,row.dataset.extra||"—"]].forEach(([label,value])=>{const term=document.createElement("dt"),description=document.createElement("dd");term.textContent=label;description.textContent=value;details.append(term,description)});
         photoGallery.replaceChildren();
         const groups=photoGroupsFor(row);
         if(!groups?.length){photoGallery.hidden=true;return}
         const photoCount=groups.reduce((total,group)=>total+group.photos.length,0),galleryTitle=document.createElement("h3");
         updatePhotoBadge(row,groups);
         galleryTitle.className="detail-images-title";galleryTitle.textContent=`Ảnh hiện trường (${photoCount})`;photoGallery.append(galleryTitle);
-        groups.forEach(group=>{
+        groups.filter(group=>group.photos.length).forEach(group=>{
           const section=document.createElement("section"),heading=document.createElement("h4"),grid=document.createElement("div");
           section.className="photo-group";heading.className="photo-group-title";heading.textContent=group.title;grid.className="photo-grid";
           group.photos.forEach(photo=>{
@@ -525,30 +681,33 @@
         });
         photoGallery.hidden=false;
       };
-      const applyReportData=(row,data)=>{const oldKey=row.dataset.selectionKey,checkbox=row.querySelector("[data-select-report]");if(selectedReportKeys.delete(oldKey))selectedReportKeys.add(data.code);row.dataset.selectionKey=data.code;row.dataset.location=data.location;row.dataset.team=normalizeTeam(data.team,data.location);row.dataset.date=data.date;row.dataset.month=data.date.slice(6,10)+"-"+data.date.slice(3,5);row.dataset.summary=data.summary;row.dataset.extraLabel=data.extraLabel;row.dataset.extra=data.extra;row.querySelector(".record-code").textContent=data.code;row.querySelector(".record-summary").textContent=data.summary;row.querySelector('[data-label="Khu vực"]').textContent=data.location;row.querySelector('[data-label="Team / Đội"]').textContent=row.dataset.team;const dateCell=row.querySelector('[data-label="Ngày ghi nhận"]'),[day,dateTime]=data.date.split(" · ");dateCell.replaceChildren(document.createTextNode(day));if(dateTime){dateCell.append(document.createElement("br"),document.createTextNode(dateTime))}checkbox.setAttribute("aria-label",`Chọn báo cáo ${data.code}`);const monthValue=row.dataset.month;if(![...month.options].some(option=>option.value===monthValue)){const[year,monthNumber]=monthValue.split("-");month.add(new Option(`Tháng ${monthNumber}/${year}`,monthValue))}sortRows();updateSelectionUI()};
+      const applyReportData=(row,data)=>{const oldKey=row.dataset.selectionKey,checkbox=row.querySelector("[data-select-report]");if(selectedReportKeys.delete(oldKey))selectedReportKeys.add(data.code);row.dataset.selectionKey=data.code;row.dataset.location=data.location;row.dataset.team=normalizeTeam(data.team,data.location);row.dataset.date=data.date;row.dataset.startTime=data.startTime||"";row.dataset.endTime=data.endTime||"";row.dataset.month=data.date.slice(6,10)+"-"+data.date.slice(3,5);{const[firstPart,...restParts]=data.summary.split(" · ");row.dataset.cause=data.cause??firstPart;row.dataset.solution=data.solution??restParts.join(" · ");row.dataset.materials=data.materials??row.dataset.materials??""}row.dataset.summary=data.summary;row.dataset.extraLabel="Thời gian xử lý";row.dataset.extra=data.extra;row.querySelector(".record-code").textContent=data.code;row.querySelector(".record-summary").textContent=data.summary;row.querySelector('[data-label="Khu vực"]').textContent=data.location;row.querySelector('[data-label="Team / Đội"]').textContent=row.dataset.team||"Cá nhân";const dateCell=row.querySelector('[data-label="Ngày ghi nhận"]'),[day,dateTime]=data.date.split(" · ");dateCell.replaceChildren(document.createTextNode(day));if(dateTime){dateCell.append(document.createElement("br"),document.createTextNode(dateTime))}checkbox.setAttribute("aria-label",`Chọn báo cáo ${data.code}`);const monthValue=row.dataset.month;if(![...month.options].some(option=>option.value===monthValue)){const[year,monthNumber]=monthValue.split("-");month.add(new Option(`Tháng ${monthNumber}/${year}`,monthValue))}sortRows();updateSelectionUI()};
       rows.forEach(row=>{const edit=savedEdits[row.dataset.editId];if(edit&&typeof edit==="object"&&["code","location","team","date","summary","extraLabel","extra"].every(key=>typeof edit[key]==="string"))applyReportData(row,edit)});
+      rows.forEach(row=>{const data=currentReportData(row);applyReportData(row,{...data,date:data.date.split(" · ")[0]})});
       deletedReportIds.forEach(id=>{const index=rows.findIndex(row=>row.dataset.editId===id);if(index>=0){selectedReportKeys.delete(rows[index].dataset.selectionKey);rows[index].remove();rows.splice(index,1)}});
       const setEditMode=editing=>{details.hidden=editing;photoGallery.hidden=editing||!photoGallery.childElementCount;detailActions.hidden=editing;editForm.hidden=!editing;deleteConfirm.hidden=true;deleteError.hidden=true;editError.hidden=true;if(!editing){editForm.reset();pendingPhotoFiles.forEach(item=>{URL.revokeObjectURL(item.url);temporaryPhotoUrls.delete(item.url)});pendingPhotoFiles.clear();addedPhotoGroupIndex=null;addedPhotoStartIndex=0;editPhotoHeading=null;addedPhotosCount=0;editPhotoFields.replaceChildren();editPhotoFields.hidden=true}else{editForm.elements.namedItem("code").focus();if(!photoStorageAvailable){editPhotoFields.querySelectorAll('input[type="file"]').forEach(input=>input.disabled=true);const note=editPhotoFields.querySelector(".edit-photo-note");if(note)note.textContent="Không thể lưu ảnh trong trình duyệt này. Bạn vẫn có thể sửa chú thích."}}};
-      const toEditorDate=value=>{const match=value.match(/^(\d{2})\/(\d{2})\/(\d{4})(?: · (\d{2}:\d{2}))?$/);return match?`${match[3]}-${match[2]}-${match[1]}T${match[4]||"00:00"}`:""};
-      const fromEditorDate=value=>{const match=value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);if(!match)throw new Error("Ngày tiếp nhận không hợp lệ.");return `${match[3]}/${match[2]}/${match[1]} · ${match[4]}:${match[5]}`};
+      const toEditorDate=value=>{const match=value.match(/^(\d{2})\/(\d{2})\/(\d{4})/);return match?`${match[3]}-${match[2]}-${match[1]}`:""};
+      const fromEditorDate=value=>{const match=value.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(!match)throw new Error("Ngày tiếp nhận không hợp lệ.");return `${match[3]}/${match[2]}/${match[1]}`};
       document.querySelector("#report-list").addEventListener("click",async event=>{const button=event.target.closest("[data-open-report]");if(!button)return;await photoStorageReady;activeReport=button.closest("[data-report-row]");renderDetails(activeReport);setEditMode(false);dialog.showModal()});
-      document.querySelector("#edit-report").addEventListener("click",()=>{if(!activeReport)return;const data=currentReportData(activeReport);for(const[key,value]of Object.entries(data))editForm.elements.namedItem(key).value=key==="date"?toEditorDate(value):value;renderEditPhotos(activeReport);setEditMode(true)});
+      document.querySelector("#edit-report").addEventListener("click",()=>{if(!activeReport)return;const data=currentReportData(activeReport);for(const[key,value]of Object.entries(data))editForm.elements.namedItem(key).value=key==="date"?toEditorDate(value):value;updateProcessing();renderEditPhotos(activeReport);setEditMode(true)});
       document.querySelector("#cancel-edit").addEventListener("click",()=>setEditMode(false));
-      editForm.addEventListener("submit",async event=>{event.preventDefault();if(!editForm.reportValidity()||!activeReport)return;const formData=new FormData(editForm),data=Object.fromEntries(formData.entries());for(const key of ["code","team","location","summary","extraLabel","extra"])data[key]=data[key].trim();if(["code","team","location","summary","extraLabel","extra"].some(key=>!data[key])){showPhotoError("Các trường bắt buộc không được để trống.");return}data.date=fromEditorDate(data.date);if(rows.some(row=>row!==activeReport&&row.dataset.selectionKey===data.code)){showPhotoError("Mã tuyến này đã tồn tại. Hãy nhập mã khác.");return}
-        const groups=photoGroupsFor(activeReport)||[],nextPhotos=groups.map((group,groupIndex)=>({title:group.title,photos:group.photos.map((photo,photoIndex)=>{const captionInput=editPhotoFields.querySelector(`[data-photo-caption][data-group-index="${groupIndex}"][data-photo-index="${photoIndex}"]`);return{...photo,caption:captionInput?captionInput.value.trim():photo.caption}})}));
-        const newPhotoSlots=[...pendingPhotoFiles.entries()].filter(([,item])=>item.isNew).sort(([left],[right])=>{const[aGroup,aPhoto]=left.split(":").map(Number),[bGroup,bPhoto]=right.split(":").map(Number);return aGroup-bGroup||aPhoto-bPhoto});
+      editForm.addEventListener("submit",async event=>{event.preventDefault();if(!editForm.reportValidity()||!activeReport)return;const formData=new FormData(editForm),data=Object.fromEntries(formData.entries());for(const key of ["cause","solution","materials"])data[key]=(data[key]||"").trim();data.summary=[data.cause,data.solution].filter(Boolean).join(" · ");for(const key of ["code","team","location","summary","extraLabel","extra"])data[key]=data[key].trim();delete data.processing;data.extraLabel="Thời gian xử lý";if(["code","location","summary"].some(key=>!data[key])){showPhotoError("Các trường bắt buộc không được để trống.");return}data.date=fromEditorDate(data.date);if(data.startTime&&data.endTime){const minutes=Math.round((new Date(data.endTime)-new Date(data.startTime))/60000);if(minutes<0){showPhotoError("Thời gian kết thúc phải sau thời gian bắt đầu.");return}data.extra=`${minutes} phút`}else if(!/phút/.test(data.extra))data.extra="";if(rows.some(row=>row!==activeReport&&row.dataset.selectionKey===data.code)){showPhotoError("Mã tuyến này đã tồn tại. Hãy nhập mã khác.");return}
+        const photoSlots=new WeakMap(),removedSlots=new Set(),removedStoredKeys=[];
+        const isRemoved=(groupIndex,photoIndex)=>editPhotoFields.querySelector(`[data-photo-caption][data-group-index="${groupIndex}"][data-photo-index="${photoIndex}"]`)?.dataset.removed==="1";
+        const groups=photoGroupsFor(activeReport)||[],nextPhotos=groups.map((group,groupIndex)=>({title:group.title,photos:group.photos.flatMap((photo,photoIndex)=>{if(isRemoved(groupIndex,photoIndex)){if(photo.src.startsWith("stored-photo:"))removedStoredKeys.push(photo.src.slice("stored-photo:".length));return[]}const captionInput=editPhotoFields.querySelector(`[data-photo-caption][data-group-index="${groupIndex}"][data-photo-index="${photoIndex}"]`),next={...photo,caption:captionInput?captionInput.value.trim():photo.caption};photoSlots.set(next,photoSlotKey(groupIndex,photoIndex));return[next]})}));
+        editGroupTitles.forEach((groupTitle,index)=>{if(!nextPhotos[index])nextPhotos[index]={title:groupTitle,photos:[]}});
+        const newPhotoSlots=[...pendingPhotoFiles.entries()].filter(([slot,item])=>item.isNew&&!isRemoved(...slot.split(":").map(Number))).sort(([left],[right])=>{const[aGroup,aPhoto]=left.split(":").map(Number),[bGroup,bPhoto]=right.split(":").map(Number);return aGroup-bGroup||aPhoto-bPhoto});
         if(nextPhotos&&newPhotoSlots.length){
-          if(!nextPhotos[addedPhotoGroupIndex])nextPhotos[addedPhotoGroupIndex]={title:"Ảnh bổ sung",photos:[]};
-          newPhotoSlots.forEach(([slot])=>{const photoIndex=Number(slot.split(":")[1]),captionInput=editPhotoFields.querySelector(`[data-photo-caption][data-group-index="${addedPhotoGroupIndex}"][data-photo-index="${photoIndex}"]`);nextPhotos[addedPhotoGroupIndex].photos.push({src:"",caption:captionInput?.value.trim()||""})});
+          newPhotoSlots.forEach(([slot])=>{const[groupIndex,photoIndex]=slot.split(":").map(Number),captionInput=editPhotoFields.querySelector(`[data-photo-caption][data-group-index="${groupIndex}"][data-photo-index="${photoIndex}"]`);if(!nextPhotos[groupIndex])nextPhotos[groupIndex]={title:"Ảnh bổ sung",photos:[]};const added={src:"",caption:captionInput?.value.trim()||""};photoSlots.set(added,slot);nextPhotos[groupIndex].photos.push(added)});
         }
         if(nextPhotos?.some(group=>group.photos.some(photo=>!photo.caption))){showPhotoError("Chú thích ảnh không được để trống.");return}
         if(pendingPhotoFiles.size&&!await photoStorageReady){showPhotoError("Không thể lưu ảnh trong trình duyệt này. Hãy thử lại trong cửa sổ trình duyệt thông thường.");return}
         const saveButton=editForm.querySelector('button[type="submit"]');saveButton.disabled=true;
-        const editId=activeReport.dataset.editId,nextEdit={...data,...(nextPhotos?{photos:nextPhotos}:{})},nextEdits={...savedEdits,[editId]:nextEdit},newPhotoKeys=[],retiredPhotoKeys=[];
+        const editId=activeReport.dataset.editId,nextEdit={...data,...(nextPhotos?{photos:nextPhotos}:{})},nextEdits={...savedEdits,[editId]:nextEdit},newPhotoKeys=[],retiredPhotoKeys=[...removedStoredKeys];
         try{
           for(const[groupIndex,group]of nextPhotos?.entries()||[]){
             for(const[photoIndex,photo]of group.photos.entries()){
-              const slot=photoSlotKey(groupIndex,photoIndex),pending=pendingPhotoFiles.get(slot);if(!pending)continue;
+              const slot=photoSlots.get(photo),pending=slot&&pendingPhotoFiles.get(slot);if(!pending||removedSlots.has(slot))continue;
               const key=`photo:${editId}:${groupIndex}:${photoIndex}:${Date.now()}-${Math.random().toString(36).slice(2)}`;
               await photoStoreRequest("put",key,pending.file);newPhotoKeys.push(key);
               if(photo.src.startsWith("stored-photo:"))retiredPhotoKeys.push(photo.src.slice("stored-photo:".length));
@@ -563,12 +722,37 @@
         }
         savedEdits=nextEdits;
         for(const[groupIndex,group]of nextPhotos?.entries()||[])for(const[photoIndex,photo]of group.photos.entries()){
-          const slot=photoSlotKey(groupIndex,photoIndex),pending=pendingPhotoFiles.get(slot);if(!pending)continue;
+          const slot=photoSlots.get(photo),pending=slot&&pendingPhotoFiles.get(slot);if(!pending||!photo.src.startsWith("stored-photo:"))continue;
           const key=photo.src.slice("stored-photo:".length),url=URL.createObjectURL(pending.file);photoUrls.set(key,url);
         }
         retiredPhotoKeys.forEach(key=>{const oldUrl=photoUrls.get(key);if(oldUrl){URL.revokeObjectURL(oldUrl);photoUrls.delete(key)}photoStoreRequest("delete",key).catch(error=>console.warn("Không thể dọn ảnh đã thay thế.",error))});
         pendingPhotoFiles.forEach(item=>{URL.revokeObjectURL(item.url);temporaryPhotoUrls.delete(item.url)});pendingPhotoFiles.clear();
         saveButton.disabled=false;applyReportData(activeReport,data);renderDetails(activeReport);setEditMode(false);status.textContent=nextPhotos?"Đã lưu thay đổi báo cáo và ảnh trên trình duyệt.":"Đã lưu thay đổi báo cáo trên trình duyệt.";filter()});
+      const inlineFields={"Khu vực":"location","Team / Đội":"team","Ngày ghi nhận":"date"};
+      const markInlineCells=row=>row.querySelectorAll("td[data-label]").forEach(cell=>{if(inlineFields[cell.dataset.label]){cell.classList.add("inline-editable");cell.title="Bấm để sửa"}});
+      rows.forEach(markInlineCells);
+      document.querySelector("#report-list").addEventListener("click",event=>{
+        const cell=event.target.closest("td.inline-editable");if(!cell||cell.querySelector("input"))return;
+        const key=inlineFields[cell.dataset.label],row=cell.closest("[data-report-row]"),data=currentReportData(row),input=document.createElement("input");
+        input.className="inline-edit";input.maxLength=200;input.setAttribute("aria-label",cell.dataset.label);
+        if(key==="date"){input.type="date";input.value=toEditorDate(data.date)}else{input.type="text";input.value=data[key];if(key==="team")input.setAttribute("list","team-options")}
+        cell.replaceChildren(input);input.focus();input.select?.();
+        let finished=false;
+        const finish=save=>{
+          if(finished)return;finished=true;
+          let value=input.value.trim();
+          try{if(key==="date"&&value)value=fromEditorDate(value)}catch(error){value=""}
+          if(!save||(!value&&key!=="team")||value===data[key]){applyReportData(row,data);return}
+          const next={...data,[key]:key==="team"?normalizeTeam(value):value};
+          try{
+            const nextEdits={...savedEdits,[row.dataset.editId]:{...savedEdits[row.dataset.editId],...next}};
+            localStorage.setItem(editStorageKey,JSON.stringify(nextEdits));savedEdits=nextEdits;
+            applyReportData(row,next);status.textContent="Đã lưu thay đổi trên trình duyệt.";filter();
+          }catch(error){console.warn("Không thể lưu thay đổi.",error);applyReportData(row,data);status.textContent="Không thể lưu thay đổi trên trình duyệt."}
+        };
+        input.addEventListener("keydown",keyEvent=>{if(keyEvent.key==="Enter"){keyEvent.preventDefault();finish(true)}else if(keyEvent.key==="Escape"){keyEvent.preventDefault();finish(false)}});
+        input.addEventListener("blur",()=>finish(true));
+      });
       window.addEventListener("beforeunload",()=>{for(const url of [...photoUrls.values(),...temporaryPhotoUrls])URL.revokeObjectURL(url)});
       document.querySelector("#delete-report").addEventListener("click",()=>{if(!activeReport)return;setEditMode(false);details.hidden=true;photoGallery.hidden=true;detailActions.hidden=true;deleteConfirm.hidden=false;deleteError.hidden=true;document.querySelector("#delete-confirm-message").textContent=`Bạn có chắc muốn xóa báo cáo ${activeReport.querySelector(".record-code").textContent.trim()}?`;document.querySelector("#confirm-delete").focus()});
       document.querySelector("#cancel-delete").addEventListener("click",()=>{deleteConfirm.hidden=true;deleteError.hidden=true;details.hidden=false;photoGallery.hidden=!photoGallery.childElementCount;detailActions.hidden=false});

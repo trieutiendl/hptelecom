@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#102a3e" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Đăng nhập | HP Telecom</title>
     <meta name="description" content="Đăng nhập vào HP Telecom." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -103,6 +103,33 @@
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
       }
+    </style>
+    <style id="noc-dark-theme">
+      :root { color-scheme: dark; --canvas: #1e2a38; --panel: #26364a; --field: #1a2431; --ink: #f3f6fa; --muted: #b8c5d3; --blue: #5cc7d1; --border: #3d516a; }
+      body { background: var(--canvas); color: var(--ink); }
+      .login-shell { border-color: #3d516a; border-radius: 14px; background: var(--panel); box-shadow: 0 20px 50px rgba(0,0,0,.35); }
+      .welcome-panel { background: #17212d; color: #f3f6fa; }
+      .welcome-panel::before, .welcome-panel::after { border-color: rgba(92,199,209,.18); }
+      .welcome-copy .overline { color: #86dae1; }
+      .welcome-copy h1, .form-content h2 { letter-spacing: -.04em; }
+      .welcome-copy p { color: #b8c5d3; }
+      .panel-note { color: #a3b2c1; }
+      .field label { color: #d3dde7; }
+      .field input, .field select { border-color: #4c627c; border-radius: 8px; background: var(--field); color: var(--ink); }
+      .field select option { background: #1a2431; color: #f3f6fa; }
+      .field input::placeholder { color: #94a3b3; }
+      .field input:focus, .field select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(92,199,209,.3); }
+      .password-toggle { color: #b8c5d3; }
+      .password-toggle:hover, .help-link:hover { color: #86dae1; }
+      .remember, .terms, .demo-notice, .account-prompt, .login-prompt, .footer-links { color: #b8c5d3; }
+      .help-link, .account-prompt a, .terms a, .login-prompt a { color: #5cc7d1; }
+      .submit-button { border-radius: 8px; background: #5cc7d1; color: #0b2328; box-shadow: none; }
+      .submit-button:hover { background: #86dae1; box-shadow: none; }
+      .submit-button:focus-visible, .password-toggle:focus-visible, .help-link:focus-visible, .brand:focus-visible,
+      .footer-links a:focus-visible, .terms a:focus-visible, .login-prompt a:focus-visible, .account-prompt a:focus-visible { outline-color: rgba(92,199,209,.5); }
+      .demo-notice[data-state="error"] { color: #ff8078; }
+      .demo-notice[data-state="success"] { color: #6ad39a; }
+      @media (max-width: 760px) { body { background: var(--canvas); } .login-shell { background: var(--panel); } }
     </style>
   </head>
   <body>

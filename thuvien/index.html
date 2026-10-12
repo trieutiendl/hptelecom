@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f3f7f8" />
+    <meta name="theme-color" content="#1e2a38" />
     <title>Thư viện ảnh | HP Telecom</title>
     <meta name="description" content="Lưu trữ, tìm kiếm và xem lại ảnh chụp hiện trường HP Telecom." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -241,6 +241,74 @@
       @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition-duration:.01ms!important; } }
     </style>
     <link rel="stylesheet" href="../server-theme.css" />
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;--ink:#f3f6fa;--muted:#b8c5d3;--teal:#5cc7d1;--blue:#5cc7d1;--line:#3d516a;--canvas:#1e2a38;--surface:#26364a;--focus:rgba(92,199,209,.5);--panel:#26364a;--panel-2:#2d3f55;--field:#1a2431;--line-2:#4c627c;--green:#6ad39a;--amber:#f0b955;--red:#ff8078}
+      body{background:var(--canvas);color:var(--ink)}
+      ::selection{background:#3b8f98;color:#fff}
+      .skip-link{background:var(--teal);color:#0b2328}
+      .sidebar{background:#17212d;color:#d3dde7;border-color:var(--line)}
+      .nav-label,.version,.nav-group-chevron,.nav-coming-soon{color:#a3b2c1;border-color:var(--line)}
+      .nav-group-trigger,.nav-link,.nav-child-link,.nav-child-disabled{color:#d3dde7}
+      .nav-child-link{color:#c3cfdb}
+      .nav-child-disabled{color:#94a3b3}
+      .sidebar .nav-group-trigger:hover,.sidebar .nav-group-trigger[aria-expanded="true"],.sidebar .nav-link:hover,.sidebar .nav-child-link:hover{border-color:var(--line);background:#233245;color:#fff}
+      .sidebar .nav-link[aria-current="page"],.sidebar .nav-child-link[aria-current="page"],.sidebar .nav .nav-group.has-current>.nav-group-trigger{border-color:var(--line-2);background:#2b4058;color:#fff;box-shadow:inset 2px 0 var(--teal)}
+      .nav-icon,.sidebar .nav-icon,.sidebar .nav-group-trigger .nav-icon{border-color:var(--line);background:#1f2d3d;color:#b8c5d3}
+      .sidebar .nav-link[aria-current="page"] .nav-icon,.sidebar .nav-child-link[aria-current="page"] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:var(--line)}
+      .nav-standalone,.sidebar-bottom{border-top-color:var(--line)}
+      .sidebar-toggle{border-color:var(--line);background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:var(--line-2);background:#2b4058;color:#fff}
+      .connection-state{color:#c3cfdb}.connection-state::before{background:var(--teal)}
+      .sidebar.is-collapsed .nav-children::before,.nav-standalone::before{color:#a3b2c1}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{border-color:var(--line);background:#17212d;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      :focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+      .topbar{background:var(--canvas);border-color:var(--line);box-shadow:none}
+      .topbar-title,.top-link{color:var(--muted)}
+      .admin{border-left-color:var(--line)}
+      .avatar{background:#1d4a52;color:#a9eaf0;border:1px solid #3f7a82}
+      .admin-name{color:var(--ink)}.admin-role,.breadcrumb,.subtitle,.gallery-title p,.empty-state,.empty-state span,.gallery-footer,.photo-meta,.preview-description,.detail-list dt,.dialog-header p{color:var(--muted)}
+      h1,.gallery-title h2,.empty-state strong,.photo-caption,.detail-list dd,.dialog-header h2,.preview-details h3{color:var(--ink)}
+      h1{letter-spacing:-.03em}
+      .demo-badge{border-color:#8a6a26;border-radius:6px;background:#4a3a17;color:var(--amber)}
+      .demo-badge::before{border-radius:2px;background:var(--amber)}
+      .upload-button{border-color:var(--teal);border-radius:8px;background:var(--teal);color:#0b2328}
+      .upload-button:hover{background:#86dae1;border-color:#86dae1;color:#0b2328}
+      .notice{border-color:#3f7a82;background:#1d3a48;color:#c9eef2}
+      .notice-symbol{border-color:#5cc7d1;color:var(--teal)}
+      .album-panel,.gallery-panel{border-color:var(--line);border-radius:10px;background:var(--panel);box-shadow:none}
+      .panel-heading{color:#a3b2c1}
+      .album-button{border-color:transparent;border-radius:8px;background:transparent;color:#d3dde7}
+      .album-button:hover{background:#2f4259;color:#fff}
+      .album-button[aria-pressed="true"]{border-color:#3f7a82;background:#1d4a52;color:#c9eef2}
+      .album-count,.storage-note,.album-tab-count{color:#a3b2c1}
+      .album-button[aria-pressed="true"] .album-count{color:#9be6ee}
+      .album-divider{background:var(--line)}
+      .gallery-toolbar{border-color:transparent;background:transparent}
+      .search-icon{color:#a3b2c1}
+      .search,.sort-select{border-color:var(--line-2);border-radius:8px;background:var(--field);color:var(--ink);color-scheme:dark}
+      .search::placeholder{color:#94a3b3}
+      .search:focus-visible,.sort-select:focus-visible{border-color:var(--teal);box-shadow:0 0 0 3px rgba(92,199,209,.3)}
+      .album-tabs{border-bottom-color:var(--line)}
+      .album-tab{background:transparent;color:var(--muted)}
+      .album-tab:hover{background:transparent;color:var(--teal)}
+      .album-tab[aria-pressed="true"]{border-bottom-color:var(--teal);color:var(--teal)}
+      .photo-card{border-color:var(--line);border-radius:10px;background:var(--panel-2)}
+      .photo-card:hover{border-color:var(--line-2)}
+      .photo-open,.photo-image{background:#17212d}
+      .photo-album{color:#c3cfdb}.photo-album::before{border-radius:2px;background:var(--green)}
+      .gallery-footer{border-top-color:var(--line)}
+      dialog{border:1px solid var(--line-2);background:var(--panel);color:var(--ink);box-shadow:0 28px 80px rgba(0,0,0,.5)}
+      dialog::backdrop{background:rgba(10,16,24,.6)}
+      .dialog-header{border-bottom-color:var(--line)}
+      .dialog-close{border-color:var(--line-2);border-radius:8px;background:transparent;color:#dbe4ed}
+      .dialog-close:hover{border-color:#637b97;background:#38506b;color:#fff}
+      .preview-stage{background:#17212d}
+      .download-button{border-color:var(--line-2);border-radius:8px;background:transparent;color:#dbe4ed}
+      .download-button:hover{border-color:#637b97;background:#38506b;color:#fff}
+      .toast{border:1px solid var(--line-2);background:#38506b;color:var(--ink);box-shadow:0 12px 30px rgba(0,0,0,.4)}
+      @media(max-width:850px){.sidebar,.sidebar.is-collapsed{border-color:var(--line);background:#17212d}}
+    </style>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
