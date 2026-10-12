@@ -21,6 +21,10 @@ Thiết kế lại giao diện **HP Telecom Staging** từ cấu trúc trong [RE
 
 Đọc [đặc tả Tuần tuyến](TUAN-TUYEN-4.1.4.md), [dữ liệu/API](TUAN-TUYEN-DATA-API.md), [kịch bản nghiệm thu](TUAN-TUYEN-CHECKLIST.md) và [mã tham chiếu](reference/4.1.4/README.md). Không bỏ màn hình sửa chữa OK/NOK, ảnh trước/sau, chèn STT, chuyển ảnh, ngày toàn tuyến, bản nháp, xuất Excel/KMZ hoặc điều kiện đồng bộ an toàn. Ghi rõ phần Team/Đội mới cho staging và phần còn thiếu API. Dùng fixture giả để thiết kế, không gọi server chính.
 
+### Di dời phải theo bản 4.1.4
+
+Đọc [đặc tả Di dời](DI-DOI-4.1.4.md), [dữ liệu/API](DI-DOI-DATA-API.md), [nghiệm thu](DI-DOI-CHECKLIST.md) và [mã tham chiếu](reference/4.1.4/relocation/README.md). Giữ 3 bước, cáp thu hồi và cáp mới độc lập, 7 nhóm ảnh sau chuẩn bị, mô tả theo cặp ảnh, MX, người cùng làm và Excel. Không áp dụng trường giờ sự cố hoặc quy tắc tự gỡ tuyến của Tuần tuyến cho Di dời. Giữ sửa lỗi đọc tọa độ trong bản 136.
+
 ### Tiêu chí hoàn thành thiết kế
 
 - Có đủ các màn hình và trạng thái trong SCREENS.md; không mất đường vào chức năng cũ.

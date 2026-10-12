@@ -1,0 +1,72 @@
+ suspend fun removePastMonthReports(app:WorkApp):Int=mutex.withLock{
+  val account=app.accountScope
+  if(ServerSession.token.isBlank()||account=="locked")return@withLock 0
+  val currentMonth=java.time.YearMonth.now(java.time.ZoneId.of("Asia/Ho_Chi_Minh")).toString()
+  val prefs=app.getSharedPreferences("server-links",Context.MODE_PRIVATE)
+  val cache=app.getSharedPreferences("server-assets",Context.MODE_PRIVATE)
+  val dao=app.db.dao();var removed=0;val changedKinds=mutableSetOf<String>()
+  ServerSession.refresh()
+  val owner=ServerSession.user?.optString("id")?.takeIf{it.isNotBlank()}?:return@withLock 0
+  for(kind in listOf("Sự cố","Di dời")){
+   for(place in dao.places(kind)){
+    if(account!=app.accountScope||ServerSession.token.isBlank())return@withLock removed
+    if(SharedReports.shared(app,place.id)||!app.canReceiveReport(place.id))continue
+    val incident=dao.incident(place.id)?:continue
+    val month=runCatching{RouteMonth.reportKey(IncidentReport.parse(incident.value).date)}.getOrDefault("")
+    if(!LocalReportRetention.eligible(kind,month,currentMonth,ReportCompletion.isComplete(incident.value),true))continue
+    val key="folder-${place.id}";val remote=prefs.getString(key,null)?:continue
+    val (signature,dirty)=syncState(app,place)
+    if(dirty||stateFile(app,place.id).baseFile.exists()||prefs.getBoolean("$key-refresh",false)||prefs.getString("$key-signature",null)!=signature)continue
+    val record=try{ServerSession.api("mobile/folders/$remote")}catch(error:ServerSession.Failure){if(error.status==404)continue else throw error}
+    if(account!=app.accountScope) return@withLock removed
+    val payload=record.optJSONObject("payload")?:continue
+    if(payload.optString("module")!=ServerSession.module(kind)||payload.optInt("version")!=1||payload.optJSONObject("report")==null)continue
+    if(!LocalReportRetention.eligible(kind,month,currentMonth,ReportCompletion.isComplete(incident.value),ReportCompletion.fromServer(payload)))continue
+    val accepted=baseline(app,place.id)?:continue
+    val acceptedLocal=accepted.optJSONObject("localWire")?:continue
+    val acceptedServer=accepted.optJSONObject("wire")?:continue
+    val localWire=snapshot(app,place)
+    val photoRoot=File(app.accountFilesDir,"photos").canonicalFile.toPath()
+    var allAssetsAcknowledged=true
+    images(localWire){path->
+     val file=File(path).canonicalFile
+     val asset=if(file.isFile&&file.toPath().startsWith(photoRoot))cache.getString(folderAssetKey(remote,ServerSession.module(kind),path,file),null)else null
+     if(asset==null)allAssetsAcknowledged=false
+     asset?:path
+    }
+    if(!LocalReportRetention.acknowledged(record.optString("owner")==owner,
+      ReportCompletion.isComplete(incident.value),ReportCompletion.fromServer(payload),stateFile(app,place.id).baseFile.exists(),prefs.getBoolean("$key-refresh",false),app.canReceiveReport(place.id),
+      prefs.getInt("$key-revision",0),record.optInt("revision",0),accepted.optInt("revision",0),signature,prefs.getString("$key-signature",null),
+      allAssetsAcknowledged&&LocalReportRetention.localPayloadAcknowledged(localWire,acceptedLocal)))continue
+    if(!LocalReportRetention.payloadsMatch(localWire,acceptedLocal,payload,acceptedServer)){
+     if(!LocalReportRetention.needsServerRefresh(localWire,acceptedLocal,payload,acceptedServer))continue
+     // Photo GPS enrichment can change GET output without increasing revision.
+     // Download and persist the full accepted snapshot, retaining the local copy
+     // for this cycle. Never ignore changed fields just to allow removal.
+     check(prefs.edit().putBoolean("$key-refresh",true).commit()){"Chưa lưu được yêu cầu nhận tọa độ; báo cáo vẫn giữ trên điện thoại."}
+     downloadLocked(app,remote,{},true,place,signature)
+     AutoSync.refresh()
+     continue
+    }
+    // Recheck the local record inside the same Room transaction that removes it.
+    // ServerSync's mutex prevents upload/receive from changing the accepted revision.
+    val deleted=FolderStore(app).deleteGuarded(listOf(place.id)){
+     if(account!=app.accountScope||ServerSession.user?.optString("id")!=owner||prefs.getString(key,null)!=remote||
+       prefs.getInt("$key-revision",0)!=record.optInt("revision",0)||prefs.getBoolean("$key-refresh",false)||
+       stateFile(app,place.id).baseFile.exists()||!app.canReceiveReport(place.id)||dao.incident(place.id)?.value!=incident.value)return@deleteGuarded false
+     val (currentSignature,stillDirty)=syncState(app,place)
+     if(stillDirty||currentSignature!=signature)return@deleteGuarded false
+     check(prefs.edit().putBoolean("server-only-$remote",true).commit()){"Chưa ghi được trạng thái giữ báo cáo trên server; bản trên điện thoại vẫn được giữ."}
+     true
+    }
+    if(!deleted)continue
+    baseFile(app,place.id).delete()
+    val edit=cache.edit()
+    cache.all.keys.filter{it.startsWith("local-${place.id}-")}.forEach{edit.remove(it)}
+    check(edit.commit()){"Đã lưu báo cáo trên server nhưng chưa dọn xong dữ liệu ảnh trên điện thoại."}
+    removed++;changedKinds.add(kind)
+   }
+  }
+  changedKinds.forEach{app.notifyFoldersDownloaded(it)}
+  removed
+ }

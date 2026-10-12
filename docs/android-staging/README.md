@@ -19,6 +19,13 @@ Thiết kế lại giao diện ứng dụng Android HP Telecom cho môi trườn
 
 Bộ tham chiếu có phần mã Tuần tuyến và các đoạn đồng bộ liên quan. Đây chưa phải dự án Android đầy đủ để build APK.
 
+## Di dời theo bản Android 4.1.4
+
+- [Đặc tả đầy đủ màn hình và nghiệp vụ Di dời](DI-DOI-4.1.4.md).
+- [Dữ liệu, tính cáp và hợp đồng API](DI-DOI-DATA-API.md).
+- [46 tình huống nghiệm thu và yêu cầu Copilot](DI-DOI-CHECKLIST.md).
+- [Mã và test tham chiếu phần Di dời](reference/4.1.4/relocation/README.md).
+
 ## Phạm vi
 
 Giữ đầy đủ Sự cố, Tuần tuyến, Di dời, Camera, Thư viện, bản nháp, xuất báo cáo và đồng bộ của APK native. Bổ sung thiết kế Team/Đội theo mô hình nhóm người dùng tự tạo của staging.

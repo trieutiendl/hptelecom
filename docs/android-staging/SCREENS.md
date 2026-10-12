@@ -25,6 +25,8 @@ Từ danh sách, mở lại đúng bộ lọc và vị trí cuộn khi quay về
 
 ## Sự cố và Di dời
 
+Phần Di dời có [đặc tả riêng theo 4.1.4](DI-DOI-4.1.4.md), [dữ liệu/API](DI-DOI-DATA-API.md) và [46 ca nghiệm thu](DI-DOI-CHECKLIST.md): ba bước, cáp thu hồi/cáp mới độc lập, bảy nhóm ảnh sau prepare, MX và người cùng làm.
+
 Sự cố có bốn bước: **Thông tin → Cáp/vật tư → Ảnh/mô tả → Kiểm tra/xuất**. Di dời có ba bước; phần kiểm tra và hoàn thành nằm cuối bước Ảnh/mô tả. Có thể dùng tab hoặc thanh bước nhưng phải giữ trường dữ liệu và bản nháp.
 
 | Mã | Nội dung | Thành phần và thao tác |

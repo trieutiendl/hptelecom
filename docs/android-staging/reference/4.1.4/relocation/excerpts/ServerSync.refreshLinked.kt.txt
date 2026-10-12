@@ -1,0 +1,34 @@
+ private suspend fun refreshLinked(app:WorkApp,place:Place,id:String,revision:Int,progress:(String)->Unit):Boolean {
+  finishImport(app,place.id)
+  val prefs=app.getSharedPreferences("server-links",Context.MODE_PRIVATE);val key="folder-${place.id}"
+  if(revision<prefs.getInt("$key-revision",0))throw ServerSession.Failure(409,"${place.name}: server đang có phiên bản cũ hơn. Giữ dữ liệu điện thoại để đối chiếu.")
+  val needsReceive=prefs.getInt("$key-revision",0)!=revision||prefs.getBoolean("$key-refresh",false)
+  app.flushReport()
+  val local=snapshot(app,place);val signature=sha(local.toString())
+  if(pending(app,place.id)!=null||signature!=prefs.getString("$key-signature",null))return false
+  if(!needsReceive){
+   // Upgrade old installations using the acknowledged local snapshot and asset receipts.
+   if(baseline(app,place.id)==null){
+    val wire=JSONObject(local.toString());val cache=app.getSharedPreferences("server-assets",Context.MODE_PRIVATE)
+    var complete=true
+    images(wire){path->val asset=cache.getString(assetKey(ServerSession.module(place.kind),path,File(path)),null);if(asset==null)complete=false;asset?:path}
+    if(complete)saveBaseline(app,place.id,revision,wire,wire)
+   }
+   return false
+  }
+  prefs.edit().putBoolean("$key-refresh",true).apply()
+  if(!app.canReceiveReport(place.id)){
+   progress("${place.name}: có bản mới trên server; sẽ nhận khi quay về danh sách.")
+   return false
+  }
+  progress("Đang cập nhật từ server: ${place.name}")
+  downloadLocked(app,id,progress,true,place,signature)
+  return true
+ }
+ /** OCR enrichment is asynchronous and can keep the same report revision. */
+ fun requestMxRefresh(app:WorkApp,placeId:Long):Boolean {
+  val prefs=app.getSharedPreferences("server-links",Context.MODE_PRIVATE)
+  val key="folder-$placeId"
+  if(!prefs.contains(key))return false
+  return prefs.edit().putBoolean("$key-refresh",true).commit()
+ }
