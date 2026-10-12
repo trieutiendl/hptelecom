@@ -48,6 +48,8 @@ Các thao tác quan trọng phải được giữ:
 
 ## Tuần tuyến và vị trí
 
+Chi tiết bắt buộc: [Tuần tuyến 4.1.4](TUAN-TUYEN-4.1.4.md), [dữ liệu/API](TUAN-TUYEN-DATA-API.md), [nghiệm thu](TUAN-TUYEN-CHECKLIST.md). Đối chiếu quy tắc tháng giao, STT, OK/NOK và tự gỡ tuyến hoàn thành trong đặc tả trước khi triển khai.
+
 | Mã | Màn hình | Thành phần và thao tác |
 | --- | --- | --- |
 | PATROL_POINTS | Vị trí trong tuyến | Tên tuyến, ghi chú giao việc, danh sách STT/vị trí/ảnh/GPS/ghi chú, Thêm ảnh, chọn từ thư viện, tiếp tục bản nháp, hoàn thành/mở lại theo quyền. |

@@ -17,6 +17,10 @@ Thiết kế lại giao diện **HP Telecom Staging** từ cấu trúc trong [RE
 9. Thay UI theo từng màn hình, giữ lớp dữ liệu, OCR, đồng bộ, quyền và tính toán. Kết nối staging là hạng mục riêng có kiểm thử.
 10. Đưa kết quả vào pull request có ảnh hoặc prototype xem được, danh sách màn hình đã hoàn thiện và phần còn thiếu.
 
+### Tuần tuyến phải theo bản 4.1.4
+
+Đọc [đặc tả Tuần tuyến](TUAN-TUYEN-4.1.4.md), [dữ liệu/API](TUAN-TUYEN-DATA-API.md), [kịch bản nghiệm thu](TUAN-TUYEN-CHECKLIST.md) và [mã tham chiếu](reference/4.1.4/README.md). Không bỏ màn hình sửa chữa OK/NOK, ảnh trước/sau, chèn STT, chuyển ảnh, ngày toàn tuyến, bản nháp, xuất Excel/KMZ hoặc điều kiện đồng bộ an toàn. Ghi rõ phần Team/Đội mới cho staging và phần còn thiếu API. Dùng fixture giả để thiết kế, không gọi server chính.
+
 ### Tiêu chí hoàn thành thiết kế
 
 - Có đủ các màn hình và trạng thái trong SCREENS.md; không mất đường vào chức năng cũ.

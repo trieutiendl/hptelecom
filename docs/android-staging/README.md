@@ -10,6 +10,15 @@ Thiết kế lại giao diện ứng dụng Android HP Telecom cho môi trườn
 - [Mã nguồn và kết nối staging](INTEGRATION.md): nơi xử lý từng chức năng, phần cần giữ và phần còn phải tích hợp.
 - [Yêu cầu dành cho GitHub Copilot hoặc người thiết kế](DESIGN-TASK.md): công việc thiết kế lại có thể giao trực tiếp.
 
+## Tuần tuyến theo bản Android 4.1.4
+
+- [Đặc tả đầy đủ màn hình và nghiệp vụ](TUAN-TUYEN-4.1.4.md).
+- [Trường dữ liệu và hợp đồng API](TUAN-TUYEN-DATA-API.md).
+- [Kịch bản kiểm tra và giao việc cho Copilot](TUAN-TUYEN-CHECKLIST.md).
+- [Mã và test tham chiếu từ bản 4.1.4](reference/4.1.4/README.md).
+
+Bộ tham chiếu có phần mã Tuần tuyến và các đoạn đồng bộ liên quan. Đây chưa phải dự án Android đầy đủ để build APK.
+
 ## Phạm vi
 
 Giữ đầy đủ Sự cố, Tuần tuyến, Di dời, Camera, Thư viện, bản nháp, xuất báo cáo và đồng bộ của APK native. Bổ sung thiết kế Team/Đội theo mô hình nhóm người dùng tự tạo của staging.

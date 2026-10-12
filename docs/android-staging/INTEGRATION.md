@@ -4,7 +4,7 @@
 
 Cấu trúc được đọc từ mã native HP Telecom Android **4.1.4 (136)**. Giao diện đang tạo bằng Kotlin và Android Views; nhiều màn hình nằm trong cùng một Activity. Tên màn hình trong SCREENS.md là nhóm trải nghiệm, không khẳng định mỗi màn hình đã có một file riêng.
 
-Bộ tài liệu này không kèm mã native, khóa ký, APK, cơ sở dữ liệu, tài khoản hoặc ảnh báo cáo. Trước khi triển khai trên Android, cần đưa đúng mã nguồn native 4.1.4 vào nhánh phát triển. Không dùng một dự án WebView cũ hoặc file HTML làm bằng chứng rằng các chức năng native đã được sao chép.
+Bộ tài liệu kèm [mã tham chiếu phần Tuần tuyến](reference/4.1.4/README.md) lấy từ native 4.1.4, gồm các lớp liên quan, test và đoạn đồng bộ. Chưa kèm toàn bộ dự án native, khóa ký, APK, cơ sở dữ liệu, tài khoản hoặc ảnh báo cáo. Trước khi triển khai trên Android, cần đưa đúng mã nguồn native 4.1.4 đầy đủ vào nhánh phát triển. Không dùng một dự án WebView cũ hoặc file HTML làm bằng chứng rằng các chức năng native đã được sao chép.
 
 ## Bản đồ mã native
 
