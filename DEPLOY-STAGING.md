@@ -39,6 +39,6 @@ Chỉ khi volume hoàn toàn mới: đọc mã khởi tạo một lần từ log
 - Menu thu lại sau khi rê chuột ra ngoài. Team/Đội tải từ /staging/api/teams; ô bên cạnh chọn tháng.
 - Liên kết nội bộ giữ /staging/; /staging/tongquan/ chuyển đến /staging/tonghop/tongquan/.
 
-33 tệp giao diện đã đối chiếu byte với bản đóng gói được triển khai. Kiểm tra cú pháp 24 đoạn JavaScript và 150 liên kết nội bộ không có lỗi. Chức năng menu và bộ chọn nhóm/tháng đã được kiểm tra trên staging. Bố cục Dockerfile ở kho này dùng các thư mục gốc thay cho thư mục web của gói NAS; chưa build lại bố cục kho này bằng Docker trên máy Windows.
+36 tệp giao diện khớp byte với gói NAS live-20261012-r6. Kiểm tra cú pháp 28 đoạn JavaScript, 164 liên kết nội bộ và 9 menu không có lỗi. Kiểm thử xác nhận lọc nhóm sở hữu/tham gia, tìm không dấu, xử lý tên trùng, lấy hơn 500 báo cáo và báo lỗi khi phiên hết hạn/phân trang thay đổi. Bố cục Dockerfile ở kho này dùng các thư mục gốc thay cho thư mục web của gói NAS; chưa build lại bố cục kho này bằng Docker trên máy Windows.
 
-Số liệu Tổng quan vẫn là dữ liệu minh họa; thay nhóm/tháng chưa lọc các biểu đồ theo báo cáo thật.
+Tổng quan chỉ đếm dữ liệu đã lưu trong API staging. Các trang báo cáo khác còn dữ liệu mẫu và các chỉnh sửa chỉ lưu trong trình duyệt; chúng không tự trở thành dữ liệu thật trên Tổng quan. Bản ghi có tên nhóm trùng nhưng thiếu data.teamId được giữ ở tổng chung, không tự gán sang một trong các nhóm. Trạng thái trống không được tính là hoàn tất.

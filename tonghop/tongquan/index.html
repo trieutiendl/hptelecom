@@ -318,7 +318,9 @@
       <style>[data-admin-only][hidden] { display: none !important; }</style>
     <script src="/staging/staging-access.js?v=github-d-20261012-r2" defer></script>
       <meta name="hp-ui-release" content="github-d-20261012" />
-  </head>
+  <style>.overview-empty{padding:22px 16px!important;color:#bdd0df!important;white-space:normal!important}.incident-table td{overflow-wrap:anywhere}.heading-tools{flex-wrap:wrap}#overview-refresh{cursor:pointer}#overview-refresh:disabled{opacity:.6}</style>
+<script src="/staging/overview-live.js?v=live-r6" defer></script>
+</head>
   <body>
     <div class="app">
       <aside class="sidebar">
@@ -347,7 +349,7 @@
               <span>Tổng hợp</span><span class="nav-group-chevron" aria-hidden="true"></span>
             </button>
             <div class="nav-children" id="summary-menu" data-label="Tổng hợp">
-              <a class="nav-child-link" href="./" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
+              <a class="nav-child-link" href="/staging/tonghop/tongquan/" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
               <a class="nav-child-link" href="/staging/tonghop/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
               <a class="nav-child-link" href="/staging/tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
             </div>
@@ -358,20 +360,21 @@
               <span>Báo cáo</span><span class="nav-group-chevron" aria-hidden="true"></span>
             </button>
             <div class="nav-children" id="reports-menu" data-label="Báo cáo" hidden>
-              <a class="nav-child-link" href="../../baocao/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
-              <a class="nav-child-link" href="../../baocao/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
-              <a class="nav-child-link" href="../../baocao/tuantuyen/" aria-label="Báo cáo Tuần Tuyến" title="Báo cáo Tuần Tuyến"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
+              <a class="nav-child-link" href="/staging/baocao/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
+              <a class="nav-child-link" href="/staging/baocao/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
+              <a class="nav-child-link" href="/staging/baocao/tuantuyen/" aria-label="Báo cáo Tuần Tuyến" title="Báo cáo Tuần Tuyến"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
             </div>
           </div>
           <div class="nav-standalone">
-            <a class="nav-link" href="../../thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
-            <a class="nav-link" href="../../nhom/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.4-3.6 2.6-5.5 6-5.5s5.6 1.9 6 5.5m1-5c3.1 0 4.7 1.8 5 5"/></svg></span>Team/Đội của tôi</a>
-            <a class="nav-link" href="../../nguoidung/" data-admin-only hidden><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
+            <a class="nav-link" href="/staging/thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
+            
+            <a class="nav-link" href="/staging/nhom/" title="Team/Đội của tôi"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.4-3.6 2.6-5.5 6-5.5s5.6 1.9 6 5.5m1-5c3.1 0 4.7 1.8 5 5"/></svg></span>Team/Đội của tôi</a>
+            <a class="nav-link" href="/staging/nguoidung/" data-admin-only hidden><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
           </div>
         </nav>
         <div class="sidebar-bottom">
-          <div class="connection-state">Bản xem trước độc lập</div>
-          <p class="version">HP Telecom · Giao diện demo</p>
+          <div class="connection-state">Server staging độc lập</div>
+          <p class="version">HP Telecom · Staging</p>
         </div>
       </aside>
 
@@ -383,7 +386,7 @@
             <div class="admin account-menu" id="account-menu">
               <button class="account-trigger" id="account-trigger" type="button" aria-label="Tài khoản quản trị viên" aria-haspopup="menu" aria-expanded="false">
                 <span class="avatar" aria-hidden="true">QT</span>
-                <span class="account-details"><span class="admin-name">Quản trị viên</span><span class="admin-role">Tài khoản demo</span></span>
+                <span class="account-details"><span class="admin-name">Quản trị viên</span><span class="admin-role">Đang tải tài khoản…</span></span>
                 <span class="account-chevron" aria-hidden="true"></span>
               </button>
               <div class="account-dropdown" id="account-dropdown" role="menu" aria-label="Tùy chọn tài khoản">
@@ -404,111 +407,40 @@
               <p class="subtitle">Theo dõi tình hình đội hiện trường và sự cố trên cùng một trang.</p>
             </div>
             <div class="heading-tools">
-              <span class="demo-badge">Số liệu minh họa</span>
+              <span class="demo-badge" id="overview-state" role="status">Đang tải dữ liệu…</span>
               <label><span class="sr-only">Lọc theo Team/Đội</span><select class="date-filter" id="region-filter" disabled><option value="">Đang tải Team/Đội…</option></select></label>
               <label>
                 <span class="sr-only">Tháng báo cáo</span>
                 <input class="date-filter" id="period" type="month" required aria-describedby="region-filter-note" />
               </label>
+<button class="date-filter" id="overview-refresh" type="button">Cập nhật</button>
             </div>
           </section>
 
           <section class="metrics" aria-label="Chỉ số tổng quan">
-            <article class="metric">
-              <div class="metric-head"><span>Đội đang hoạt động</span><span class="metric-symbol" aria-hidden="true">⌖</span></div>
-              <strong class="metric-value" data-week="18" data-today="12" data-month="22">18</strong>
-              <div class="metric-foot"><strong>14</strong> đội đang nhận nhiệm vụ</div>
-            </article>
-            <article class="metric">
-              <div class="metric-head"><span>Nhiệm vụ đã hoàn tất</span><span class="metric-symbol" aria-hidden="true">✓</span></div>
-              <strong class="metric-value" data-week="246" data-today="38" data-month="918">246</strong>
-              <div class="metric-foot"><strong>+8.4%</strong> so với kỳ trước</div>
-            </article>
-            <article class="metric">
-              <div class="metric-head"><span>Sự cố đang xử lý</span><span class="metric-symbol" aria-hidden="true">△</span></div>
-              <strong class="metric-value" data-week="12" data-today="5" data-month="12">12</strong>
-              <div class="metric-foot"><strong style="color:var(--amber)">3 ưu tiên cao</strong> cần theo dõi</div>
-            </article>
-            <article class="metric">
-              <div class="metric-head"><span>Thời gian phản hồi TB</span><span class="metric-symbol" aria-hidden="true">◷</span></div>
-              <strong class="metric-value" data-week="42 phút" data-today="36 phút" data-month="48 phút">42 phút</strong>
-              <div class="metric-foot"><strong>−6 phút</strong> so với kỳ trước</div>
-            </article>
-          </section>
-
-          <section class="content-grid" aria-label="Tiến độ di dời và đội thực hiện">
-            <article class="panel">
-              <div class="panel-head">
-                <div><h2>Tiến độ nhiệm vụ</h2><p>Nhiệm vụ được giao và hoàn tất theo thời gian</p></div>
-                <div class="chart-legend"><span><i class="legend-dot"></i>Được giao</span><span><i class="legend-dot gray"></i>Hoàn tất</span></div>
-              </div>
-              <div class="chart-area">
-                <svg viewBox="0 0 640 210" role="img" aria-label="Biểu đồ minh họa tiến độ nhiệm vụ trong 7 ngày">
-                  <g stroke="#edf0f4" stroke-width="1">
-                    <path d="M42 22H626"/><path d="M42 62H626"/><path d="M42 102H626"/><path d="M42 142H626"/><path d="M42 182H626"/>
-                  </g>
-                  <g fill="#8793a3" font-size="9" font-family="Manrope, sans-serif">
-                    <text x="4" y="25">80</text><text x="4" y="65">60</text><text x="4" y="105">40</text><text x="4" y="145">20</text><text x="12" y="185">0</text>
-                  </g>
-                  <path d="M45 126 C78 115 98 120 129 95 S183 104 213 81 S269 90 297 68 S352 75 381 54 S438 67 465 48 S520 56 550 37 S598 45 624 29" fill="none" stroke="#006d77" stroke-width="3" stroke-linecap="round"/>
-                  <path d="M45 151 C78 142 100 145 129 127 S183 134 213 111 S268 123 297 99 S352 111 381 87 S438 103 465 82 S520 92 550 72 S599 80 624 60" fill="none" stroke="#b6c4d7" stroke-width="3" stroke-linecap="round"/>
-                  <g fill="#fff" stroke="#006d77" stroke-width="2">
-                    <circle cx="45" cy="126" r="4"/><circle cx="129" cy="95" r="4"/><circle cx="213" cy="81" r="4"/><circle cx="297" cy="68" r="4"/><circle cx="381" cy="54" r="4"/><circle cx="465" cy="48" r="4"/><circle cx="550" cy="37" r="4"/><circle cx="624" cy="29" r="4"/>
-                  </g>
-                </svg>
-                <div class="chart-labels"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div>
-              </div>
-            </article>
-
-            <article class="panel">
-              <div class="panel-head"><div><h2>Di dời gần đây</h2><p>Các yêu cầu và đội thực hiện</p></div><a class="text-link" href="/staging/tonghop/didoi">Xem tất cả</a></div>
-              <div class="dispatch-list">
-                <div class="dispatch-row"><span class="team-avatar">DD</span><span><span class="team-title">Di dời tuyến cáp quang</span><span class="team-sub">Ba Đình, Hà Nội · Đang di dời</span></span><span class="dispatch-count"><strong>10/10</strong><small>dự kiến</small></span></div>
-                <div class="dispatch-row"><span class="team-avatar">DD</span><span><span class="team-title">Di dời tủ cáp viễn thông</span><span class="team-sub">Quận 1, TP.HCM · Chờ xử lý</span></span><span class="dispatch-count"><strong>11/10</strong><small>dự kiến</small></span></div>
-                <div class="dispatch-row"><span class="team-avatar">DD</span><span><span class="team-title">Di dời cáp qua khu vực thi công</span><span class="team-sub">Hải Châu, Đà Nẵng · Đang di dời</span></span><span class="dispatch-count"><strong>09/10</strong><small>dự kiến</small></span></div>
-                <div class="dispatch-row"><span class="team-avatar">DD</span><span><span class="team-title">Di dời thiết bị mạng</span><span class="team-sub">Ninh Kiều, Cần Thơ · Đã hoàn tất</span></span><span class="dispatch-count"><strong>08/10</strong><small>hoàn tất</small></span></div>
-              </div>
-            </article>
-          </section>
-
-          <section class="lower-grid" aria-label="Sự cố và hoạt động">
-            <article class="panel">
-              <div class="panel-head"><div><h2>Sự cố cần chú ý</h2><p>Các sự cố mới nhất trong hệ thống demo</p></div><a class="text-link" href="/staging/baocao/suco">Xem tất cả</a></div>
-              <div style="overflow-x:auto">
-                <table class="incident-table">
-                  <thead><tr><th scope="col">Mã sự cố</th><th scope="col">Khu vực</th><th scope="col">Ưu tiên</th><th scope="col">Trạng thái</th><th scope="col">Đội phụ trách</th></tr></thead>
-                  <tbody>
-                    <tr><td class="incident-id">SC-2408</td><td>Ba Đình, Hà Nội</td><td><span class="priority high">Cao</span></td><td><span class="incident-status open">Đang xử lý</span></td><td>Hà Nội 01</td></tr>
-                    <tr><td class="incident-id">SC-2407</td><td>Quận 1, TP.HCM</td><td><span class="priority medium">Trung bình</span></td><td><span class="incident-status">Đã tiếp nhận</span></td><td>TP.HCM 02</td></tr>
-                    <tr><td class="incident-id">SC-2406</td><td>Hải Châu, Đà Nẵng</td><td><span class="priority low">Thấp</span></td><td><span class="incident-status open">Đang xử lý</span></td><td>Đà Nẵng 01</td></tr>
-                    <tr><td class="incident-id">SC-2405</td><td>Ninh Kiều, Cần Thơ</td><td><span class="priority high">Cao</span></td><td><span class="incident-status">Đã tiếp nhận</span></td><td>Chưa phân đội</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </article>
-            <article class="panel">
-              <div class="panel-head"><div><h2>Hoạt động gần đây</h2><p>Cập nhật minh họa từ các đội</p></div></div>
-              <div class="activity-list">
-                <div class="activity"><span class="activity-dot"></span><p class="activity-text"><strong>Đội Hà Nội 01</strong> đã tiếp nhận sự cố SC-2408.<span class="activity-time">09:42 · Ba Đình, Hà Nội</span></p></div>
-                <div class="activity"><span class="activity-dot"></span><p class="activity-text"><strong>Đội TP.HCM 02</strong> đã cập nhật trạng thái nhiệm vụ.<span class="activity-time">09:35 · Quận 1, TP.HCM</span></p></div>
-                <div class="activity"><span class="activity-dot"></span><p class="activity-text"><strong>Đội Đà Nẵng 01</strong> đang di dời tuyến cáp qua khu vực thi công.<span class="activity-time">09:28 · Hải Châu, Đà Nẵng</span></p></div>
-              </div>
-            </article>
-          </section>
-
-          <nav class="quick-links" aria-label="Đi đến khu vực quản trị">
+<article class="metric"><div class="metric-head"><span>Team/Đội</span></div><strong class="metric-value" data-live-metric="teams">—</strong><div class="metric-foot">Trong danh sách nhóm được phép xem.</div></article>
+<article class="metric"><div class="metric-head"><span>Báo cáo sự cố</span></div><strong class="metric-value" data-live-metric="incidents">—</strong><div class="metric-foot">Theo nhóm và tháng đã chọn.</div></article>
+<article class="metric"><div class="metric-head"><span>Báo cáo di dời</span></div><strong class="metric-value" data-live-metric="relocations">—</strong><div class="metric-foot">Theo nhóm và tháng đã chọn.</div></article>
+<article class="metric"><div class="metric-head"><span>Báo cáo hoàn tất</span></div><strong class="metric-value" data-live-metric="completed">—</strong><div class="metric-foot" id="overview-completed-note">Chỉ tính báo cáo có trạng thái hoàn tất.</div></article>
+</section>
+<section class="content-grid" aria-label="Báo cáo theo nhóm">
+<article class="panel"><div class="panel-head"><div><h2>Báo cáo theo Team/Đội</h2><p>Số báo cáo đã lưu trong tháng đã chọn</p></div></div><div style="overflow-x:auto"><table class="incident-table"><thead><tr><th scope="col">Team/Đội</th><th scope="col">Sự cố</th><th scope="col">Di dời</th><th scope="col">Hoàn tất</th></tr></thead><tbody id="overview-teams-body"><tr><td colspan="4">Đang tải…</td></tr></tbody></table></div></article>
+<article class="panel"><div class="panel-head"><div><h2>Di dời gần đây</h2><p>5 báo cáo cập nhật mới nhất</p></div><a class="text-link" href="/staging/tonghop/didoi/">Xem tất cả</a></div><div class="dispatch-list" id="overview-relocations"></div></article>
+</section>
+<section class="lower-grid" aria-label="Sự cố và cập nhật">
+<article class="panel"><div class="panel-head"><div><h2>Sự cố gần đây</h2><p>8 báo cáo cập nhật mới nhất</p></div><a class="text-link" href="/staging/baocao/suco/">Xem tất cả</a></div><div style="overflow-x:auto"><table class="incident-table"><thead><tr><th scope="col">Mã sự cố</th><th scope="col">Khu vực</th><th scope="col">Ưu tiên</th><th scope="col">Trạng thái</th><th scope="col">Team/Đội</th></tr></thead><tbody id="overview-incidents-body"><tr><td colspan="5">Đang tải…</td></tr></tbody></table></div></article>
+<article class="panel"><div class="panel-head"><div><h2>Cập nhật báo cáo gần đây</h2><p>Theo thời gian lưu trên server</p></div></div><div class="activity-list" id="overview-activity"></div></article>
+</section>
+<nav class="quick-links" aria-label="Đi đến khu vực quản trị">
             <a class="quick-link" href="/staging/tonghop/didoi"><span class="quick-icon" aria-hidden="true">⌖</span><span><strong>Quản lý di dời</strong><small>Theo dõi yêu cầu và tiến độ di dời</small></span></a>
             <a class="quick-link" href="/staging/baocao/suco"><span class="quick-icon" aria-hidden="true">△</span><span><strong>Báo cáo Sự cố</strong><small>Xem và quản lý báo cáo sự cố</small></span></a>
             <a class="quick-link" href="/staging/nguoidung/" data-admin-only hidden><span class="quick-icon" aria-hidden="true">♙</span><span><strong>Quản lý người dùng</strong><small>Tài khoản, vai trò và đội</small></span></a>
           </nav>
-          <p class="notice" id="region-filter-note" role="status" aria-live="polite">Trang tổng hợp là bản dựng giao diện độc lập. Số liệu, đội, sự cố và hoạt động đang hiển thị chỉ để minh họa, chưa lấy từ máy chủ HP Telecom.</p>
+          <p class="notice" id="region-filter-note" role="status" aria-live="polite">Đang lấy dữ liệu đã lưu trong staging.</p>
         </main>
       </div>
     </div>
     <script>
-      const period = document.querySelector("#period");
-      const regionFilter = document.querySelector("#region-filter");
-      const regionFilterNote = document.querySelector("#region-filter-note");
       const accountMenu = document.querySelector("#account-menu");
       const accountTrigger = document.querySelector("#account-trigger");
       const accountFeedback = document.querySelector("#account-feedback");
@@ -564,7 +496,7 @@
         accountTrigger.focus();
         setAccountMenuOpen(false);
         showAccountFeedback(action === "info"
-          ? "Thông tin tài khoản: Quản trị viên · Tài khoản demo."
+          ? (window.HPOverviewUser ? `${window.HPOverviewUser.fullName || window.HPOverviewUser.username} · ${window.HPOverviewUser.username}` : "Chưa tải được thông tin tài khoản.")
           : "Đổi mật khẩu chưa khả dụng trong bản xem trước độc lập.");
       });
       accountMenu.addEventListener("keydown", (event) => {
@@ -584,57 +516,7 @@
         event.preventDefault();
         items[next]?.focus();
       });
-      const monthParts = new Intl.DateTimeFormat("en", {
-        timeZone: "Asia/Ho_Chi_Minh", year: "numeric", month: "2-digit"
-      }).formatToParts(new Date());
-      const currentMonth = `${monthParts.find(part => part.type === "year").value}-${monthParts.find(part => part.type === "month").value}`;
-      period.value = currentMonth;
-      let teamMessage = "Đang tải danh sách nhóm.";
-      let loadingTeams = false;
-      function updateFilterNote() {
-        const [year, month] = period.value.split("-");
-        const selectedTeam = regionFilter.value ? regionFilter.selectedOptions[0].textContent : "Tất cả Team/Đội";
-        regionFilterNote.textContent = `${teamMessage} ${selectedTeam} · Tháng ${month}/${year}. Số liệu và biểu đồ trên trang vẫn là minh họa, chưa tổng hợp theo nhóm và tháng đã chọn.`;
-      }
-      async function loadOverviewTeams() {
-        if (loadingTeams) return;
-        loadingTeams = true;
-        const selectedId = regionFilter.value;
-        try {
-          const response = await fetch(new URL("/staging/api/teams", location.origin), {
-            credentials: "same-origin", cache: "no-store", signal: AbortSignal.timeout(12000)
-          });
-          if (!response.ok) throw new Error(response.status === 401
-            ? "Đăng nhập để chọn nhóm" : "Không tải được nhóm");
-          const result = await response.json();
-          if (!Array.isArray(result.teams)) throw new Error("Không tải được nhóm");
-          const teams = result.teams.filter(team => team && team.id != null && typeof team.name === "string")
-            .sort((a, b) => a.name.localeCompare(b.name, "vi"));
-          regionFilter.replaceChildren(new Option(teams.length ? "Tất cả Team/Đội" : "Chưa có nhóm nào", ""));
-          teams.forEach(team => regionFilter.add(new Option(team.name, String(team.id))));
-          if (teams.some(team => String(team.id) === selectedId)) regionFilter.value = selectedId;
-          regionFilter.disabled = !teams.length;
-          teamMessage = teams.length ? "Danh sách Team/Đội lấy từ các nhóm bạn được phép xem."
-            : "Chưa có nhóm. Bạn có thể tạo nhóm tại Team/Đội của tôi.";
-        } catch (error) {
-          regionFilter.replaceChildren(new Option(error.message === "Đăng nhập để chọn nhóm" ? error.message : "Không tải được nhóm", ""));
-          regionFilter.disabled = true;
-          teamMessage = error.message === "Đăng nhập để chọn nhóm"
-            ? "Hãy đăng nhập để xem các nhóm của bạn."
-            : "Chưa tải được danh sách nhóm. Hãy tải lại trang để thử lại.";
-        } finally {
-          loadingTeams = false;
-          updateFilterNote();
-        }
-      }
-      period.addEventListener("change", () => {
-        if (!/^\d{4}-\d{2}$/.test(period.value)) period.value = currentMonth;
-        updateFilterNote();
-      });
-      regionFilter.addEventListener("change", updateFilterNote);
-      window.addEventListener("focus", loadOverviewTeams);
-      updateFilterNote();
-      loadOverviewTeams();
+
     </script>
       <script>
         (() => {

@@ -24,7 +24,7 @@ services:
       start_period: 10s
 
   hptelecom-staging-independent-web:
-    image: hptelecom-staging-web:filters-20261012-r4
+    image: hptelecom-staging-web:live-20261012-r6
     build:
       context: .
       dockerfile: Dockerfile.staging

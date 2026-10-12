@@ -1,5 +1,5 @@
 FROM nginx:alpine
-COPY index.html script.js server-theme.css staging-access.js /usr/share/nginx/html/
+COPY index.html script.js server-theme.css staging-access.js team-picker.js team-picker.css overview-live.js /usr/share/nginx/html/
 COPY assets/ /usr/share/nginx/html/assets/
 COPY baocao/ /usr/share/nginx/html/baocao/
 COPY dangky/ /usr/share/nginx/html/dangky/
