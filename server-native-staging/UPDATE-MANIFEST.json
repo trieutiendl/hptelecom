@@ -1,0 +1,40 @@
+{
+  "files": {
+    "HUONG-DAN.md": "c010ce53a1191fac05ca4b4dcde646cabcedb5f344d1f30e5c6c4dd0cf1ae744",
+    "README-UPDATE-4.0.15.md": "7e6b3783a36e384bf2a0f3dbb7d7d0d65a6a84adf9737d84f0745bc5fcb0097d",
+    "VIDEO-LIBRARY-4.0.15.md": "754803ec9b7dda38788db4820b2ffa76d6b8f7a899be35b7f1ee5e4da83eb8c2",
+    "cable_tasks.py": "6c7d8f52c6d56b9bf050e3529445a338186f4bddd650acdfef615d539f741b93",
+    "gps_formats.py": "75383f05b4d113d760e26d393cbec6510529c6d6e482285931aa17e749277ca2",
+    "mobile.py": "96d531cbfb07dd1af21031aadedad8f078e8e572c3a2c83f9a67a27b2a21abb4",
+    "photo_jobs.py": "6ab4f5dd9e9d7bd99d75d13d5b10e8892321efcd5613736a949251cf950e449f",
+    "photo_ocr.py": "5ead594927b04128b4c649c9275496ee6e8cfd8762df2516b5e1ba3a551afb8e",
+    "public_hosts.py": "2a8318f3b1aea7ebc77b4c3839dee414730f66a1c9cca8f1250c4f8a2376594e",
+    "report_collaboration.py": "ba6732afd1da933fbad98a37e6574e90170b89d1e69085a287a90b357ce58bc4",
+    "route_catalog.py": "77c952c4233662b921e57782425190b06e0d99b21b044c76810350ee58ed4240",
+    "route_catalog_seed.json": "158d4aeab162990872f4704e5dcdba5cd960a4874e04df9b7b12d294b434f0b1",
+    "server.py": "a513a990fed6c288540382521b02eb7ae9c05d2ac8ff54a68b67f603f62fbd3b",
+    "static/app.js": "96d7e90b75ee9f7a18d84b056fd0a192c6c6016da1f782e6d7826dbbf7966425",
+    "static/brand-mark-light.png": "915999a3d7a6998bb33d84c7ba93ad76ae57986ba45791eb46f6ca3c334adafb",
+    "static/brand-mark.png": "4018fad685d746c6c393f9cd59cd9b77c5744e62cae94d2b231efc9058fac11a",
+    "static/export-bundle.js": "ad34c9028c22c594f2cab1608bfeffec5a6968ebda24bd70fd2860df28bc73e2",
+    "static/homepage-preview.jpg": "3d3e96bba9352124126b164402ac02ccaa39ae0da297ac2d6792a3ed52771982",
+    "static/icon.png": "fdad085d5a670ac63d72de624d9e0f154156a9a0b4d84f50c0baf998d79270c4",
+    "static/index.html": "a8278972f3032551bc332dd7fce1d7ab0fd8a82931e27fbbfb2457168dee40ea",
+    "static/landing.css": "c0afd31048e4956dc61302c26f25a5ed5c40d7a83d65bdadf29882f9c049feb8",
+    "static/landing.html": "a02ca367c86d63b66c798c2a2e74149f08f76f4a531fc5bb80e2c1cd7a9bde4a",
+    "static/logo.png": "54f57a513ecec879894d341d1bdbb003f8d067cc77fa79171dc36fe501c1a5c2",
+    "static/policy.css": "298f8f9faa7302c4ddacd1d20b4f8fa28b72591b41946913a3d9996267744f25",
+    "static/privacy.html": "a7e733bd1cf9681e1f782b9992cb0c3acc2ab55cbbf02b345c9fa0876c1523d9",
+    "static/style.css": "f9f8ea5a61ca32ed7891221325091eb5bd9dd5b10ab21152e1de717895ef9843",
+    "static/support.html": "dc050f9cfc26b78a4a6166374390bdc2c1d1e4f5360cb3287356c53f1c2366a3",
+    "video_library.py": "81f0e52af626d692765952d28f389aa9b9338e92c2f12f38ff62e32983c8e605"
+  },
+  "previous_versions": [
+    "4.0.13",
+    "4.0.14",
+    "4.0.16"
+  ],
+  "schema": 1,
+  "server_id": "9d11bc2ae21e4807bd307e44ba64a4af",
+  "version": "4.0.15"
+}

@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HP Telecom Staging · Prototype Android (Minh họa)</title>
+<style>
+:root{color-scheme:dark;--bg:#071426;--surf:rgba(255,255,255,.07);--surf2:rgba(255,255,255,.12);--ink:#eaf4ff;--mute:#93a9c4;--line:rgba(160,200,255,.16);--acc:#27d3f2;--acc-ink:#031521;--ok:#4ae0a0;--warn:#ffc15a;--bad:#ff8a8a;--stg:#c4a0ff;--r:14px;--glass:blur(16px) saturate(140%);--lift:0 10px 28px rgba(0,8,20,.35),inset 0 1px 0 rgba(255,255,255,.08)}
+[data-theme=light]{color-scheme:light;--bg:#eef3fa;--surf:rgba(255,255,255,.8);--surf2:#e3ecf7;--ink:#0b1b30;--mute:#46607f;--line:rgba(20,60,110,.16);--acc:#0a7fb8;--acc-ink:#fff;--ok:#0a7a45;--warn:#8a5200;--bad:#b3261e;--stg:#6d35b8;--lift:0 8px 22px rgba(20,60,110,.12),inset 0 1px 0 #fff}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.45 system-ui,"Segoe UI",Roboto,sans-serif;background:#05080d;color:var(--ink)}
+.stage{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;padding:24px 16px}
+.side{width:300px;color:#dbe6f3}
+.side h1{font-size:20px;margin:0 0 4px}.side p{margin:0 0 12px;color:#9db0c6;font-size:14px}
+.side button,.side select{font:inherit;min-height:44px;border-radius:10px;border:1px solid #2c3c52;background:#16202f;color:#edf2f8;padding:0 12px;margin:0 6px 8px 0;cursor:pointer}
+.side button[aria-pressed=true]{background:#27d3f2;color:#031521;border-color:#27d3f2;font-weight:700}
+.side h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#7f93aa;margin:18px 0 8px}
+.phone{width:380px;height:760px;border-radius:40px;border:9px solid #0a1220;background:radial-gradient(130% 55% at 100% 0%,rgba(39,211,242,.22),transparent 60%),radial-gradient(90% 45% at 0% 100%,rgba(47,124,246,.2),transparent 65%),var(--bg);color:var(--ink);overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(120,180,255,.18)}
+[data-theme=light] .phone{background:radial-gradient(130% 55% at 100% 0%,rgba(10,127,184,.12),transparent 60%),var(--bg)}
+.phone.big{font-size:20px}
+.top{padding:12px 14px 9px;background:rgba(7,20,38,.55);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+[data-theme=light] .top{background:rgba(255,255,255,.7)}
+.top h3{margin:0;font-size:17px;font-weight:750;letter-spacing:-.01em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stg{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--stg);border:1px solid color-mix(in srgb,var(--stg) 60%,transparent);background:color-mix(in srgb,var(--stg) 12%,transparent);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.demo{font-size:11px;font-weight:700;color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent);padding:3px 16px;text-align:center}
+.body{flex:1;overflow:auto;padding:12px 14px 16px;font-size:14px}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);background:rgba(7,20,38,.62);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border-top:1px solid var(--line);padding-bottom:4px}
+[data-theme=light] .nav{background:rgba(255,255,255,.8)}
+.nav[hidden],.chip[hidden],.btn[hidden]{display:none}
+.nav button{position:relative;background:none;border:0;color:var(--mute);min-height:52px;font:600 11px system-ui;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:color .2s}
+.nav button[aria-current=page]{color:var(--acc)}.nav .ic{font-size:18px;line-height:1}
+.nav button[aria-current=page]::before{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:0 0 4px 4px;background:var(--acc)}
+.btn{min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surf);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);color:var(--ink);font:700 14px system-ui;padding:0 14px;width:100%;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+.btn:active{transform:scale(.97)}
+.btn.p{background:linear-gradient(135deg,#27d3f2,#2f7cf6);color:#031521;border-color:transparent;box-shadow:0 6px 16px rgba(0,8,20,.4)}
+[data-theme=light] .btn.p{color:#fff;background:linear-gradient(135deg,#0a9bd0,#2459d6)}
+.btn.d{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 55%,transparent)}
+.btn.s{width:auto;min-height:44px}
+.row{display:flex;gap:10px;margin:10px 0}.row>*{flex:1;min-width:0}
+.card{background:var(--surf);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin:0 0 10px;box-shadow:var(--lift)}
+.card h4{margin:0 0 3px;font-size:15px;letter-spacing:-.01em}.mute{color:var(--mute);font-size:12px}
+label{display:block;font-weight:650;font-size:12px;color:var(--mute);margin:10px 0 4px}
+input,select,textarea{width:100%;min-height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);font:14px system-ui;padding:8px 12px}
+[data-theme=light] input,[data-theme=light] select,[data-theme=light] textarea{background:#fff}
+select option{background:#0d1f38;color:#eaf4ff}
+textarea{min-height:72px}
+input::placeholder,textarea::placeholder{color:var(--mute)}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--acc);outline-offset:1px;box-shadow:0 0 0 5px color-mix(in srgb,var(--acc) 22%,transparent)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border-radius:999px;padding:4px 11px;border:1px solid color-mix(in srgb,currentColor 55%,transparent);background:color-mix(in srgb,currentColor 11%,transparent)}
+.chip.ok{color:var(--ok)}.chip.warn{color:var(--warn)}.chip.bad{color:var(--bad)}.chip.info{color:var(--acc)}
+.steps{display:flex;gap:6px;margin:0 0 16px}.steps div{flex:1;text-align:center;font-size:12px;font-weight:700;color:var(--mute);border-bottom:3px solid var(--line);padding-bottom:6px}
+.steps .on{color:var(--acc);border-color:var(--acc)}.steps .done{color:var(--ok);border-color:var(--ok)}
+details.grp{background:var(--surf);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px;box-shadow:var(--lift)}
+details.grp summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:56px;padding:0 14px;font-weight:700;cursor:pointer}
+details.grp summary::-webkit-details-marker{display:none}
+details.grp summary .t{flex:1}details.grp summary::after{content:"▾";font-size:18px;color:var(--mute);transition:transform .15s}
+details.grp[open] summary::after{transform:rotate(180deg)}
+.ph{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 14px}
+.ph div{position:relative;aspect-ratio:1;border-radius:10px;background:repeating-linear-gradient(45deg,var(--surf2),var(--surf2) 8px,var(--line) 8px,var(--line) 9px);display:flex;align-items:flex-end;font-size:11px;color:var(--mute);padding:4px}
+.ph .x{position:absolute;top:4px;right:4px;width:32px;height:32px;min-height:0;border-radius:50%;border:1px solid #b3261e;background:var(--surf);color:#b3261e;font-size:14px;line-height:1;padding:0;cursor:pointer}
+.ph .cf{position:absolute;inset:0;border-radius:10px;background:var(--surf);border:1px solid #b3261e;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:4px;padding:6px;color:var(--text,inherit);font-size:12px;text-align:center}
+.ph .cf .btn{min-height:32px;padding:0 6px;font-size:13px}
+.act{position:sticky;bottom:-20px;margin:14px -16px -20px;background:var(--surf);border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:10px}
+.fab{position:absolute;right:16px;bottom:76px;width:64px;height:64px;border-radius:50%;background:var(--acc);color:var(--acc-ink);border:0;font-size:28px;box-shadow:0 6px 18px #0006;cursor:pointer}
+.stateview{text-align:center;padding:40px 12px}.stateview .big{font-size:44px}.stateview h4{margin:10px 0 4px;font-size:18px}
+.sk{height:74px;border-radius:14px;background:linear-gradient(90deg,var(--surf2),var(--line),var(--surf2));background-size:200% 100%;animation:sh 1.4s infinite;margin-bottom:12px}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none}details.grp summary::after{transition:none}}
+.seg{display:flex;gap:8px;overflow:auto;padding-bottom:4px;margin-bottom:10px}.seg button{min-height:44px;border-radius:999px;border:1px solid var(--line);background:var(--surf);color:var(--ink);font:600 13px system-ui;padding:0 14px;white-space:nowrap;cursor:pointer}
+.seg button[aria-pressed=true]{background:linear-gradient(135deg,#27d3f2,#2f7cf6);color:#031521;border-color:transparent;box-shadow:0 6px 16px rgba(39,211,242,.25)}
+.tile{display:flex;flex-direction:column;gap:8px;align-items:flex-start;padding:12px;min-height:84px;border-radius:var(--r);background:var(--surf);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line);box-shadow:var(--lift);font:700 13px system-ui;color:var(--ink);cursor:pointer;text-align:left;transition:transform .15s cubic-bezier(.2,.8,.2,1)}
+.tile:active{transform:scale(.97)}
+.tile .ic{font-size:19px;width:38px;height:38px;display:grid;place-items:center;border-radius:14px;background:color-mix(in srgb,var(--acc) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--acc) 35%,transparent)}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mx{display:flex;align-items:center;gap:8px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <aside class="side">
+    <h1>HP Telecom Staging</h1>
+    <p>Prototype giao diện Android. Mọi dữ liệu là <b>Minh họa</b>, không gửi request lên server.</p>
+    <h2>Màn hình</h2><div id="screens"></div>
+    <h2>Giao diện</h2>
+    <button id="theme" aria-pressed="false">Nền sáng</button>
+    <button id="big" aria-pressed="false">Chữ lớn (125%)</button>
+    <h2>Trạng thái</h2>
+    <select id="state" aria-label="Trạng thái màn hình"></select>
+  </aside>
+  <div class="phone" id="phone"><div class="top"><img src="logo.svg" alt="" style="width:30px;height:30px;border-radius:9px;background:#071426;flex:none"><h3 id="title"></h3><span class="stg">Staging</span></div><div class="demo">Minh họa · chưa kết nối API</div><div class="body" id="body"></div><nav class="nav" id="nav" aria-label="Điều hướng chính"></nav></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const NAV=[["home","⌂","Trang chủ"],["work","☰","Công việc"],["library","▦","Thư viện"],["account","☺","Tài khoản"]];
+const SCREENS={
+ login:["Đăng nhập","auth"],register:["Đăng ký","auth"],home:["Trang chủ","home"],work:["Công việc","work"],
+ inc1:["Sự cố · Thông tin","work"],inc2:["Sự cố · Cáp/vật tư","work"],inc3:["Sự cố · Ảnh/mô tả","work"],inc4:["Sự cố · Kiểm tra","work"],
+ rel1:["Di dời · Thông tin","work"],rel2:["Di dời · Cáp/vật tư","work"],rel3:["Di dời · Ảnh/mô tả","work"],patrol:["Tuần tuyến","work"],camera:["Camera","home"],library:["Thư viện","library"],teams:["Team/Đội của tôi","home"],chat:["Chat nhóm","home"],team:["Đắk Lắk","home"],account:["Tài khoản","account"]};
+const TITLE={pending:"Chờ duyệt",collab:"Người cùng làm",teamNew:"Tạo nhóm"};
+let cur="login",st="ok";
+const STATES={ok:"Có dữ liệu",loading:"Đang tải",empty:"Trống",error:"Lỗi, thử lại",offline:"Offline",denied:"Không đủ quyền",expired:"Phiên hết hạn"};
+const sv=(i,t,d,b)=>`<div class="stateview"><div class="big" aria-hidden="true">${i}</div><h4>${t}</h4><p class="mute">${d}</p>${b?`<button class="btn p s" data-s="ok">${b}</button>`:""}</div>`;
+function stateView(){
+ return {loading:`<div class="sk"></div><div class="sk"></div><div class="sk"></div>`,
+ empty:sv("📭","Chưa có dữ liệu","Tháng 10/2026 · nhóm đã chọn chưa có mục nào.","Tạo mới"),
+ error:sv("⚠️","Không tải được dữ liệu","Kiểm tra kết nối rồi thử lại. Bản nháp trên máy vẫn được giữ.","Thử lại"),
+ offline:sv("📡","Đang offline","Bạn vẫn xem và sửa được dữ liệu đã lưu trên máy. Báo cáo sẽ ở trạng thái Chờ đồng bộ.","Tiếp tục offline"),
+ denied:sv("🔒","Không đủ quyền","Chỉ Chủ nhóm hoặc Điều phối viên mới thực hiện được thao tác này.","Quay lại"),
+ expired:sv("⏱","Phiên đăng nhập đã hết hạn","Dữ liệu chưa gửi vẫn được giữ trên máy. Đăng nhập lại để tiếp tục.","Đăng nhập lại")}[st];
+}
+const steps=n=>`<div class="steps">${["Thông tin","Cáp/vật tư","Ảnh","Kiểm tra"].map((t,i)=>`<div class="${i+1<n?"done":i+1==n?"on":""}">${i+1<n?"✓ ":""}${t}</div>`).join("")}</div>`;
+const rsteps=n=>`<div class="steps">${["Thông tin","Cáp/vật tư","Ảnh"].map((t,i)=>`<div class="${i+1<n?"done":i+1==n?"on":""}">${i+1<n?"✓ ":""}${t}</div>`).join("")}</div>`;
+const act=(back,next)=>`<div class="act"><button class="btn" data-go="${back}">Lưu nháp &amp; quay lại</button><button class="btn p" data-go="${next}">Tiếp tục</button></div>`;
+const mats=[["Măng xông",2,"bộ","","24FO"],["Néo",2,"bộ 2 hướng","",""]];
+const CAP=["2FO","4FO","6FO","8FO","12FO","24FO","36FO","48FO","96FO"];let editIdx=-1,pendDel=null;
+const MXPTS=[["MX 1","12.700480","108.326998"],["MX 2","",""]];const CAPPTS=[{n:1,name:"Hiện trường 1",lat:"12.700210",lon:"108.326610",note:""},{n:2,name:"MX 1",lat:"12.700480",lon:"108.326998",note:"MX 1"},{n:3,name:"Đầu số cáp",lat:"12.700790",lon:"108.327350",note:""},{n:4,name:"MX 2",lat:"",lon:"",note:"MX 2"},{n:5,name:"Kết quả đo",lat:"12.701050",lon:"108.327720",note:""}];
+function crc32(b){let c,r=-1;for(let i=0;i<b.length;i++){c=(r^b[i])&255;for(let k=0;k<8;k++)c=c&1?(c>>>1)^0xEDB88320:c>>>1;r=(r>>>8)^c}return(r^-1)>>>0}
+function buildKmz(name,pts,raw){const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");const kml=raw?raw(esc):`<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>${esc(name)}</name>${pts.map(m=>`<Placemark><name>${esc(m[0])}</name><description>${esc(name)} · Măng xông</description><Point><coordinates>${m[2]},${m[1]},0</coordinates></Point></Placemark>`).join("")}</Document></kml>`;const enc=new TextEncoder(),nm=enc.encode("doc.kml"),d=enc.encode(kml),c=crc32(d);const w=[];const u16=v=>[v&255,v>>8&255],u32=v=>[v&255,v>>8&255,v>>16&255,v>>>24&255];const lh=[0x50,0x4b,3,4,...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(c),...u32(d.length),...u32(d.length),...u16(nm.length),...u16(0),...nm];const cd=[0x50,0x4b,1,2,...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(c),...u32(d.length),...u32(d.length),...u16(nm.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(0),...nm];const off=lh.length+d.length;const end=[0x50,0x4b,5,6,0,0,0,0,...u16(1),...u16(1),...u32(cd.length),...u32(off),...u16(0)];return new Blob([new Uint8Array(lh),d,new Uint8Array(cd),new Uint8Array(end)],{type:"application/vnd.google-earth.kmz"})}
+document.addEventListener("click",e=>{if(!e.target.closest("#kmz"))return;const pts=CAPPTS.filter(p=>p.lat);const r={name:"DLKP32-DLKP22",pts};const a=document.createElement("a");a.href=URL.createObjectURL(buildKmz("DLKP32-DLKP22",[],ptKml([r])));a.download="DLKP32-DLKP22.kmz";document.body.appendChild(a);a.click();a.remove();$("#kmzmsg").textContent="Đã tạo DLKP32-DLKP22.kmz · đường nối "+pts.length+" điểm chụp, hiện điểm MX"});
+const PT=[
+{id:1,type:"Kiểm tra",name:"DLBT09-LDDR02",month:"2026-10",note:"Kiểm tra tuyến trục, vệ sinh hộp phối quang và đo suy hao.",done:false,sync:"Chờ gửi",team:"Tây Đắk Lắk",km:"8,4",pts:[
+ {n:1,name:"Cột 01 trạm DLBT09",lat:12.6642,lon:108.0381,note:"ĐẦU TUYẾN",ev:"OK",rec:"",bf:0,af:0},
+ {n:2,name:"MX 1 cột 14",lat:12.6655,lon:108.0412,note:"MX 1 CỘT 14",ev:"NOK",rec:"Thay ống co nhiệt, bọc lại măng xông.",bf:1,af:0},
+ {n:3,name:"Cột 22",lat:12.6671,lon:108.0455,note:"VỆ SINH HỘP PHỐI QUANG",ev:"OK",rec:"",bf:0,af:0}]},
+{id:2,type:"Kiểm tra",name:"DLMD16-DLMD22",month:"2026-10",note:"Kiểm tra măng xông, dây treo và khoảng võng cáp.",done:true,sync:"Đã đồng bộ",team:"Tây Đắk Lắk",km:"5,2",pts:[
+ {n:1,name:"Cột 03",lat:12.4311,lon:107.8764,note:"ĐẦU TUYẾN",ev:"OK",rec:"",bf:0,af:0},
+ {n:2,name:"DP 05",lat:12.4333,lon:107.8791,note:"DP 05",ev:"OK",rec:"",bf:0,af:0}]},
+{id:3,type:"Kiểm tra",name:"DLKP32-DLKP22",month:"2026-09",note:"Rà soát điểm giao cắt và tình trạng biển báo tuyến.",done:true,sync:"Đã đồng bộ",team:"Tây Đắk Lắk",km:"6,1",pts:[
+ {n:1,name:"Ngã tư Trần Hưng Đạo",lat:12.70048,lon:108.326998,note:"BIỂN BÁO ĐỦ",ev:"OK",rec:"",bf:0,af:0}]},
+{id:4,type:"Bảo dưỡng",name:"DLBT09-LDDR02",month:"2026-10",note:"Bảo dưỡng hộp phối quang, vệ sinh đầu nối và siết lại phụ kiện.",done:false,sync:"Chờ gửi",team:"Tây Đắk Lắk",km:"8,4",pts:[]}
+];
+const PT_POOL=[{type:"Kiểm tra",name:"DLES27-DLES20",month:"2026-10",note:"Rà soát cột treo và cập nhật ảnh hiện trường.",km:"5,7"}];
+const pt={tab:"Kiểm tra",view:"list",id:0,sel:null,openPt:0,form:null,msg:""};
+const ptEsc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const ptMonth=m=>m?("Tháng "+m.split("-")[1]+"/"+m.split("-")[0]):"Chưa rõ tháng";
+const ptRoute=()=>PT.find(r=>r.id==pt.id);
+const ptTouch=r=>{r.sync="Chờ gửi"};
+const ptRef=()=>{const s=$("#body").scrollTop;render();$("#body").scrollTop=s};
+const ptDown=(blob,name)=>{const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove()};
+const ptSlug=s=>s.replace(/[^\w-]+/g,"-");
+function ptSuggest(r){let n=1;const u=new Set(r.pts.map(p=>p.n));while(u.has(n))n++;return n}
+function ptStatus(r){return r.done?`<span class="chip ok">✓ Đã hoàn thành</span>`:`<span class="chip info">Đang thực hiện</span>`}
+function ptSync(r){return `<span class="chip ${r.sync=="Đã đồng bộ"?"ok":"warn"}">${r.sync=="Đã đồng bộ"?"☁ Đã đồng bộ":"● Lưu trên máy · chờ gửi"}</span>`}
+function ptListView(){
+ const all=PT.filter(r=>r.type==pt.tab).sort((a,b)=>b.month.localeCompare(a.month));
+ const months=[...new Set(all.map(r=>r.month))];
+ const sm=pt.sel;
+ return `<div class="seg" role="group" aria-label="Loại tuần tuyến">${["Kiểm tra","Bảo dưỡng"].map(t=>`<button data-pttab="${t}" aria-pressed="${pt.tab==t}">${t}</button>`).join("")}</div>
+${sm?`<div class="card" style="padding:10px 12px"><b>Đã chọn ${sm.size}/${all.length} tuyến</b><div class="row" style="margin:8px 0 0"><button class="btn s" data-ptall="1">Chọn tất cả</button><button class="btn s" data-ptcancel="1">Hủy chọn</button></div><div class="row" style="margin:8px 0 0"><button class="btn s" data-ptex="xls">Excel</button><button class="btn s" data-ptex="kmz">KMZ</button><button class="btn s" data-ptex="both">Excel + KMZ</button></div><button class="btn s" style="margin-top:8px;color:var(--bad)" data-ptdel="1">Xóa khỏi máy</button></div>`:`<button class="btn p" data-ptrecv="1" style="margin-bottom:10px">⬇ Nhận tuyến được giao</button>`}
+<div id="ptmsg" class="mute" role="status" style="margin-bottom:8px">${ptEsc(pt.msg)}</div>
+${all.length?months.map(m=>`<h3 style="font-size:13px;margin:14px 0 6px;color:var(--mute)">${ptMonth(m).toUpperCase()}</h3>${all.filter(r=>r.month==m).map(r=>`<div class="card" style="padding:10px 12px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px">${sm?`<input type="checkbox" data-ptsel="${r.id}" aria-label="Chọn ${r.name}" ${sm.has(r.id)?"checked":""} style="width:22px;min-height:22px;flex:none">`:""}<div style="flex:1;min-width:0;cursor:pointer" data-ptopen="${r.id}" role="button" tabindex="0"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:14px">${r.done&&r.pts.length?"✓ ":""}${r.name}</b>${ptStatus(r)}</div><div class="mute" style="margin-top:2px">${r.pts.length} vị trí · ${ptMonth(r.month)}</div><div class="mute" style="margin-top:2px">${ptEsc(r.note)}</div></div>${sm?"":`<button class="btn s" data-ptmenu="${r.id}" aria-label="Thêm thao tác ${r.name}" style="width:40px;min-height:40px;flex:none">⋯</button>`}</div></div>`).join("")}`).join(""):`<p class="mute" style="text-align:center;margin:24px 0">Chưa có tuyến ${pt.tab.toLowerCase()}. Hãy bấm Nhận tuyến được giao. Dữ liệu trên máy vẫn được giữ.</p>`}
+<p class="mute" style="margin-top:12px">Tuyến do điều phối viên hoặc quản trị giao trên server. Điện thoại chỉ nhận việc, chụp ảnh và báo cáo kết quả; không tạo hay sửa tên tuyến.</p>`}
+function ptForm(r){
+ const f=pt.form;if(!f)return"";
+ if(f.kind=="add")return `<div class="card" style="margin-top:10px"><h4>Thêm ảnh vị trí</h4><div class="mute">Camera nhập thông tin theo tuyến ${ptEsc(r.name)}. Ảnh giữ trên máy trước.</div><label for="pa1">STT</label><input id="pa1" type="number" min="1" value="${f.keep?f.keep[0]:f.n}"><label for="pa2">Tên vị trí</label><input id="pa2" maxlength="120" placeholder="Ví dụ: Cột 14" value="${ptEsc(f.keep?f.keep[1]:"")}"><label for="pa3">Ghi chú / Mô tả báo cáo</label><input id="pa3" placeholder="MX hoặc DP sẽ được đánh dấu trong KMZ" value="${ptEsc(f.keep?f.keep[2]:"")}"><label>Đánh giá</label><div class="seg"><button data-ptev="OK" aria-pressed="${f.ev=="OK"}">OK — Đạt</button><button data-ptev="NOK" aria-pressed="${f.ev=="NOK"}">NOK — Chưa đạt</button></div><div class="card" style="padding:10px 12px;margin-top:10px"><b>GPS</b><div class="mute">${f.gps?`${f.gps[0]}, ${f.gps[1]} · sai số 8 m (minh họa)`:"Chưa có tọa độ. Cần lấy GPS trước khi lưu."}</div><button class="btn s" data-ptgps="1" style="margin-top:8px">📍 Lấy GPS tại vị trí hiện tại</button></div><div class="row"><button class="btn" data-ptcancelform="1">Giữ bản nháp</button><button class="btn p" data-ptsave="add">Lưu ảnh</button></div></div>`;
+ const p=r.pts.find(x=>x.n==f.n);if(!p)return"";
+ return `<div class="card" style="margin-top:10px"><h4>Thông tin vị trí ${p.n} · ${ptEsc(p.name)}</h4><label>Đánh giá</label><div class="seg"><button data-ptev="OK" aria-pressed="${f.ev=="OK"}">OK — Đạt</button><button data-ptev="NOK" aria-pressed="${f.ev=="NOK"}">NOK — Chưa đạt</button></div><label for="pe1">Phương án / Kiến nghị sửa</label><textarea id="pe1">${ptEsc(f.rec)}</textarea><div class="row"><div><label>Trước sửa</label><button class="btn s" data-ptph="bf">${f.bf?"✓ Đã có ảnh · thay":"＋ Thêm ảnh"}</button></div><div><label>Sau sửa</label><button class="btn s" data-ptph="af">${f.af?"✓ Đã có ảnh · thay":"＋ Thêm ảnh"}</button></div></div><div class="mute" style="margin-top:6px">Thêm hoặc thay ảnh trước/sau đặt đánh giá về NOK, đúng như bản 4.1.4.</div><div class="row"><button class="btn" data-ptcancelform="1">Hủy</button><button class="btn p" data-ptsave="edit">Lưu thông tin</button></div></div>`}
+function ptDetailView(){
+ const r=ptRoute();if(!r){pt.view="list";return ptListView()}
+ return `<button class="btn s" data-ptback="1" style="width:auto;margin-bottom:10px">‹ Danh sách tuyến</button>
+<div class="card"><h4>${r.name}</h4><div class="mute">${r.type} · ${ptMonth(r.month)}</div><div style="margin:8px 0">${ptStatus(r)} ${ptSync(r)}</div><div class="mute">Ghi chú giao việc</div><div>${ptEsc(r.note)}</div></div>
+<div id="ptmsg" class="mute" role="status" style="margin:8px 0">${ptEsc(pt.msg)}</div>
+${r.done?"":`<div class="row"><button class="btn p" data-ptadd="1">📷 Thêm ảnh</button><button class="btn" data-ptlib="1">Từ thư viện</button></div>`}
+${r.pts.length?r.pts.slice().sort((a,b)=>a.n-b.n).map(p=>{const o=pt.openPt==p.n;return `<div class="card" style="padding:10px 12px;margin-bottom:8px"><div style="display:flex;gap:10px;align-items:center;cursor:pointer" data-ptpt="${p.n}" role="button" tabindex="0"><span class="chip info" style="flex:none">${p.n}</span><div style="flex:1;min-width:0"><b style="font-size:14px">${ptEsc(p.name)}</b><div class="mute">${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}</div>${p.note?`<div class="mute">${ptEsc(p.note)}</div>`:""}</div><span class="chip ${p.ev=="OK"?"ok":"bad"}">${p.ev}</span></div>${o?`<div class="row" style="margin:10px 0 0"><button class="btn s" data-ptedit="${p.n}">Sửa thông tin · OK / NOK</button><button class="btn s" data-ptstt="${p.n}">Sửa STT</button></div><div class="row" style="margin:6px 0 0"><button class="btn s" data-ptsave1="${p.n}">Tải ảnh xuống</button><button class="btn s" style="color:var(--bad)" data-ptrm="${p.n}">Xóa</button></div>${p.rec?`<div class="mute" style="margin-top:6px">Kiến nghị: ${ptEsc(p.rec)}</div>`:""}`:""}</div>`}).join(""):`<p class="mute" style="text-align:center;margin:18px 0">Chưa có vị trí nào. Bấm Thêm ảnh để chụp vị trí đầu tiên.</p>`}
+${ptForm(r)}
+<div class="row" style="margin-top:12px"><button class="btn" data-ptex="xls">Xuất Excel</button><button class="btn" data-ptex="kmz">Xuất KMZ</button></div>
+<div class="row" style="margin:8px 0 0"><button class="btn" data-ptmove="1">Chuyển ảnh</button></div>
+<div class="row" style="margin:8px 0 0"><button class="btn" data-ptsync="1">☁ Đồng bộ</button><button class="btn p" data-ptdone="1">${r.done?"Mở lại":"Hoàn thành"}</button></div>
+<p class="mute" style="margin-top:10px">Hoàn thành chưa có nghĩa là đã gửi xong. Tuyến chỉ được gỡ khỏi máy khi server đã xác nhận cùng phiên bản.</p>`}
+function patrolView(){return pt.view=="detail"?ptDetailView():ptListView()}
+const ptTargets=()=>pt.view=="detail"?[ptRoute()]:PT.filter(r=>pt.sel&&pt.sel.has(r.id));
+function ptKml(list){return esc=>`<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>${esc(list.length==1?list[0].name:"Tuần tuyến")}</name>${list.map(r=>{const ps=r.pts.slice().sort((a,b)=>a.n-b.n);const mark=(p,lbl)=>`<Placemark><name>${esc(lbl)}</name><description>${esc(p.name)}</description><Point><coordinates>${p.lon},${p.lat},0</coordinates></Point></Placemark>`;const pick=ps.filter((p,i)=>i==0||i==ps.length-1||/\b(MX|DP)\b/i.test(p.note+" "+p.name));return `<Folder><name>${esc(r.name)}</name>${ps.length>1?`<Placemark><name>${esc(r.name)}</name><LineString><tessellate>1</tessellate><coordinates>${ps.map(p=>p.lon+","+p.lat+",0").join(" ")}</coordinates></LineString></Placemark>`:""}${pick.map(p=>mark(p,"STT "+p.n+" · "+p.name)).join("")}</Folder>`}).join("")}</Document></kml>`}
+function ptXls(list){const rows=[];list.forEach(r=>{r.pts.slice().sort((a,b)=>a.n-b.n).forEach(p=>rows.push(`<tr><td>${p.n}</td><td>${ptEsc(p.name)}</td><td>${p.lat}</td><td>${p.lon}</td><td>${ptEsc(p.note)}</td><td>${p.ev}</td><td>${ptEsc(p.rec)}</td></tr>`))});const head=list.map(r=>`<p><b>BÁO CÁO ${r.type.toUpperCase()}</b> · Team/Đội: ${ptEsc(r.team)} · Tuyến: ${ptEsc(r.name)} · Tổng chiều dài: ${r.km} km</p>`).join("");return new Blob(['<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body>'+head+'<table border="1"><tr><th>STT</th><th>Tên vị trí</th><th>Latitude</th><th>Longitude</th><th>Ghi chú</th><th>Đánh giá</th><th>Kiến nghị / Giải pháp</th></tr>'+rows.join("")+"</table></body></html>"],{type:"application/vnd.ms-excel"})}
+function ptExport(kind){const l=ptTargets().filter(Boolean);if(!l.length){pt.msg="Chưa chọn tuyến để xuất.";ptRef();return}
+ if(l.every(r=>!r.pts.length)){pt.msg="Tuyến chưa có ảnh nên chưa xuất được.";ptRef();return}
+ if(l.length==1)l.length&&0;
+ const base=l.length==1?ptSlug(l[0].name):"tuan-tuyen";
+ if(kind=="xls"||kind=="both")ptDown(ptXls(l),base+".xls");
+ if(kind=="kmz"||kind=="both"){const k=l.filter(r=>r.pts.length);ptDown(buildKmz(base,[],ptKml(k)),base+".kmz")}
+ pt.msg="Đã tạo "+(kind=="both"?"Excel + KMZ":kind=="xls"?"Excel":"KMZ")+" · "+l.length+" tuyến. Chọn nơi lưu hoặc chia sẻ trên Android."+(l.some(r=>!r.pts.length)?" Có tuyến trống nên bị bỏ qua khỏi KMZ.":"");ptRef()}
+document.addEventListener("click",e=>{const g=s=>e.target.closest(s);let x;const r=ptRoute();
+ if(!g("#phone"))return;
+ if(x=g("[data-pttab]")){pt.tab=x.dataset.pttab;pt.msg="";ptRef()}
+ else if(x=g("[data-ptopen]")){const id=+x.dataset.ptopen;if(pt.sel){pt.sel.has(id)?pt.sel.delete(id):pt.sel.add(id);ptRef()}else{pt.id=id;pt.view="detail";pt.openPt=0;pt.form=null;pt.msg="";render()}}
+ else if(x=g("[data-ptmenu]")){const id=+x.dataset.ptmenu;pt.sel=new Set([id]);pt.msg="Chế độ chọn nhiều: chọn tuyến rồi xuất hoặc xóa.";ptRef()}
+ else if(x=g("[data-ptsel]")){const id=+x.dataset.ptsel;pt.sel.has(id)?pt.sel.delete(id):pt.sel.add(id);ptRef()}
+ else if(g("[data-ptall]")){PT.filter(r=>r.type==pt.tab).forEach(r=>pt.sel.add(r.id));ptRef()}
+ else if(g("[data-ptcancel]")){pt.sel=null;pt.msg="";ptRef()}
+ else if(g("[data-ptrecv]")){const n=PT_POOL.shift();if(!n){pt.msg="Không có tuyến mới được giao.";ptRef();return}PT.push({id:Date.now(),...n,done:false,sync:"Đã đồng bộ",team:"Tây Đắk Lắk",pts:[]});pt.tab=n.type;pt.msg="Đã nhận tuyến "+n.name;ptRef()}
+ else if(g("[data-ptdel]")){const l=PT.filter(r=>pt.sel.has(r.id));if(!l.length)return;if(confirm("Xóa "+l.length+" tuyến khỏi điện thoại? Ảnh, thông tin và bản nháp của tuyến trên máy sẽ bị xóa. Việc giao tuyến trên server không bị hủy.")){l.forEach(r=>PT.splice(PT.indexOf(r),1));pt.sel=null;pt.msg="Đã xóa "+l.length+" tuyến khỏi máy."}ptRef()}
+ else if(x=g("[data-ptex]")){ptExport(x.dataset.ptex)}
+ else if(g("[data-ptback]")){pt.view="list";pt.form=null;pt.msg="";render()}
+ else if(x=g("[data-ptpt]")){const n=+x.dataset.ptpt;pt.openPt=pt.openPt==n?0:n;ptRef()}
+ else if(g("[data-ptadd]")){pt.form={kind:"add",n:ptSuggest(r),ev:"OK",gps:null};ptRef();$("#pa2")&&$("#pa2").focus()}
+ else if(g("[data-ptgps]")){pt.form.gps=[12.6671,108.0455];pt.form.keep=[$("#pa1").value,$("#pa2").value,$("#pa3").value];ptRef()}
+ else if(x=g("[data-ptev]")){const f=pt.form;if($("#pa1")){f.keep=[$("#pa1").value,$("#pa2").value,$("#pa3").value]}if($("#pe1"))f.rec=$("#pe1").value;f.ev=x.dataset.ptev;ptRef()}
+ else if(x=g("[data-ptph]")){const f=pt.form;f.rec=$("#pe1").value;f[x.dataset.ptph]=1;f.ev="NOK";ptRef()}
+ else if(g("[data-ptcancelform]")){pt.form=null;pt.msg="Đã giữ bản nháp trên máy.";ptRef()}
+ else if(x=g("[data-ptsave]")){const f=pt.form;
+  if(x.dataset.ptsave=="add"){const n=+$("#pa1").value,nm=$("#pa2").value.trim(),nt=$("#pa3").value.trim().toUpperCase();
+   if(!(n>=1)||!nm||!nt){pt.msg="Cần nhập STT, tên vị trí và ghi chú.";ptRef();return}
+   if(!f.gps){pt.msg="Chưa có GPS. Hãy lấy GPS trước khi lưu, không dùng tọa độ giả.";ptRef();return}
+   r.pts.forEach(p=>{if(p.n>=n)p.n++});r.pts.push({n,name:nm,lat:f.gps[0],lon:f.gps[1],note:nt,ev:f.ev,rec:"",bf:0,af:0});r.done=false;ptTouch(r);
+   pt.openPt=n;pt.form=f.ev=="NOK"?{kind:"edit",n,ev:"NOK",rec:"",bf:0,af:0}:null;pt.msg="Đã lưu trên máy"+(f.ev=="NOK"?". Vị trí NOK: nhập thông tin sửa chữa bên dưới.":".");ptRef()}
+  else{const p=r.pts.find(q=>q.n==f.n);p.ev=f.ev;p.rec=$("#pe1").value.trim();p.bf=f.bf;p.af=f.af;r.done=false;ptTouch(r);pt.form=null;pt.msg="Đã lưu thông tin vị trí "+p.n;ptRef()}}
+ else if(x=g("[data-ptedit]")){const p=r.pts.find(q=>q.n==+x.dataset.ptedit);pt.form={kind:"edit",n:p.n,ev:p.ev,rec:p.rec,bf:p.bf,af:p.af};ptRef()}
+ else if(x=g("[data-ptstt]")){const p=r.pts.find(q=>q.n==+x.dataset.ptstt);const v=parseInt(prompt("STT mới cho "+p.name,p.n),10);if(!(v>=1)||v==p.n)return;const o=p.n;r.pts.forEach(q=>{if(q===p)return;if(o<v&&q.n>o&&q.n<=v)q.n--;else if(o>v&&q.n>=v&&q.n<o)q.n++});p.n=v;r.done=false;ptTouch(r);pt.openPt=v;pt.msg="Đã đổi STT "+o+" → "+v+". Chữ trên ảnh và thông tin vị trí được cập nhật theo.";ptRef()}
+ else if(x=g("[data-ptrm]")){const n=+x.dataset.ptrm;if(confirm("Xóa vị trí "+n+" cùng ảnh và thông tin sửa chữa?")){r.pts.splice(r.pts.findIndex(q=>q.n==n),1);r.done=false;ptTouch(r);pt.openPt=0;pt.msg="Đã xóa vị trí "+n+". Tuyến được mở lại."}ptRef()}
+ else if(g("[data-ptsave1]")){pt.msg="Đã tải ảnh xuống thư viện điện thoại (minh họa).";ptRef()}
+ else if(g("[data-ptlib]")){pt.msg="Thư viện server chỉ nhận ảnh có GPS hợp lệ khác 0/0. Chưa có ảnh phù hợp trong dữ liệu minh họa.";ptRef()}
+ else if(g("[data-ptdate]")){const v=prompt("Ngày áp dụng cho toàn tuyến (dd/mm/yyyy), để trống để ẩn ngày","");if(v===null)return;pt.msg=v?"Đã đổi ngày toàn tuyến sang "+v+" (minh họa).":"Đã ẩn ngày trên ảnh của toàn tuyến (minh họa).";ptTouch(r);ptRef()}
+ else if(g("[data-ptmove]")){const o=PT.filter(q=>q!==r&&q.type==r.type);pt.msg=o.length?"Chọn ảnh rồi chuyển sang tuyến khác. STT được cấp tiếp sau STT lớn nhất của tuyến đích (minh họa).":"Chưa có tuyến khác đã nhận để chuyển ảnh tới.";ptRef()}
+ else if(g("[data-ptsync]")){if(r.pts.length&&!pt.form){r.sync="Đã đồng bộ";pt.msg="Đã đồng bộ (minh họa)."}else pt.msg=pt.form?"Còn bản nháp. Hãy lưu hoặc xóa bản nháp trước khi đồng bộ.":"Tuyến chưa có ảnh để đồng bộ.";ptRef()}
+ else if(g("[data-ptdone]")){if(r.done){r.done=false;ptTouch(r);pt.msg="Đã mở lại tuyến."}else if(!r.pts.length){pt.msg="Cần ít nhất một ảnh đã lưu."}else if(pt.form){pt.msg="Còn bản nháp. Hãy lưu hoặc xóa bản nháp trước."}else{r.done=true;ptTouch(r);pt.msg="Đã hoàn thành. Dữ liệu đang chờ gửi lên server."}ptRef()}
+});
+const GRP=[["hien","Hiện trường sự cố"],["dau","Đầu số cáp"],["mx","Măng xông (MX)"],["vt","Vật tư"],["kq","Kết quả đo kiểm"]];
+const photos={hien:[1,2,3],dau:[1],mx:[1,2],vt:[],kq:[1],tr:[1,2],sau:[1],tc:[1,2]};const RGRP=[["tr","Trước di dời"],["sau","Sau hoàn thành"],["vt","Vật tư"],["mx","Măng xông (MX)"],["dau","Đầu số cáp"],["tc","Hình ảnh thi công"],["kq","Kết quả đo kiểm"]];
+const MXBOX=`<div class="mx"><span class="chip ok">✓ Đã đọc tọa độ</span></div><p style="margin:6px 0 0">Tọa độ MX: <b>12.700480, 108.326998</b></p><div class="mx"><span class="chip info">◌ Đang đọc ảnh…</span></div><div class="mx"><span class="chip bad">✕ Chưa đọc được</span><button class="btn s">Đọc lại</button></div><p class="mute" style="margin:6px 0 0">Không tự điền tọa độ khi chưa đọc được; bạn có thể nhập tay.</p>`;
+const grp=([k,t],open)=>`<details class="grp" id="g-${k}"${open??(k==="hien"||k==="mx")?" open":""}><summary><span class="t">${t}</span><span class="chip info">${photos[k].length} ảnh</span></summary>${photos[k].length?`<div class="ph">${photos[k].map((n,i)=>`<div>${k==="mx"?"MX ":""}${n}${pendDel===k+":"+i?`<span class="cf" style="position:absolute;left:0;top:0;right:0;bottom:0;box-sizing:border-box;border-radius:10px;background:var(--surf);border:1.5px solid var(--bad);display:flex;flex-direction:column;justify-content:center;gap:4px;padding:6px;text-align:center;color:var(--ink);font-size:12px"><b>Xóa ảnh?</b><button class="btn d s" style="width:100%;min-height:34px;padding:0;font-size:13px" data-delok="${k}:${i}">Xóa</button><button class="btn s" style="width:100%;min-height:34px;padding:0;font-size:13px" data-delno="${k}">Giữ</button></span>`:`<button class="x" data-del="${k}:${i}" aria-label="Xóa ảnh ${n}">✕</button>`}</div>`).join("")}</div>`:`<p class="mute" style="padding:0 14px">Chưa có ảnh.</p>`}<div style="padding:0 14px 14px">${k==="mx"?MXBOX:""}<div class="row"><button class="btn" data-shot="${k}">📷 Chụp</button><button class="btn" data-shot="${k}">🖼 Chọn ảnh</button></div></div></details>`;
+const matRows=()=>mats.length?mats.map(([n,q,u,o,t],i)=>`<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="row" style="align-items:center;margin:0"><div style="flex:3"><b>${n}</b>${o?`<br><span class="mute">${o}</span>`:""}</div><div style="flex:1">${q} ${u}</div><button class="btn s" data-ed="${i}" aria-label="Sửa ${n}">Sửa</button><button class="btn d s" data-rm="${i}" aria-label="Bỏ ${n}">✕</button></div>${n==="Măng xông"?`<label for="ty${i}" style="margin:6px 0 4px">Chủng loại</label><select id="ty${i}" data-ty="${i}"><option value="">Chưa chọn</option>${CAP.map(c=>`<option${c===t?" selected":""}>${c}</option>`).join("")}</select>${t?"":`<span class="chip warn" style="margin-top:6px">⚠ Chưa chọn chủng loại · điền sau cũng được</span>`}`:""}</div>`).join(""):`<p class="mute">Chưa có vật tư. Bấm “Thêm vật tư”.</p>`;
+const V={
+login:()=>`<div style="text-align:center;margin:18px 0"><div style="width:132px;height:132px;margin:0 auto 6px;border-radius:32px;background:#071426;display:grid;place-items:center;box-shadow:var(--lift),0 0 0 1px var(--line)"><img src="logo.svg" alt="HP Hà Phong telecom" style="width:108px;height:108px"></div><h2 style="margin:6px 0">HP Telecom</h2><span class="stg">Môi trường Staging</span></div>
+<label for="u">Tên đăng nhập</label><input id="u" autocomplete="username" value="ky.thuat.minh.hoa"><label for="p">Mật khẩu</label><input id="p" type="password" value="••••••••">
+<label style="display:flex;gap:10px;align-items:center;font-weight:600;min-height:48px"><input type="checkbox" style="width:24px;min-height:24px" checked> Nhớ đăng nhập</label>
+<button class="btn p" data-go="home">Đăng nhập</button><div style="height:10px"></div><button class="btn" data-go="register">Tạo tài khoản</button>
+<p class="mute" style="text-align:center;margin-top:16px">Offline chỉ dùng được khi có phiên hợp lệ đã lưu.</p>`,
+register:()=>`<label for="n">Họ tên</label><input id="n" value="Nguyễn Văn A"><label for="un">Tên đăng nhập</label><input id="un"><span class="chip bad" style="margin-top:6px">✕ Tên đăng nhập đã tồn tại</span>
+<label for="em">Email</label><input id="em" type="email"><label for="ph">Điện thoại</label><input id="ph" type="tel"><label for="pw">Mật khẩu</label><input id="pw" type="password">
+<p class="mute">Sau đăng ký, quản trị viên cần duyệt. Bạn không phải chọn tỉnh hoặc đội cố định.</p><button class="btn p" data-go="pending">Gửi đăng ký</button>`,
+pending:()=>sv("⏳","Chờ quản trị duyệt","Yêu cầu đã gửi. Trạng thái <b>Bị từ chối</b> hoặc <b>Tài khoản bị khóa</b> cũng hiện tại đây bằng chữ.")+`<button class="btn" data-go="login">Quay lại đăng nhập</button>`,
+home:()=>`<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div style="width:48px;height:48px;border-radius:14px;background:#071426;display:grid;place-items:center;box-shadow:0 0 0 1px var(--line)"><img src="logo.svg" alt="HP Telecom" style="width:40px;height:40px"></div><div style="flex:1;min-width:0"><div style="font-weight:750;font-size:16px">Xin chào, Minh</div><div class="mute">Kỹ thuật viên · Đắk Lắk</div></div><span class="chip warn">● 2 chờ gửi</span></div>
+<div class="card" data-go="inc3" role="button" tabindex="0" style="cursor:pointer"><div class="mute" style="font-weight:700">VIỆC ĐANG LÀM</div><div style="font-size:17px;font-weight:750;margin:4px 0 2px">DLKP32-DLKP22</div><div class="mute">Trần Hưng Đạo - Krông Pắk · bước 3/4</div><div style="height:6px;border-radius:3px;background:var(--line);margin:12px 0 10px"><div style="width:75%;height:100%;border-radius:3px;background:var(--acc)"></div></div><button class="btn p" data-go="inc3">Tiếp tục</button></div>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:14px">${[["inc1","⚡","Sự cố"],["patrol","🧭","Tuần tuyến"],["rel1","🏗","Di dời"],["camera","📷","Camera"],["teams","👥","Team"]].map(([g,i,n])=>`<button data-go="${g}" style="display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;color:var(--ink);font:600 12px system-ui;cursor:pointer;min-height:72px"><span style="width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:20px;background:var(--surf2);border:1px solid var(--line)">${i}</span>${n}</button>`).join("")}</div>
+<div class="mute" style="font-weight:700;margin:0 2px 8px">GẦN ĐÂY</div>
+${[["DLEH70-DLEH08","Ea Khăl","warn"],["DLKN02-DLKN27","Cư Ê Wi","info"],["DLKP11-DLKP12","Krông Pắk","ok"]].map(([c,l,k])=>`<div class="card" data-go="inc1" role="button" tabindex="0" style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px"><span class="chip ${k}" style="padding:0;width:10px;height:10px;border-radius:50%;background:currentColor"></span><div style="flex:1;min-width:0"><b style="font-size:14px">${c}</b><div class="mute">${l}</div></div><span class="mute">›</span></div>`).join("")}`,
+work:()=>`<div class="seg" role="group" aria-label="Loại công việc"><button aria-pressed="true">Sự cố</button><button aria-pressed="false">Tuần tuyến</button><button aria-pressed="false" data-go="rel1">Di dời</button></div>
+<div class="row"><div><label style="margin-top:0" for="m">Tháng</label><input id="m" type="month" value="2026-10"></div><div><label style="margin-top:0" for="t">Nhóm</label><select id="t"><option>Tất cả nhóm</option><option>Đắk Lắk</option><option>Cá nhân</option></select></div></div>
+${[["DLKP32-DLKP22","Trần Hưng Đạo - Krông Pắk","ok","Đã đồng bộ"],["DLEH70-DLEH08","Ea Khăl","warn","Chờ đồng bộ"],["DLKN02-DLKN27","Cư Ê Wi","info","Bản nháp · 3/4"]].map(([c,l,k,s])=>`<div class="card" data-go="inc1" role="button" tabindex="0" style="padding:10px 12px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:14px">${c}</b><span class="chip ${k}">${k=="ok"?"✓":k=="warn"?"●":"✎"} ${s}</span></div><div class="mute" style="margin-top:2px">${l}</div><div class="mute">Đắk Lắk · 02/10/2026 · 2 người cùng làm</div></div>`).join("")}
+<button class="fab" data-go="inc1" aria-label="Thêm sự cố">＋</button>`,
+inc1:()=>steps(1)+`<label for="a">Tuyến / tên báo cáo</label><input id="a" value="DLKP32-DLKP22">
+<label for="b">Địa điểm</label><div class="row" style="margin:0"><input id="b" value="Trần Hưng Đạo - Krông Pắk" style="flex:3"><button class="btn" style="flex:1" aria-label="Lấy GPS">📍</button></div>
+<span class="chip warn" style="margin-top:8px">⚠ GPS yếu · sai số 38 m</span>
+<label for="rd">Ngày lập báo cáo</label><input id="rd" type="date" value="2026-10-02">
+<div class="card" style="margin-top:14px"><h4>Thời gian xử lý</h4>
+<div class="row"><div><label for="sd">Ngày bắt đầu</label><input id="sd" type="date" value="2026-10-02"></div><div><label for="st">Giờ bắt đầu</label><input id="st" type="time" value="14:29"></div></div>
+<div class="row"><div><label for="ed">Ngày kết thúc</label><input id="ed" type="date" value="2026-10-02"></div><div><label for="et">Giờ kết thúc</label><input id="et" type="time" value="16:09"></div></div>
+<p class="mute" style="margin:8px 0 0">Thời gian xử lý: <b>100 phút</b> (kết thúc − bắt đầu, tự tính)</p>
+<span class="chip bad" style="margin-top:8px">✕ Mẫu lỗi: kết thúc phải sau bắt đầu</span></div>
+<label for="c">Nguyên nhân</label><select id="c"><option>Chọn nguyên nhân…</option><option>Cháy trụ điện</option><option>Đứt MX</option><option>Đứt ODF</option><option>Xe mang</option><option>Chặt trúng cáp</option><option>Khác…</option></select><input id="c2" placeholder="Nhập nguyên nhân khác" style="display:none;margin-top:8px"><label for="d">Phương án xử lý</label><textarea id="d">Kéo phủ, hàn lại 2 măng xông</textarea>
+<button class="btn" style="margin-top:12px" data-go="collab">👥 Người cùng làm (2)</button>${act("work","inc2")}`,
+collab:()=>`<p class="mute">Chọn người được cùng sửa báo cáo này.</p>${[["Trần B","Điều phối viên",1],["Lê C","Kỹ thuật viên",1],["Phạm D","Kỹ thuật viên · bị thu hồi quyền",0]].map(([n,r,c])=>`<label style="display:flex;gap:12px;align-items:center;min-height:56px;font-weight:600;margin:0;border-bottom:1px solid var(--line)"><input type="checkbox" style="width:24px;min-height:24px" ${c?"checked":""}><span>${n}<br><span class="mute">${r}</span></span></label>`).join("")}<div class="row"><button class="btn" data-go="inc1">Hủy</button><button class="btn p" data-go="inc1">Lưu</button></div>`,
+inc2:()=>steps(2)+`<div class="card"><h4>Cáp thu hồi / kéo lại</h4><div class="row"><div><label for="x1">Số mét</label><input id="x1" value="20"></div><div><label for="x2">Chủng loại</label><select id="x2"><option>Chưa chọn</option>${CAP.map(c=>`<option>${c}</option>`).join("")}</select></div></div></div>
+<div class="card"><h4>Cáp kéo mới</h4><div class="row"><div><label for="y1">Đầu số 1</label><input id="y1" value="1200"></div><div><label for="y2">Đầu số 2</label><input id="y2" value="1275"></div></div><p class="mute" style="margin:8px 0 0">Số mét tính ra: <b>75 m</b></p><div class="row" style="margin-top:8px"><div><label for="y3">Chủng loại</label><select id="y3"><option>Chưa chọn</option>${CAP.map(c=>`<option>${c}</option>`).join("")}</select></div><div><label for="kv0">Khoảng vượt (KV)</label><select id="kv0"><option>KV100</option><option>KV200</option><option>KV300</option><option>KV500</option></select></div></div></div>
+<div class="card"><h4>Vật tư</h4><div id="mat-list">${matRows()}</div>
+<div id="mat-form" hidden style="border-top:1px solid var(--line);margin-top:10px;padding-top:4px"><div id="mat-pick"><p style="font-weight:700;margin:8px 0">Bạn chọn vật tư gì?</p><select id="mp"><option value="">Chưa chọn</option>${["Măng xông","Néo","Treo","Kẹp","Ty","Gông dự phòng","Biển báo"].map(n=>`<option>${n}</option>`).join("")}<option value="__other">Vật tư khác…</option></select><button class="btn" id="mat-cancel" style="margin-top:8px">Hủy</button></div>
+<div id="mat-detail" hidden><p style="margin:8px 0"><b id="mat-name"></b> · <button class="btn s" id="mat-back" style="display:inline-flex;min-height:36px">Chọn lại</button></p><select id="mn" hidden><option>Măng xông</option><option>Néo</option><option>Treo</option><option>Kẹp</option><option>Ty</option><option>Gông dự phòng</option><option>Biển báo</option><option value="__other">Vật tư khác…</option></select>
+<div id="mo-wrap" hidden><label for="mx">Tên vật tư khác</label><input id="mx" maxlength="80" placeholder="Nhập tên vật tư"><span class="chip bad" id="mx-err" hidden style="margin-top:8px">✕ Hãy nhập tên vật tư</span></div>
+<div class="row"><div><label for="mq">Số lượng</label><input id="mq" type="number" min="1" value="1" inputmode="numeric"></div><div><label for="mu">Đơn vị</label><select id="mu"><option>bộ</option><option>bộ 2 hướng</option><option>cái</option><option>m</option></select></div></div>
+<label for="mo">Ghi chú</label><input id="mo"><span class="chip bad" id="mat-err" hidden style="margin-top:8px">✕ Số lượng phải lớn hơn 0</span>
+<div class="row"><button class="btn" id="mat-cancel2">Hủy</button><button class="btn p" id="mat-save">Thêm</button></div></div></div>
+<button class="btn" id="mat-add" style="margin-top:6px">＋ Thêm vật tư</button></div>${act("inc1","inc3")}`,
+inc3:()=>steps(3)+GRP.map(g=>grp(g)).join("")+`${act("inc2","inc4")}`,
+inc4:()=>steps(4)+`<div class="card"><h4>DLKP32-DLKP22</h4><div class="mute">Trần Hưng Đạo - Krông Pắk</div><div class="mute">Lập 02/10/2026 · 02/10 14:29 → 02/10 16:09 · 100 phút</div><div class="mute">Cáp mới 75 m · KV100 (Cáp · Néo · Treo) · Măng xông 2 · Ảnh 7</div></div>
+<div class="card" style="border-color:var(--warn)"><span class="chip warn">⚠ Còn thiếu</span><ul style="margin:8px 0 0;padding-left:20px"><li>Nhóm “Vật tư” chưa có ảnh</li><li>MX 2 chưa có tọa độ</li></ul></div>
+<span class="chip warn">● Đã lưu trên máy · chưa gửi</span><div class="card"><h4>Các điểm chụp · hiện điểm MX</h4>${CAPPTS.map((p,i,a)=>{const ok=!!p.lat,mx=/MX/.test(p.name),pos=ok?(i==0?"Điểm đầu":a.filter(q=>q.lat).slice(-1)[0]===p?"Điểm cuối":mx?"Điểm MX":"Điểm chụp"):"Bỏ qua";return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)"><div><b>${p.n}. ${p.name}</b><div class="mute">${ok?p.lat+", "+p.lon:"Chưa có tọa độ"}</div></div><span class="chip ${ok?(mx?"info":"ok"):"bad"}">${ok?"✓ "+pos:"✕ Bỏ qua"}</span></div>`}).join("")}<button class="btn" id="kmz" style="margin-top:8px">🌍 Xuất KMZ vẽ tuyến · hiện điểm MX (${CAPPTS.filter(p=>p.lat).length} điểm)</button><div class="mute" id="kmzmsg" style="margin-top:6px">Vẽ đường nối các điểm chụp có tọa độ như Tuần tuyến; đánh dấu điểm đầu, điểm cuối và điểm MX.</div></div
+<div class="row"><button class="btn">⬇ Xuất Excel</button><button class="btn p" data-go="work">Hoàn thành</button></div><button class="btn" data-go="inc3">Quay lại sửa</button>`,
+rel1:()=>rsteps(1)+`<label for="r1">Tuyến / tên báo cáo</label><input id="r1" value="DLBT09-DLBT12 di dời">
+<div class="seg" style="margin-top:10px"><button aria-pressed="false">Tự nhập địa điểm</button><button aria-pressed="true">Lấy theo định vị</button></div>
+<label for="r2">Địa điểm di dời</label><div class="row" style="margin:0"><input id="r2" value="12.667100, 108.045500" style="flex:3"><button class="btn" style="flex:1" aria-label="Lấy GPS">📍</button></div><span class="chip ok" style="margin-top:8px">✓ Sai số 12 m · có thể sửa tay</span>
+<label for="r3">Người lập báo cáo</label><input id="r3" value="Minh" readonly>
+<label for="r4">Ngày thực hiện</label><div class="row" style="margin:0"><input id="r4" type="date" value="2026-10-12" style="flex:3"><button class="btn" style="flex:1">Hôm nay</button></div>
+<label for="r5">Nguyên nhân di dời</label><select id="r5"><option>Điện lực yêu cầu</option><option>Dân yêu cầu di dời</option><option>Khác…</option></select>
+<label for="r6">Nội dung di dời</label><textarea id="r6">Di dời cột 14 theo yêu cầu điện lực</textarea>
+<div class="card" style="margin-top:12px"><h4>Người cùng làm</h4><div class="mute">Danh sách do server cho phép</div><div class="row" style="margin-top:8px"><span class="chip info">Hưng</span><span class="chip info">Lan</span></div><button class="btn s" data-go="collab" style="margin-top:8px">Chọn người cùng làm</button></div>
+${act("work","rel2")}`,
+rel2:()=>rsteps(2)+`<div class="card"><h4>Loại cáp</h4><div class="row"><div><label for="q1">Chủng loại</label><select id="q1">${CAP.map(c=>`<option${c==="12FO"?" selected":""}>${c}</option>`).join("")}</select></div><div><label for="q2">Khoảng vượt</label><select id="q2"><option>KV100</option><option>KV200</option><option>KV300</option><option>KV500</option></select></div></div><p class="mute" style="margin:8px 0 0">Dùng chung cho cáp thu hồi và cáp mới.</p></div>
+<div class="card"><label style="display:flex;gap:10px;align-items:center;font-weight:700;margin:0;min-height:48px"><input type="checkbox" style="width:24px;min-height:24px" checked> Có thu hồi, kéo lại cáp</label><label for="q3">Số mét thu hồi</label><input id="q3" inputmode="decimal" value="50"></div>
+<div class="card"><label style="display:flex;gap:10px;align-items:center;font-weight:700;margin:0;min-height:48px"><input type="checkbox" style="width:24px;min-height:24px" checked> Có kéo cáp mới</label><div class="row"><div><label for="q4">Đầu số cáp mới 1</label><input id="q4" inputmode="decimal" value="3067"></div><div><label for="q5">Đầu số cáp mới 2</label><input id="q5" inputmode="decimal" value="2917"></div></div><p class="mute" style="margin:8px 0 0">Số mét cáp mới: <b>150 m</b> (|3067 − 2917|)</p></div>
+<div class="card"><h4>Vật tư</h4>${matRows()}<button class="btn" style="margin-top:6px" data-go="rel2">＋ Thêm vật tư</button><p class="mute" style="margin:8px 0 0">Loại có sẵn: Măng xông, Néo, Treo, Ty, Kẹp, Gông dự phòng, D12, Đai Inox, Biển báo, Vật tư khác.</p></div>
+${act("rel1","rel3")}`,
+rel3:()=>rsteps(3)+RGRP.map(g=>grp(g,g[0]==="mx")).join("")+`<div class="card" style="margin-top:10px"><span class="chip warn">⚠ Còn thiếu</span><ul style="margin:8px 0 0;padding-left:20px"><li>Nhóm “Vật tư” chưa có ảnh</li></ul></div><span class="chip warn" style="margin-top:8px">● Đã lưu trên máy · chưa gửi</span><div id="rxlv"></div><div class="row" style="margin-top:8px"><button class="btn" id="rxl">⬇ Xuất Excel</button><button class="btn p" data-go="work">Hoàn thành</button></div><button class="btn" data-go="rel2">Quay lại sửa</button>`,
+patrol:()=>patrolView(),
+camera:()=>`<div id="cv" style="aspect-ratio:3/4;border-radius:16px;background:linear-gradient(160deg,#1b2a3d,#05080d);position:relative;color:#fff;overflow:hidden;cursor:crosshair">
+<div id="cfx" style="position:absolute;inset:0;transition:filter .2s"></div>
+<div style="position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;padding:8px;z-index:2"><button class="btn s" style="width:44px" data-go="home" aria-label="Quay về màn hình trước">‹</button><button class="btn s" style="width:44px" id="cfl" aria-pressed="false" aria-label="Bật đèn camera">⚡</button><button class="btn s" style="width:44px" id="csw" aria-label="Đổi camera trước / sau">⟲</button><button class="btn s" style="width:44px" id="cop" aria-label="Tùy chọn chụp ảnh">⚙</button></div>
+<div id="cst" style="position:absolute;left:10px;top:60px;font-size:12px;line-height:1.5;text-shadow:0 1px 2px #000;color:#fff"></div>
+<div id="cfocus" style="position:absolute;width:56px;height:56px;border:2px solid #4cdce9;border-radius:50%;display:none;transform:translate(-50%,-50%)"></div>
+<span id="crec" class="chip" style="position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#c0262d;display:none;z-index:2">● 0:00 / 2:00</span><span id="cfacing" class="chip" style="position:absolute;right:10px;top:60px;background:#000a">Camera sau</span>
+<button class="btn s" id="czm" style="position:absolute;right:10px;bottom:46px;width:auto;padding:0 12px;border-radius:20px" aria-label="Đổi mức phóng to camera">1.0×</button>
+<div id="chint" style="position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:12px;text-shadow:0 1px 2px #000">Chạm ảnh để lấy nét, chỉnh sáng ☀ / ☾</div></div>
+<div id="copt" class="card" style="display:none;margin-top:10px"><b>Tùy chọn chụp ảnh</b><div class="row" style="margin-top:8px"><button class="btn s" id="cgps">Lấy lại GPS</button><button class="btn s" id="cdate">☑ Hiện ngày tháng</button><button class="btn s" id="ccol">Màu chữ: Trắng</button></div></div>
+<label for="czr">Phóng to / thu nhỏ</label><input id="czr" type="range" min="10" max="30" value="10" aria-label="Phóng to / thu nhỏ camera">
+<label id="cbl" style="display:none">Độ sáng: +0.0 EV</label><input id="cbr" type="range" min="-20" max="20" value="0" style="display:none" aria-hidden="true" tabindex="-1">
+
+<div id="cform" class="card" style="display:none;margin-top:10px"><b>Thông tin vị trí</b><label for="cpos">Tên vị trí</label><input id="cpos" value="Cột 14 Km42" maxlength="120"><label for="cmemo">Ghi chú / Mô tả</label><input id="cmemo" placeholder="Chạm để nhập ghi chú…"><div class="row" style="margin-top:8px"><button class="btn s" id="cfc">Hủy</button><button class="btn p s" id="cfs">Lưu</button></div></div>
+<div class="card" style="margin-top:10px;text-align:center;background:#daf3fc;color:#0b1d29;font-weight:800">Tự lưu Thư viện &amp; Server</div>
+<div class="row" style="margin-top:10px;align-items:center;text-align:center"><div><button class="btn" data-go="library" aria-label="Thư viện">🖼</button><div class="mute" id="clib">Thư viện</div></div><div><button class="btn p" id="csh" style="border-radius:50%;width:76px;height:76px;margin:0 auto" aria-label="Chụp ảnh">⬤</button></div><div><button class="btn" id="ctp" aria-label="Mẫu dấu">▤</button><div class="mute">Mẫu dấu</div></div></div>
+<div id="cask" class="card" style="display:none;margin-top:10px"><span id="cask1"></span><div class="row" style="margin-top:8px"><button class="btn s" id="cwait">Chờ thêm</button><button class="btn p s" id="cgo">Vẫn chụp</button></div></div>
+<p class="mute" id="cstat" style="text-align:center" role="status">Ảnh lưu theo tài khoản đang đăng nhập</p>
+<div class="row" style="justify-content:center;margin-top:6px"><button class="btn s" id="cmp" aria-pressed="true">Ảnh ●</button><button class="btn s" id="cmv" aria-pressed="false">Video</button></div>`,
+library:()=>`<div class="seg" id="libtabs"><button aria-pressed="true" data-lt="a">Ảnh</button><button aria-pressed="false" data-lt="v">Video</button><button aria-pressed="false" data-lt="t">Thùng rác</button></div><div id="libx"></div><div id="liba">
+<div class="row"><div><label style="margin-top:0" for="lm">Tháng</label><input id="lm" type="month" value="2026-10"></div><div><label style="margin-top:0" for="lt">Nhóm</label><select id="lt"><option>Tất cả nhóm</option><option>Đắk Lắk</option><option>Cá nhân</option></select></div></div>
+${[["📁 Sự cố",12,"Mất tín hiệu Cư Jút, Km42"],["📁 Di dời",9,"Điện lực yêu cầu, Buôn Ma Thuột"],["📁 Tuần tuyến",24,"Tuyến MX Đắk Lắk"],["📁 Camera",6,"Ảnh chụp nhanh"],["📁 Chưa phân loại",3,"Chưa gán thư mục"]].map(([n,c,d],i)=>{const gone=(window.LD=window.LD||{})[n]||[];return `<details class="grp"${i==0?" open":""}><summary><span class="t">${n}</span><span class="chip info">${c-gone.length}</span></summary><div style="padding:0 14px 14px"><div class="mute" style="margin-bottom:8px">${d}</div><div class="ph">${[1,2,3].filter(k=>!gone.includes(k)).map(k=>`<div style="position:relative">Ảnh ${k}<button data-pd="${n}|${k}" aria-label="Xóa ảnh ${k}" style="position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(217,83,79,.92);color:#fff;font-size:13px;cursor:pointer">✕</button></div>`).join("")||`<span class="mute">Không còn ảnh</span>`}</div></div></details>`}).join("")}
+</div><p class="mute">Chỉ người chụp hoặc quản trị được sửa, xóa ảnh.</p>`,
+teams:()=>`${[["Đắk Lắk","Chủ nhóm · 8 thành viên"],["Krông Pắk","Thành viên · 5 thành viên"]].map(([n,d])=>`<div class="card" data-go="team" role="button" tabindex="0" style="cursor:pointer"><b>${n}</b><div class="mute">${d}</div></div>`).join("")}<button class="btn p" data-go="teamNew">＋ Tạo nhóm</button>`,
+teamNew:()=>`<label for="tn">Tên nhóm</label><input id="tn" placeholder="Ví dụ: Đắk Lắk"><p class="mute">Tên nhóm giữ đúng như bạn nhập. Người tạo nhóm là Chủ nhóm.</p><div class="row"><button class="btn" data-go="teams">Hủy</button><button class="btn p" data-go="teams">Tạo nhóm</button></div>`,
+team:()=>`<div class="card"><h4>Đắk Lắk</h4><div class="mute">Tổ chức · mã nhóm daklak · 8 thành viên</div></div>
+<details class="grp" open><summary><span class="t">Thành viên</span><span class="chip info">8</span></summary><div style="padding:0 14px 14px"><input id="tq" style="padding:6px 10px;min-height:0;margin-bottom:4px" type="search" placeholder="Tìm thành viên" aria-label="Tìm thành viên"><div id="tmem"></div><button class="btn p" id="tadd" style="margin-top:6px;padding:8px;min-height:0">＋ Thêm người</button><div id="tact" style="margin-top:10px"></div></div></details>
+<div class="row" style="gap:8px"><button class="btn p" data-go="chat" style="flex:2">💬 Chat nhóm</button><button class="btn s" id="tleave" style="flex:1;color:#d9534f">Rời nhóm</button></div><div id="tmsg" class="mute" role="status" style="margin-top:8px"></div><p class="mute">Nút quản lý chỉ hiện theo quyền server trả về; Điều phối viên không mặc định là Chủ nhóm.</p>`,
+chat:()=>`<div class="mute" style="text-align:center;margin-bottom:6px">Nhóm Đắk Lắk · tự cập nhật 5 giây · chạm tin của mình để thu hồi</div>
+<div id="cm" style="display:flex;flex-direction:column;gap:8px;min-height:300px;max-height:250px;overflow:auto">${chatRows()}</div>
+<style>#cmenu .btn{flex:1;min-width:0;white-space:nowrap;padding:8px 4px;font-size:14px}</style>
+<div id="cmenu" style="display:none;gap:8px;margin-top:8px"><button class="btn s" data-att="img"><span style="color:#2e9e5b">${IC.img}</span> Ảnh</button><button class="btn s" data-att="vid"><span style="color:#d9534f">${IC.vid}</span> Video</button><button class="btn s" data-att="doc" style="white-space:nowrap;padding:8px 6px"><span style="color:#1f6feb">${IC.doc}</span> Tệp</button><button class="btn s" id="csk" style="white-space:nowrap;padding:8px 6px"><span style="color:#f0a020">${IC.smile}</span> Sticker</button></div>
+<div id="cstk" style="display:none;margin-top:8px;padding:8px;border-radius:12px;background:var(--surf2);border:1px solid var(--line)"><div style="font-weight:700;font-size:13px;margin-bottom:6px">Sticker của tôi</div><div id="cgt" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;max-height:150px;overflow:auto">${stkGrid()}</div><input type="file" id="cfile" accept="image/*" multiple hidden></div>
+<div class="row" style="margin-top:8px;align-items:center"><button class="btn s" id="cp" aria-label="Đính kèm" style="flex:1;color:#1f6feb">${IC.clip}</button><input id="ci" placeholder="Nhập tin nhắn…" style="flex:4"><button class="btn p" id="cs" aria-label="Gửi" style="flex:1.2">${IC.send}</button></div>`,
+account:()=>`<div class="card"><h4>Nguyễn Minh</h4><div class="mute">Kỹ thuật viên · Staging · v4.1.4-stg</div></div>
+<div class="card"><span class="chip warn">● Chờ đồng bộ · 2 báo cáo, 5 ảnh</span><p class="mute">Lần đồng bộ gần nhất: 07:12</p><button class="btn p">Đồng bộ ngay</button></div>
+<button class="btn d" data-go="login">Đăng xuất</button>`
+};
+let chatMsgs=[["Trần B","Tuyến Buôn Ma Thuột đã có cáp mới chưa?","07:40",0],["Minh","Đã kéo xong 300m, đang đo kiểm.","07:42",1],["Lê C","Mình đang ở hiện trường, chụp ảnh măng xông gửi sau.","07:45",0,["img"]]];
+const E=(x,y)=>`<ellipse cx="${x}" cy="${y}" rx="5" ry="6.5" fill="#111"/><circle cx="${x+1.5}" cy="${y-2}" r="1.8" fill="#fff"/>`;
+const BL='<path d="M16 46l3-3M20 47l3-3M60 46l3-3M64 47l3-3" stroke="#e5484d" stroke-width="2" stroke-linecap="round"/>';
+const TRT=[
+["",E(30,36)+E(50,36)+'<path d="M26 52q14 14 28 0z" fill="#fff" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/><path d="M33 53v6M40 54v7M47 53v6" stroke="#111" stroke-width="2"/>'],
+["nhất bạn rồi",E(30,36)+E(50,36)+'<path d="M32 52q8 7 16 0" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>'+BL],
+["ủa gì zợ ?",'<circle cx="30" cy="36" r="9" fill="#fff" stroke="#111" stroke-width="2.5"/><circle cx="52" cy="36" r="9" fill="#fff" stroke="#111" stroke-width="2.5"/><circle cx="32" cy="37" r="3.5" fill="#111"/><circle cx="54" cy="37" r="3.5" fill="#111"/><ellipse cx="41" cy="58" rx="4" ry="5" fill="none" stroke="#111" stroke-width="2.5"/>'],
+["adou",'<path d="M20 28l16 6M60 28l-16 6" stroke="#111" stroke-width="3" stroke-linecap="round"/>'+E(30,40)+E(50,40)+'<path d="M32 58q8-6 16 0" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>'],
+["toang",E(30,34)+E(50,34)+'<path d="M26 40v18M54 40v18" stroke="#3aa0ff" stroke-width="4" stroke-linecap="round"/><path d="M32 60q8-6 16 0" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>'],
+["khum bít",'<path d="M22 32q8-5 16 0M44 32q8-5 16 0" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>'+E(30,40)+E(52,40)+'<path d="M34 58h14" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>'],
+["nai xừ",'<path d="M22 36h16M44 36h16" stroke="#111" stroke-width="4" stroke-linecap="round"/><path d="M32 52q9 8 18 0" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round"/><path d="M68 14l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#ffd23f"/>'],
+["haha",'<path d="M22 36q8-8 16 0M44 36q8-8 16 0" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round"/><path d="M26 48q15 18 30 0z" fill="#fff" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/>'+BL]];
+const trt=(i,sz=64)=>`<div style="text-align:center;width:${sz+16}px"><div style="color:#e5484d;font:700 ${sz>70?13:10}px/1.1 sans-serif;min-height:${sz>70?15:11}px">${TRT[i][0]}</div><svg width="${sz}" height="${sz}" viewBox="0 0 82 82" style="pointer-events:none"><circle cx="41" cy="41" r="36" fill="#fff" stroke="#111" stroke-width="3"/>${TRT[i][1]}</svg></div>`;
+const bub=(a,me)=>a&&(a[0]=="stk"||a[0]=="usr")?`line-height:1.1;background:none;border:0;padding:0;color:inherit`:`padding:8px 12px;background:${me?"linear-gradient(135deg,#27d3f2,#2f7cf6)":"var(--surf2)"};color:${me?"#031521":"var(--ink)"};border:1px solid var(--line)`;
+const chatRows=()=>chatMsgs.map(([n,t,h,me,a],i)=>`<div ${me?`data-cdel="${i}"`:""} style="align-self:${me?"flex-end":"flex-start"};max-width:80%;border-radius:14px;${bub(a,me)}">${me||(a&&(a[0]=="stk"||a[0]=="usr"))?"":`<b style="font-size:12px">${n}</b><br>`}${a&&a[0]=="usr"?`<img src="${a[1]}" alt="Sticker" style="width:120px;height:120px;object-fit:contain;display:block">`:a?attHtml(a,me):""}${t}<div style="font-size:11px;opacity:.7;text-align:right">${h}</div></div>`).join("");
+let myStk=[];
+const stkGrid=()=>(myStk.map((s,i)=>`<div style="position:relative"><button data-usr="${i}" aria-label="Gửi sticker ${i+1}" style="border:0;background:rgba(255,255,255,.08);border-radius:10px;padding:4px;cursor:pointer;width:100%;aspect-ratio:1"><img src="${s}" alt="" style="width:100%;height:100%;object-fit:contain;pointer-events:none"></button><button data-usrdel="${i}" aria-label="Xóa sticker" style="position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;border:0;background:#d9534f;color:#fff;font-size:12px;cursor:pointer">✕</button></div>`).join(""))+`<button id="cadd" aria-label="Thêm sticker" style="border:2px dashed #9bb;background:none;border-radius:10px;aspect-ratio:1;font-size:26px;color:#1f6feb;cursor:pointer">＋</button>`;
+document.addEventListener("change",e=>{if(e.target.id!=="cfile")return;[...e.target.files].forEach(f=>{const r=new FileReader();r.onload=()=>{myStk.push(r.result);$("#cgt").innerHTML=stkGrid()};r.readAsDataURL(f)});e.target.value=""});
+const svg=p=>`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;pointer-events:none">${p}</svg>`;
+const IC={smile:svg('<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>'),clip:svg('<path d="M21 11l-9 9a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/>'),send:svg('<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>'),img:svg('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/>'),vid:svg('<rect x="2" y="5" width="14" height="14" rx="2"/><path d="M16 10l6-3v10l-6-3z"/>'),doc:svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>')};
+const STK=["👍","✅","🙏","😂","🔧","🚧","📡","⚠️"];
+const DOCCOL={pdf:"#d9534f",doc:"#1f6feb",docx:"#1f6feb",xls:"#2e9e5b",xlsx:"#2e9e5b"};
+const attHtml=(a,me)=>a[0]=="img"?`<div style="width:180px;height:120px;border-radius:10px;background:linear-gradient(135deg,#7aa7d9,#3b6aa0);display:grid;place-items:center;color:#fff;margin-bottom:4px">${IC.img.replace(/22/g,"40")}</div>`:a[0]=="vid"?`<div style="width:180px;height:120px;border-radius:10px;background:#1b2635;color:#fff;display:grid;place-items:center;margin-bottom:4px;position:relative"><span style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center">${IC.vid}</span><span style="position:absolute;right:8px;bottom:6px;font-size:11px">${a[2]}</span></div>`:`<div style="display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;background:${me?"rgba(255,255,255,.18)":"#fff"};margin-bottom:4px"><span style="width:36px;height:36px;border-radius:8px;background:${DOCCOL[a[1].split(".").pop()]||"#888"};color:#fff;display:grid;place-items:center">${IC.doc}</span><span><b style="font-size:13px">${a[1]}</b><br><span style="font-size:11px;opacity:.7">${a[2]}</span></span></div>`;
+const ATT={img:["img","anh-hien-truong.jpg","1,2 MB"],vid:["vid","video-do-kiem.mp4","0:24"],doc:["doc","bien-ban-nghiem-thu.pdf","340 KB"]};
+function chatSend(a){const i=$("#ci");const v=i.value.trim();if(!v&&!a)return;const d=new Date();chatMsgs.push(["Minh",v.replace(/</g,"&lt;"),String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"),1,a]);i.value="";$("#cmenu").style.display="none";$("#cstk").style.display="none";const m=$("#cm");m.innerHTML=chatRows();m.scrollTop=m.scrollHeight}
+document.addEventListener("click",e=>{if(e.target.id==="csk"||e.target.closest("#csk")){const s=$("#cstk");s.style.display=s.style.display=="block"?"none":"block"}const tb=null;const tr=null;const sk=e.target.closest("[data-usr]");if(sk)chatSend(["usr",myStk[+sk.dataset.usr]]);const rm=e.target.closest("[data-usrdel]");if(rm){myStk.splice(+rm.dataset.usrdel,1);$("#cgt").innerHTML=stkGrid()}if(e.target.closest("#cadd"))$("#cfile").click();if(e.target.id==="cs")chatSend();if(e.target.id==="cp"){const m=$("#cmenu");m.style.display=m.style.display=="flex"?"none":"flex"}const t=e.target.closest("[data-att]");if(t)chatSend(ATT[t.dataset.att]);const x=e.target.closest("[data-cdel]");if(x&&confirm("Thu hồi tin nhắn này?")){chatMsgs.splice(+x.dataset.cdel,1);$("#cm").innerHTML=chatRows()}});
+document.addEventListener("keydown",e=>{if(e.target.id==="ci"&&e.key==="Enter")chatSend()});
+const DATA_VIEWS=["home","work","patrol","library","teams","team","account"];
+function render(){
+ const k=SCREENS[cur]?SCREENS[cur][1]:"work";
+ $("#title").textContent=TITLE[cur]||SCREENS[cur][0];
+ $("#body").innerHTML=DATA_VIEWS.includes(cur)&&st!="ok"?stateView():V[cur]();
+ $("#nav").hidden=["login","register","pending"].includes(cur);
+ $("#nav").innerHTML=NAV.map(([id,ic,l])=>`<button data-go="${id}"${k==id?' aria-current="page"':""}><span class="ic" aria-hidden="true">${ic}</span>${l}</button>`).join("");
+ document.querySelectorAll("#screens button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.go==cur));
+ $("#body").scrollTop=0;
+}
+function go(id){if(V[id]){cur=id;st="ok";$("#state").value="ok";render()}}
+document.addEventListener("change",e=>{if(e.target.id==="c"){$("#c2").style.display=e.target.value==="Khác…"?"block":"none"}
+if(e.target.dataset&&e.target.dataset.ty!==undefined){mats[+e.target.dataset.ty][4]=e.target.value;$("#mat-list").innerHTML=matRows();return}
+if(e.target.id==="mp"){const v=e.target.value;if(!v)return;$("#mn").value=v;$("#mn").dispatchEvent(new Event("change",{bubbles:true}));$("#mat-name").textContent=v==="__other"?"Vật tư khác":v;$("#mat-pick").hidden=true;$("#mat-detail").hidden=false;(v==="__other"?$("#mx"):$("#mq")).focus();return}
+if(e.target.id==="mn"){const U={"Măng xông":"bộ","Néo":"bộ 2 hướng","Treo":"bộ","Kẹp":"cái","Ty":"cái","Gông dự phòng":"bộ","Biển báo":"cái"};if(U[e.target.value])$("#mu").value=U[e.target.value];$("#mo-wrap").hidden=e.target.value!=="__other";if(!$("#mo-wrap").hidden)$("#mx").focus()}});
+document.addEventListener("click",e=>{
+ const id=e.target.closest("button")?.id,rm=e.target.closest("[data-rm]");
+ const list=()=>$("#mat-list").innerHTML=matRows();
+ const reset=()=>{editIdx=-1;$("#mat-save").textContent="Thêm";$("#mat-back").hidden=false;$("#mat-form").hidden=true;$("#mat-add").hidden=false;$("#mat-err").hidden=true;$("#mx-err").hidden=true;$("#mat-pick").hidden=false;$("#mp").selectedIndex=0;$("#mat-detail").hidden=true;$("#mo").value="";$("#mx").value="";$("#mq").value=1;$("#mn").selectedIndex=0;$("#mo-wrap").hidden=true};
+ const pick=null;
+ if(pick){const v="";$("#mn").value=v;$("#mn").dispatchEvent(new Event("change",{bubbles:true}));$("#mat-name").textContent=v==="__other"?"Vật tư khác":v;$("#mat-pick").hidden=true;$("#mat-detail").hidden=false;(v==="__other"?$("#mx"):$("#mq")).focus();return}
+ if(id==="mat-back"){$("#mat-pick").hidden=false;$("#mp").selectedIndex=0;$("#mat-detail").hidden=true;$("#mo-wrap").hidden=true;return}
+ if(id==="mat-add"){$("#mat-form").hidden=false;e.target.hidden=true;return}
+ if(id==="mat-cancel"||id==="mat-cancel2"){reset();return}
+ if(id==="mat-save"){const q=parseInt($("#mq").value,10),other=$("#mn").value==="__other",name=other?$("#mx").value.trim():$("#mn").value;
+  $("#mx-err").hidden=!(other&&!name);$("#mat-err").hidden=q>0;if(!(q>0)||!name)return;
+  const row=[name,q,$("#mu").value,$("#mo").value.trim(),editIdx>=0?mats[editIdx][4]:""];
+  if(editIdx>=0)mats[editIdx]=row;else mats.push(row);list();reset();return}
+ const ed=e.target.closest("[data-ed]");
+ if(ed){const i=+ed.dataset.ed,[n,q,u,o]=mats[i],known=[...$("#mn").options].some(x=>x.value===n&&x.value!=="__other");
+  editIdx=i;$("#mat-form").hidden=false;$("#mat-add").hidden=true;$("#mat-pick").hidden=true;$("#mat-detail").hidden=false;
+  $("#mn").value=known?n:"__other";$("#mx").value=known?"":n;$("#mo-wrap").hidden=known;$("#mat-name").textContent=known?n:"Vật tư khác";
+  $("#mq").value=q;$("#mu").value=u;$("#mo").value=o;$("#mat-save").textContent="Lưu";$("#mat-back").hidden=true;$("#mat-form").scrollIntoView({block:"center"});return}
+ const sh=e.target.closest("[data-shot]"),dl=e.target.closest("[data-del]"),ok=e.target.closest("[data-delok]"),no=e.target.closest("[data-delno]");
+ if(sh||dl||ok||no){const k=sh?sh.dataset.shot:(dl||ok||no).dataset[dl?"del":ok?"delok":"delno"].split(":")[0],el=$("#g-"+k),open=el.open;
+  const prev=pendDel&&pendDel.split(":")[0];pendDel=null;
+  if(sh)photos[k].push((photos[k].length?Math.max(...photos[k]):0)+1);
+  else if(dl)pendDel=dl.dataset.del;
+  else if(ok)photos[k].splice(+ok.dataset.delok.split(":")[1],1);
+  el.outerHTML=grp(GRP.find(g=>g[0]===k),open);
+  if(prev&&prev.split(":")[0]!==k){const o=$("#g-"+prev);if(o)o.outerHTML=grp(GRP.find(g=>g[0]===prev),o.open)}
+  return}
+ if(rm){mats.splice(+rm.dataset.rm,1);list();return}
+ const s=e.target.closest("[data-s]");if(s){st=s.dataset.s;$("#state").value=st;render();return}const g=e.target.closest("[data-go]");if(g)go(g.dataset.go)});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.dataset&&e.target.dataset.go)go(e.target.dataset.go)});
+$("#screens").innerHTML=Object.entries(SCREENS).map(([id,[n]])=>`<button data-go="${id}">${n}</button>`).join("");
+$("#state").innerHTML=Object.entries(STATES).map(([k,v])=>`<option value="${k}">${v}</option>`).join("");
+$("#state").onchange=e=>{st=e.target.value;render()};
+$("#theme").onclick=e=>{const l=document.documentElement.dataset.theme!="light";document.documentElement.dataset.theme=l?"light":"";e.target.setAttribute("aria-pressed",l)};
+$("#big").onclick=e=>{const b=$("#phone").classList.toggle("big");e.target.setAttribute("aria-pressed",b)};
+let unread=0,miniOpen=false;
+const ph=$("#phone");
+ph.insertAdjacentHTML("beforeend",`<button id="fab" aria-label="Mở chat nhóm" style="display:none;position:absolute;right:104px;top:7px;width:38px;height:38px;border-radius:50%;border:0;background:linear-gradient(135deg,#27d3f2,#2f7cf6);color:#031521;cursor:pointer;z-index:20;padding:0;display:none;align-items:center;justify-content:center">${svg('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>')}<span id="fabn" style="display:none;position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:#e5484d;color:#fff;font:700 12px/20px sans-serif;padding:0 5px"></span></button>
+<div id="mini" style="display:none;position:absolute;right:10px;bottom:72px;width:300px;height:330px;border-radius:16px;background:rgba(10,24,45,.92);backdrop-filter:blur(16px);color:var(--ink);box-shadow:0 8px 28px rgba(0,0,0,.5);border:1px solid var(--line);z-index:21;flex-direction:column;overflow:hidden"><div style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:linear-gradient(135deg,#27d3f2,#2f7cf6);color:#031521"><b style="flex:1;font-size:14px">Chat nhóm · Đắk Lắk</b><button id="mfull" aria-label="Mở toàn màn hình" style="border:0;background:none;color:#031521;cursor:pointer;font-size:16px">⤢</button><button id="mmin" aria-label="Thu gọn" style="border:0;background:none;color:#031521;cursor:pointer;font-size:18px">—</button></div><div id="mrows" style="flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px;background:transparent"></div><div id="mmenu" style="display:none;gap:6px;padding:6px 8px 0"><button class="btn s" data-matt="img" style="flex:1;padding:0 4px;min-height:38px;font-size:12px">${IC.img} Ảnh</button><button class="btn s" data-matt="vid" style="flex:1;padding:0 4px;min-height:38px;font-size:12px">${IC.vid} Video</button><button class="btn s" data-matt="doc" style="flex:1;padding:0 4px;min-height:38px;font-size:12px">${IC.doc} Tệp</button></div><div style="display:flex;gap:6px;padding:8px"><button id="mp" aria-label="Đính kèm" class="btn s" style="flex:none;width:44px;padding:0">${IC.clip}</button><input id="mi" placeholder="Nhập tin nhắn…" style="flex:1;min-width:0;width:auto"><button id="ms" aria-label="Gửi" class="btn p" style="flex:none;width:48px;padding:0">${IC.send}</button></div></div>`);
+const attTxt=a=>!a?"":a[0]=="img"?"🖼 Ảnh":a[0]=="vid"?"🎬 Video":a[0]=="usr"?"Sticker":"📄 "+a[1];
+const miniRows=()=>chatMsgs.slice(-12).map(([n,t,h,me,a])=>`<div style="align-self:${me?"flex-end":"flex-start"};max-width:85%;padding:6px 10px;border-radius:12px;font-size:13px;background:${me?"linear-gradient(135deg,#27d3f2,#2f7cf6)":"rgba(255,255,255,.12)"};color:${me?"#031521":"var(--ink)"}">${me?"":`<b style="font-size:11px">${n}</b><br>`}${attTxt(a)}${a&&t?"<br>":""}${t}</div>`).join("");
+function fabUpdate(){
+ const hide=["login","register","chat"].includes(cur);
+ if(cur=="chat"){unread=0;miniOpen=false}
+ $("#fab").style.display=hide||miniOpen?"none":"flex";
+ $("#mini").style.display=!hide&&miniOpen?"flex":"none";
+ const n=$("#fabn");n.textContent=unread;n.style.display=unread?"block":"none";
+ if(miniOpen){const r=$("#mrows");r.innerHTML=miniRows();r.scrollTop=r.scrollHeight}
+}
+const _render=render;render=function(){_render();fabUpdate()};
+function miniSend(){const i=$("#mi");const v=i.value.trim();if(!v)return;const d=new Date();chatMsgs.push(["Minh",v.replace(/</g,"&lt;"),String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"),1]);i.value="";fabUpdate()}
+document.addEventListener("click",e=>{
+ if(e.target.closest("#fab")){miniOpen=true;unread=0;fabUpdate()}
+ else if(e.target.closest("#mmin")){miniOpen=false;fabUpdate()}
+ else if(e.target.closest("#mfull")){go("chat")}
+ else if(e.target.closest("#ms"))miniSend();else if(e.target.closest("#mp")){const m=$("#mmenu");m.style.display=m.style.display=="flex"?"none":"flex"}else{const z=e.target.closest("[data-matt]");if(z){const d=new Date();chatMsgs.push(["Minh","",String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"),1,ATT[z.dataset.matt]]);$("#mmenu").style.display="none";fabUpdate()}}});
+document.addEventListener("keydown",e=>{if(e.target.id==="mi"&&e.key==="Enter")miniSend()});
+let incN=0;
+setInterval(()=>{if(cur=="chat"||cur=="login"||cur=="register"||incN>=3)return;const m=["Trần B","Lê C","Trần B"][incN],t=["Anh Minh ơi, đo xong gửi kết quả nhé.","Có ai đang ở trạm Krông Búk không?","Mình vừa kéo xong tuyến 2."][incN++];const d=new Date();chatMsgs.push([m,t,String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"),0]);unread++;fabUpdate()},12000);
+render();
+document.addEventListener("click",e=>{if(!e.target.closest("#rxl"))return;const v=document.getElementById("rxlv");if(!v)return;v.innerHTML=`<div class="card" style="margin-top:10px"><span class="chip ok">✓ Đã tạo BaoCao-DiDoi-DLBT09-DLBT12.xlsx</span><div style="margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:12px"><div style="background:var(--acc);color:#031521;font-weight:800;padding:6px 8px;text-align:center">BÁO CÁO DI DỜI • DLBT09-DLBT12 di dời</div><div style="padding:6px 8px;border-top:1px solid var(--line)">Địa điểm: 12.667100, 108.045500<br>Người thực hiện: Minh · Ngày: 12/10/2026<br>Nguyên nhân: Điện lực yêu cầu</div><div style="padding:6px 8px;border-top:1px solid var(--line)"><b>Nội dung:</b> Thu hồi kéo lại 50m 12FO; Di dời cột 14 theo yêu cầu điện lực</div><div style="padding:6px 8px;border-top:1px solid var(--line)"><b>Vật tư:</b> 150m cáp 12FO · Măng xông 2 bộ · Néo 2 bộ</div><div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line)"><div style="padding:14px 6px;text-align:center;border-right:1px solid var(--line)">Ảnh trái</div><div style="padding:14px 6px;text-align:center">Ảnh phải</div></div><div style="padding:6px 8px;border-top:1px solid var(--line);text-align:center" class="mute">Mô tả hàng ảnh ở giữa · Kết quả đo kiểm ở cuối</div></div><p class="mute" style="margin:8px 0 0">Khác Sự cố: không có thời gian nhận sự cố, khôi phục hay tổng phút xử lý. Xuất xong chưa có nghĩa là đã đồng bộ.</p></div>`});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-lt]");if(!b)return;const k=b.dataset.lt;document.querySelectorAll("#libtabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));const a=document.getElementById("liba"),x=document.getElementById("libx");if(!a||!x)return;a.style.display=k==="a"?"":"none";const fm=(n,c,d)=>`<details class="grp"><summary><span class="t">📁 ${n}</span><span class="chip info">${c}</span></summary><div style="padding:0 14px 14px" class="mute">${d}</div></details>`;x.innerHTML=k==="v"?fm("Sự cố",3,"Video 0:42 · 1:10 · 0:25")+fm("Tuần tuyến",5,"Video khảo sát tuyến")+fm("Chưa phân loại",1,"Video 0:18"):k==="t"?`<p class="mute">Mục đã xóa giữ 30 ngày rồi tự dọn.</p>`+((window.TR=window.TR||[["Ảnh Km42 (Sự cố)","xóa 10/10"],["Video tuyến MX","xóa 08/10"]]).map(([n,d,f,k],i)=>`<div class="card"><b>${n}</b><div class="mute">${d}</div><div class="row"><button class="btn s" data-trr="${i}">Khôi phục</button><button class="btn s" data-trx="${i}" style="color:#d9534f">Xóa vĩnh viễn</button></div></div>`).join("")||`<p class="mute">Thùng rác trống.</p>`):""});
+(()=>{const C={acc:38,date:true,col:0,fl:false,nl:false,front:false,zoom:[1,2,3],zi:0,saved:0,memo:"",pos:"Cột 14 Km42"};const cols=[["Trắng","#fff"],["Vàng","#ffe600"],["Đen","#000"],["Đỏ","#ff4040"],["Xanh","#00e5ff"]];
+const $=id=>document.getElementById(id);
+const st=t=>{const e=$("cstat");if(e)e.textContent=t};
+const stamp=()=>{const e=$("cst");if(!e)return;e.style.color=cols[C.col][1];e.innerHTML=["Người chụp: Minh",C.date?"Ngày chụp: 12/10/2026 07:39":"","Địa chỉ GPS: Buôn Ma Thuột, Đắk Lắk","Lat: 12.700480 | Long: 108.326998"+(C.acc>50?"":""),C.memo?"Ghi chú: "+C.memo.replace(/</g,"&lt;"):""].filter(Boolean).join("<br>")};
+const fx=()=>{const e=$("cfx");if(!e)return;const b=+$("cbr").value/20;e.style.background="rgba(255,255,255,"+Math.max(0,b*.25)+")";$("cv").style.filter="brightness("+(1+Math.min(0,b)*.5)+")"};
+const gps=()=>{const e=document.querySelector("#cv");if(e&&!e.querySelector("#cgpschip")){}};
+const upd=()=>{const z=$("czm");if(!z)return;z.textContent=C.zoom[C.zi].toFixed(1)+"×";$("czr").value=C.zoom[C.zi]*10;stamp()};
+const reset=()=>{if(!$("cv"))return;stamp();$("cv").dataset.init=1};
+new MutationObserver(()=>{if($("cv")&&!$("cv").dataset.init){C.fl=C.nl=C.front=false;C.zi=0;reset();st("GPS sai số "+C.acc+" m · chạm ảnh để lấy nét")}}).observe(document.body,{childList:true,subtree:true});
+document.addEventListener("input",e=>{const t=e.target;if(t.id==="czr"){const v=+t.value/10;C.zi=[1,2,3].reduce((a,x,i)=>Math.abs(x-v)<Math.abs(C.zoom[a]-v)?i:a,0);$("czm").textContent=v.toFixed(1)+"×"}if(t.id==="cbr"){$("cbl").textContent="Độ sáng: "+(t.value>=0?"+":"")+(t.value/10).toFixed(1)+" EV";fx()}});
+document.addEventListener("click",e=>{const t=e.target.closest("button,#cv");if(!t||!$("cv"))return;const id=t.id;
+if(id==="cv"){const r=t.getBoundingClientRect(),f=$("cfocus");f.style.left=e.clientX-r.left+"px";f.style.top=e.clientY-r.top+"px";f.style.display="block";$("chint").textContent="Đã chọn vùng lấy nét";setTimeout(()=>{f.style.display="none"},900);return}
+if(id==="cfl"||id==="cnl"){C.fl=!C.fl;C.nl=C.fl;$("cfl").setAttribute("aria-pressed",C.fl);$("cfl").style.background=C.fl?"var(--acc)":"";$("cfl").style.color=C.fl?"#031521":"";$("cnl").textContent=C.fl?"Tắt đèn chụp đêm":"Bật đèn chụp đêm";st(C.fl?"Đã bật đèn camera":"Đã tắt đèn camera")}
+if(id==="csw"){C.front=!C.front;$("cfacing").textContent=C.front?"Camera trước":"Camera sau";st(C.front?"Đã đổi sang camera trước":"Đã đổi sang camera sau")}
+if(id==="czm"){C.zi=(C.zi+1)%3;upd()}
+if(id==="cbd"){$("cbr").value=0;$("cbl").textContent="Độ sáng: +0.0 EV";fx();st("Đã đặt sáng mặc định")}
+if(id==="cop"){const o=$("copt");o.style.display=o.style.display==="none"?"":"none"}
+if(id==="cgps"){C.acc=Math.round(8+Math.random()*60);st("Đã lấy lại GPS · sai số "+C.acc+" m")}
+if(id==="cdate"){C.date=!C.date;t.textContent=C.date?"☑ Hiện ngày tháng":"☐ Ẩn ngày tháng";stamp()}
+if(id==="ccol"){C.col=(C.col+1)%5;t.textContent="Màu chữ: "+cols[C.col][0];stamp()}
+if(id==="cinfo"){$("cform").style.display="";$("cpos").value=C.pos;$("cmemo").value=C.memo}
+if(id==="cfc")$("cform").style.display="none";
+if(id==="cfs"){C.pos=$("cpos").value.trim()||C.pos;C.memo=$("cmemo").value.trim();$("cform").style.display="none";stamp();st("Đã lưu thông tin vị trí")}
+if(id==="ctp")st("Mẫu dấu: chọn logo, chữ và ô hiển thị trên ảnh");
+if(id==="cwait"){$("cask").style.display="none";st("Đang chờ GPS tốt hơn…")}
+const shoot=()=>{$("cask").style.display="none";C.saved++;$("clib").textContent="Thư viện ("+C.saved+")";st("Đã lưu thư viện và xếp hàng gửi server. ("+C.saved+" ảnh mới)");const v=$("cv");v.style.boxShadow="inset 0 0 0 999px #fff8";setTimeout(()=>v.style.boxShadow="",120)};
+if(id==="cgo")shoot();
+if(id==="csh"){if(C.acc>50){$("cask1").textContent="Sai số GPS "+C.acc+" m. Vẫn chụp?";$("cask").style.display=""}else shoot()}});})();
+(()=>{const $=id=>document.getElementById(id);let vid=false,rec=false,t0=0,tm=null,vs=0;const fmt=s=>Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+const st=t=>{const e=$("cstat");if(e)e.textContent=t};
+const mode=v=>{vid=v;$("cmp").setAttribute("aria-pressed",!v);$("cmv").setAttribute("aria-pressed",v);$("cmp").textContent=v?"Ảnh":"Ảnh ●";$("cmv").textContent=v?"Video ●":"Video";$("cst").style.display=v?"none":"";$("cop").style.display=v?"none":"";$("czm").style.display=v?"none":"";$("czr").previousElementSibling.style.display=$("czr").style.display=v?"none":"";$("ctp").parentElement.style.visibility=v?"hidden":"";$("cask").style.display="none";$("copt").style.display="none";$("cform").style.display="none";$("csh").textContent="⬤";$("csh").setAttribute("aria-label",v?"Bắt đầu quay video":"Chụp ảnh");$("chint").textContent=v?"Video có âm thanh · tối đa 2 phút / 64 MB":"Chạm ảnh để lấy nét, chỉnh sáng ☀ / ☾";st(v?"Video lưu theo tài khoản đang đăng nhập":"Ảnh lưu theo tài khoản đang đăng nhập")};
+const stop=r=>{clearInterval(tm);rec=false;vs++;$("crec").style.display="none";$("csh").textContent="⬤";$("csh").setAttribute("aria-label","Bắt đầu quay video");$("cmp").disabled=$("cmv").disabled=false;st(r+" · Đã lưu video "+vs+" ("+fmt(Math.floor((Date.now()-t0)/1000))+") vào Thư viện và xếp hàng gửi server.")};
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!$("cv"))return;
+if(b.id==="cmp"&&vid&&!rec)mode(false);
+if(b.id==="cmv"&&!vid&&!rec)mode(true);
+if(b.id==="csh"&&vid){e.stopImmediatePropagation();if(!rec){rec=true;t0=Date.now();$("crec").style.display="";$("crec").textContent="● 0:00 / 2:00";b.textContent="■";b.setAttribute("aria-label","Dừng và lưu video");$("cmp").disabled=$("cmv").disabled=true;st("Đang quay · nhấn nút vuông để dừng và lưu");tm=setInterval(()=>{const s=Math.floor((Date.now()-t0)/1000);$("crec").textContent="● "+fmt(s)+" / 2:00";if(s>=120)stop("Đã đạt giới hạn 2 phút")},500)}else stop("Đã dừng quay")}},true);
+new MutationObserver(()=>{if($("cv")&&!$("cv").dataset.vinit){$("cv").dataset.vinit=1;vid=false;rec=false;clearInterval(tm)}}).observe(document.body,{childList:true,subtree:true});})();
+(()=>{const $=id=>document.getElementById(id);let hide=null,drag=null;
+const ui=()=>{let u=$("cexp");if(!u){u=document.createElement("div");u.id="cexp";u.style.cssText="position:absolute;display:none;width:30px;height:120px;z-index:3;touch-action:none;color:#ffe066;font-size:16px;text-align:center;user-select:none";u.innerHTML='<div style="line-height:18px">☀</div><div style="position:absolute;left:14px;top:20px;bottom:20px;width:2px;background:#ffe066aa"></div><div id="cexk" style="position:absolute;left:7px;width:16px;height:16px;border-radius:50%;background:#ffe066;box-shadow:0 0 6px #000a"></div><div style="position:absolute;bottom:0;left:0;right:0;line-height:18px;color:#cfd8ff">☾</div>';$("cv").appendChild(u)}return u};
+const setV=v=>{v=Math.max(-20,Math.min(20,v));const r=$("cbr");r.value=Math.round(v);r.dispatchEvent(new Event("input",{bubbles:true}));const k=$("cexk");if(k)k.style.top=(20+(20-v)/40*(120-56))+"px"};
+const keep=()=>{clearTimeout(hide);hide=setTimeout(()=>{const u=$("cexp");if(u)u.style.display="none";const f=$("cfocus");if(f)f.style.display="none"},2500)};
+document.addEventListener("pointerdown",e=>{const v=$("cv");if(!v||!v.contains(e.target)||e.target.closest("button"))return;if(e.target.closest("#cexp")){drag={y:e.clientY,v:+$("cbr").value};keep();return}const r=v.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,f=$("cfocus"),u=ui();f.style.left=x+"px";f.style.top=y+"px";f.style.display="block";u.style.left=Math.min(x+44,r.width-36)+"px";u.style.top=Math.max(50,Math.min(y-60,r.height-130))+"px";u.style.display="block";setV(+$("cbr").value);$("chint").textContent="Đã chọn vùng lấy nét · kéo lên ☀ sáng hơn, kéo xuống ☾ tối hơn";drag={y:e.clientY,v:+$("cbr").value};keep();v.setPointerCapture&&v.setPointerCapture(e.pointerId)});
+document.addEventListener("pointermove",e=>{if(!drag)return;setV(drag.v+(drag.y-e.clientY)/(120-56)*40);keep()});
+document.addEventListener("pointerup",()=>{drag=null});
+document.addEventListener("click",e=>{if(e.target.closest("#cv")&&!e.target.closest("button"))e.stopImmediatePropagation()},true);})();
+(()=>{const $=id=>document.getElementById(id);let m=0;const N=["Tắt","Nháy khi chụp","Bật đèn liên tục"],I=["⚡","⚡A","🔦"];
+const show=()=>{const b=$("cfl");b.textContent=I[m];b.style.background=m?"var(--acc)":"";b.style.color=m?"#031521":"";b.setAttribute("aria-label","Đèn camera: "+N[m]);b.setAttribute("aria-pressed",m>0);let c=$("cflc");if(!c){c=document.createElement("span");c.id="cflc";c.className="chip";c.style.cssText="position:absolute;left:10px;bottom:50px;background:#000a;z-index:2";$("cv").appendChild(c)}c.textContent="Đèn: "+N[m];c.style.display=m?"":"none";const t=$("cstat");if(t)t.textContent=m==1?"Đèn sẽ nháy sáng khi chụp ảnh":m==2?"Đã bật đèn camera":"Đã tắt đèn camera"};
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!$("cv"))return;if(b.id==="cfl"){e.stopImmediatePropagation();m=(m+1)%3;show();return}
+if(b.id==="csh"&&m===1&&$("cmv").getAttribute("aria-pressed")!=="true"){const v=$("cv"),f=document.createElement("div");f.style.cssText="position:absolute;inset:0;background:#fff;z-index:5;opacity:1;transition:opacity .35s;pointer-events:none";v.appendChild(f);requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.opacity=0}));setTimeout(()=>f.remove(),450)}},true);
+new MutationObserver(()=>{if($("cv")&&!$("cv").dataset.finit){$("cv").dataset.finit=1;m=0}}).observe(document.body,{childList:true,subtree:true});})();
+(()=>{const $=id=>document.getElementById(id);const F=[["Giờ, phút, giây + ngày/tháng/năm","07:39:12  |  12/10/2026"],["Giờ, phút + ngày/tháng/năm","07:39  |  12/10/2026"],["Chỉ ngày/tháng/năm","12/10/2026"],["Chỉ giờ, phút, giây","07:39:12"],["Chỉ giờ, phút","07:39"]];
+let S={logo:true,date:true,fmt:0,addr:true,gps:true,alt:false,auth:true,note:""};
+const esc=t=>t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const render=()=>{const e=$("cst");if(!e)return;const L=[];if(S.auth)L.push("Người chụp: Minh");if(S.date)L.push("Ngày chụp: "+F[S.fmt][1]);if(S.addr)L.push("Địa chỉ GPS: Buôn Ma Thuột, Đắk Lắk");if(S.gps)L.push("Lat: 12.700480 | Long: 108.326998");if(S.alt)L.push("Độ cao: 412 m");if(S.note.trim())L.push("Ghi chú: "+esc(S.note.trim()));
+e.innerHTML=(S.logo?'<img src="logo.svg" alt="HP telecom" style="width:20%;max-width:64px;min-width:44px;height:auto;display:block;margin-bottom:3px">':"")+L.join("<br>")};
+const ck=(id,l,v)=>`<label style="display:flex;gap:10px;align-items:center;min-height:44px;margin:0"><input type="checkbox" id="${id}" ${v?"checked":""} style="width:20px;height:20px"> ${l}</label>`;
+const open=()=>{let d=$("cmau");if(d)d.remove();d=document.createElement("div");d.id="cmau";d.className="card";d.setAttribute("role","dialog");d.setAttribute("aria-label","Mẫu dấu trên ảnh");d.style.cssText="margin-top:10px;border-color:var(--acc)";
+d.innerHTML=`<b style="font-size:17px">Mẫu dấu trên ảnh</b><div style="display:flex;align-items:center;justify-content:space-between">${ck("mlg","Logo",S.logo)}<button class="btn s" id="mlc" style="width:auto;padding:0 14px">Đổi logo</button></div><p class="mute" style="margin:0 0 6px">Logo giữ đúng tỷ lệ, rộng tối đa 20% khung ảnh.</p>${ck("mdt","Hiện ngày / giờ chụp",S.date)}<label for="mfm" style="margin-top:4px">Kiểu ngày / giờ</label><select id="mfm">${F.map((f,i)=>`<option value="${i}" ${i==S.fmt?"selected":""}>${f[0]}</option>`).join("")}</select><div class="mute" id="mpv" style="padding:4px 0 8px"></div>${ck("mad","Địa chỉ từ GPS",S.addr)}${ck("mgp","Tọa độ GPS",S.gps)}${ck("mal","Độ cao khi GPS có dữ liệu",S.alt)}${ck("mau","Người chụp",S.auth)}<input id="mnt" maxlength="180" placeholder="Ghi chú trên ảnh" aria-label="Ghi chú trên ảnh" value="${esc(S.note).replace(/"/g,"&quot;")}" style="margin-top:6px"><div class="row" style="margin-top:10px"><button class="btn s" id="mhu">Hủy</button><button class="btn p s" id="mlu">Lưu</button></div>`;
+$("ctp").closest(".row").after(d);pv();d.scrollIntoView({block:"nearest"})};
+const pv=()=>{const a=$("mdt"),f=$("mfm");if(!a)return;f.disabled=!a.checked;f.style.opacity=a.checked?1:.45;$("mpv").textContent=a.checked?"Xem trước: "+F[f.value][1]:"Không hiện ngày / giờ trên ảnh"};
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!$("cv"))return;
+if(b.id==="ctp")open();
+if(b.id==="mhu")$("cmau").remove();
+if(b.id==="mlc"){const t=$("cstat");if(t)t.textContent="Chọn logo PNG, JPG hoặc WebP (tối đa 12 MB) từ máy"}
+if(b.id==="mlu"){S={logo:$("mlg").checked,date:$("mdt").checked,fmt:+$("mfm").value,addr:$("mad").checked,gps:$("mgp").checked,alt:$("mal").checked,auth:$("mau").checked,note:$("mnt").value};$("cmau").remove();render();const t=$("cstat");if(t)t.textContent="Đã lưu mẫu dấu cho ảnh chụp tiếp theo"}
+if(b.id==="cdate"){S.date=!S.date}
+if(["cdate","ccol","cfs","mlu"].includes(b.id))setTimeout(render,0)});
+document.addEventListener("change",e=>{if(e.target.id==="mdt"||e.target.id==="mfm")pv()});
+new MutationObserver(()=>{if($("cv")&&!$("cv").dataset.minit){$("cv").dataset.minit=1;setTimeout(render,0)}}).observe(document.body,{childList:true,subtree:true});})();(()=>{const R=["Chủ nhóm","Điều phối viên","Kỹ thuật viên"],RT=["Tuyến QL14 Km40–45","Tuyến Buôn Ma Thuột 02","Tuyến Krông Pắk 05"];
+let M=[{n:"Minh",r:0,t:[]},{n:"Trần B",r:1,t:["Tuyến QL14 Km40–45"]},{n:"Lê C",r:2,t:[]}],sel=-1;
+const $=i=>document.getElementById(i),esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const msg=x=>{const m=$("tmsg");if(m)m.textContent=x};
+const cnt=()=>{const c=document.querySelector("#body details.grp .chip.info");if(c)c.textContent=M.length;const h=document.querySelector("#body .card .mute");if(h)h.textContent="Tổ chức · mã nhóm daklak · "+M.length+" thành viên"};
+const list=()=>{const l=$("tmem");if(!l)return;const q=(($("tq")||{}).value||"").toLowerCase();
+l.innerHTML=M.map((m,i)=>({m,i})).filter(o=>o.m.n.toLowerCase().includes(q)).map(({m,i})=>`<div class="row" style="align-items:center;border-bottom:1px solid var(--line);margin:0;padding:4px 0;gap:6px"><div style="flex:1;min-width:0;line-height:1.25"><b>${esc(m.n)}</b> <span class="mute" style="font-size:12px">· ${R[m.r]}${m.t.length?" · "+m.t.length+" tuyến":""}</span></div>${m.r?`<button class="btn s" style="flex:none;width:40px;min-height:0;padding:2px 0" data-tm="${i}" aria-label="Quản lý ${esc(m.n)}">⋯</button>`:""}</div>`).join("")||'<div class="mute" style="padding:8px 0">Không có thành viên phù hợp</div>';cnt()};
+const panel=()=>{const a=$("tact");if(!a)return;if(sel<0){a.innerHTML="";return}const m=M[sel];
+a.innerHTML=`<div class="card" style="padding:10px"><b>${esc(m.n)}</b><div class="row" style="margin-top:6px;gap:6px;flex-wrap:nowrap"><button class="btn s" style="padding:6px 2px;font-size:12.5px;min-height:0" data-ta="role">Đổi vai trò</button><button class="btn s" style="padding:6px 2px;font-size:12.5px;min-height:0" data-ta="route">Giao tuyến</button><button class="btn s" style="padding:6px 2px;font-size:12.5px;min-height:0;color:#d9534f" data-ta="del">Xóa</button><button class="btn s" style="padding:6px 2px;font-size:12.5px;min-height:0" data-ta="close" aria-label="Đóng">✕</button></div><div id="trs"></div></div>`};
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||!$("tmem")&&!b.dataset.ta)return;
+if(b.dataset.tm!==undefined){sel=+b.dataset.tm;panel();$("tact").scrollIntoView({block:"nearest"});return}
+if(b.id=="tadd"){sel=-1;$("tact").innerHTML=`<div class="card"><label for="tnm">Tên đăng nhập</label><input id="tnm" placeholder="Ví dụ: nguyenvand"><label for="tnr">Vai trò</label><select id="tnr"><option value="2">Kỹ thuật viên</option><option value="1">Điều phối viên</option></select><div class="row" style="margin-top:8px"><button class="btn s" data-ta="cancel">Hủy</button><button class="btn p" data-ta="ok">Thêm</button></div></div>`;return}
+if(b.id=="tleave"){$("tact").innerHTML=`<div class="card">Rời nhóm Đắk Lắk? Bạn là Chủ nhóm nên cần chuyển quyền trước.<div class="row" style="margin-top:8px"><button class="btn s" data-ta="close">Đóng</button></div></div>`;return}
+const k=b.dataset.ta;if(!k)return;const m=M[sel];
+if(k=="close"||k=="cancel"){sel=-1;panel();$("tact").innerHTML="";return}
+if(k=="ok"){const n=($("tnm").value||"").trim();if(!n){msg("Nhập tên đăng nhập");return}if(M.some(x=>x.n.toLowerCase()==n.toLowerCase())){msg("Người này đã trong nhóm");return}M.push({n,r:+$("tnr").value,t:[]});$("tact").innerHTML="";list();msg("Đã thêm "+n+" (Minh họa)");return}
+if(k=="role"){m.r=m.r==1?2:1;list();panel();msg("Đã đổi vai trò "+m.n+" → "+R[m.r]);return}
+if(k=="route"){$("trs").innerHTML=RT.map((r,i)=>`<label style="display:flex;gap:8px;align-items:center;margin:2px 0;font-size:13px"><input type="checkbox" data-tr="${i}" style="width:20px;height:20px;flex:none;margin:0" ${m.t.includes(r)?"checked":""}><span style="flex:1;text-align:left">${r}</span></label>`).join("");return}
+if(k=="del"){M.splice(sel,1);sel=-1;$("tact").innerHTML="";list();msg("Đã xóa khỏi nhóm (Minh họa)");return}});
+document.addEventListener("change",e=>{const c=e.target;if(c.dataset&&c.dataset.tr!==undefined&&sel>=0){const r=RT[+c.dataset.tr],m=M[sel];m.t=c.checked?[...new Set([...m.t,r])]:m.t.filter(x=>x!=r);list();msg((c.checked?"Đã giao ":"Đã bỏ giao ")+r+" cho "+m.n)}});
+document.addEventListener("input",e=>{if(e.target.id=="tq")list()});
+new MutationObserver(()=>{const l=$("tmem");if(l&&!l.dataset.i){l.dataset.i=1;sel=-1;list()}}).observe(document.body,{childList:true,subtree:true});})();(()=>{const tab=k=>{const b=document.querySelector('[data-lt="'+k+'"]');b&&b.click()};
+document.addEventListener("click",e=>{const d=e.target.closest("[data-pd]");
+if(d){const [n,k]=d.dataset.pd.split("|");(window.LD[n]=window.LD[n]||[]).push(+k);(window.TR=window.TR||[]).push(["Ảnh "+k+" ("+n.replace(/^\S+\s/,"")+")","xóa 12/10",n,+k]);const tile=d.parentElement,det=tile.closest("details"),c=det.querySelector(".chip");c.textContent=Math.max(0,(+c.textContent)-1);tile.remove();const ph=det.querySelector(".ph");if(!ph.children.length)ph.innerHTML='<span class="mute">Không còn ảnh</span>';return}
+const r=e.target.closest("[data-trr]"),x=e.target.closest("[data-trx]");
+if(r){const it=window.TR.splice(+r.dataset.trr,1)[0];if(it[2]&&window.LD[it[2]])window.LD[it[2]]=window.LD[it[2]].filter(v=>v!==it[3]);tab("t")}
+if(x){window.TR.splice(+x.dataset.trx,1);tab("t")}});})();</script>
+</body>
+</html>
