@@ -1,0 +1,8 @@
+{
+  "version": "4.1.11",
+  "build": "39",
+  "bundleIdentifier": "vn.hptelecom.fieldwork.server",
+  "teamId": "DX247Z5GQ8",
+  "sourceSha256": "aab178a5d5ffc694500392a5fbe33b3185115529bbe8bc75afd4cc2230e2e2ef",
+  "testsPassed": 206
+}
