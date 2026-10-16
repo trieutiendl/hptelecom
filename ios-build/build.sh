@@ -39,6 +39,7 @@ echo 'Verified release source. Installing dependencies.'
 npm ci --no-audit --no-fund >> "$BUILD_WORK/build.log" 2>&1
 npm run check >> "$BUILD_WORK/build.log" 2>&1
 npm run check:store >> "$BUILD_WORK/build.log" 2>&1
+node --test tests/route-camera-information.test.cjs tests/camera-parity.test.ts tests/photo-location.test.cjs tests/jsx-text.test.cjs tests/camera-archive.test.cjs tests/camera-video-archive.test.cjs >> "$BUILD_WORK/build.log" 2>&1
 node - <<'NODE'
 const fs=require('fs'), path=require('path');
 const release=JSON.parse(fs.readFileSync(path.join(process.env.BUILD_HELPERS,'release.json')));
