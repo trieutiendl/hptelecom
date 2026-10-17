@@ -1,0 +1,55 @@
+ private suspend fun uploadLocked(app:WorkApp,place:Place,progress:(String)->Unit){
+  assignmentSchema(app);finishImport(app,place.id)
+  if(SharedReports.contributor(app,place.id)){contributing.add(place.id);try{uploadContribution(app,place,progress)}finally{contributing.remove(place.id)};return}
+  RoutePhotoTitles.refresh(app,place.id)
+  val scope=app.accountScope;ServerSession.refresh();check(ServerSession.allowed(place.kind)){"Bạn chưa được cấp quyền"};app.flushReport()
+  val prefs=app.getSharedPreferences("server-links",Context.MODE_PRIVATE);val cache=app.getSharedPreferences("server-assets",Context.MODE_PRIVATE);val key="folder-${place.id}"
+  suspend fun finishPending(){
+   val p=pending(app,place.id)?:return
+   var request=p.getJSONObject("request")
+   val remote=p.getString("remote")
+   val r=try{ServerSession.api("mobile/folders/$remote","PUT",request)}catch(e:ServerSession.Failure){
+    if(e.status!=409)throw e
+    val record=try{ServerSession.api("mobile/folders/$remote")}catch(missing:ServerSession.Failure){
+     if(missing.status==404)throw ServerSession.Failure(409,"Báo cáo không còn trên server. Dữ liệu điện thoại vẫn được giữ; không tự tạo lại.")
+     throw missing
+    }
+    check(scope==app.accountScope){"Tài khoản đã thay đổi"}
+    if(record.getInt("revision")<request.getInt("revision"))throw ServerSession.Failure(409,"Server đang có phiên bản cũ hơn. Giữ báo cáo điện thoại, chưa tự gộp dữ liệu.")
+    val accepted=p.optJSONObject("base")?:baseline(app,place.id)?.takeIf{it.optInt("revision")==request.optInt("revision")}?.optJSONObject("wire")
+    val remotePayload=record.getJSONObject("payload")
+    val reconciled=try{
+     if(plain(request.getJSONObject("payload"))==plain(remotePayload))remotePayload
+     else if(accepted!=null)merge(accepted,request.getJSONObject("payload"),remotePayload)
+     else throw ServerSession.Failure(409,"Báo cáo cũ đã thay đổi ở cả hai nơi và chưa có mốc đối chiếu. Ảnh trên máy vẫn được giữ; chưa ghi đè server.")
+    }catch(conflict:ServerSession.Failure){
+     // The server definitively rejected this operation. Keep the report and baseline,
+     // but release this stale request so later local edits can be considered.
+     stateFile(app,place.id).delete();throw conflict
+    }
+    request=JSONObject().put("operation",UUID.randomUUID().toString()).put("revision",record.getInt("revision")).put("payload",reconciled)
+    p.put("request",request).put("base",remotePayload)
+    savePending(app,place.id,p)
+    progress("Đang gộp thay đổi và gửi lại ${place.name}")
+    ServerSession.api("mobile/folders/$remote","PUT",request)
+   }
+   check(scope==app.accountScope){"Tài khoản đã thay đổi"}
+   val source=p.optJSONObject("source")?:request.getJSONObject("payload")
+   val needsNasMx=MxPhotoUpload.needsCoordinates(source)
+   saveBaseline(app,place.id,r.getInt("revision"),source,request.getJSONObject("payload"))
+   check(prefs.edit().putInt("$key-revision",r.getInt("revision")).putString("$key-signature",p.getString("signature"))
+    .putBoolean("$key-refresh",plain(source)!=plain(request.getJSONObject("payload"))||needsNasMx).commit()){"Chưa lưu được trạng thái đồng bộ"}
+   stateFile(app,place.id).delete()
+   if(needsNasMx){AutoSync.refresh();AutoSync.awaitMx(app,place.id)}
+  }
+  suspend fun retryPending(){try{finishPending()}catch(e:ServerSession.Failure){if(e.status==400&&e.message.orEmpty().contains("Thiếu ảnh")){stateFile(app,place.id).delete();cache.edit().clear().commit()};throw e}}
+  retryPending();val payload=snapshot(app,place);val signature=sha(payload.toString());if(prefs.getString("$key-signature",null)==signature){if(place.kind=="Tuyến cáp")archiveCompletedCable(app,place,prefs.getString(key,null),true,prefs.getInt("$key-revision",0));progress("Đã đồng bộ ${place.name}");return}
+  val module=ServerSession.module(place.kind);check(module!="cable"||prefs.contains(key)){"Tuyến cáp phải được quản trị tạo và giao trên server."};val remote=prefs.getString(key,null)?:UUID.randomUUID().toString().also{check(prefs.edit().putString(key,it).commit())};val revision=prefs.getInt("$key-revision",0)
+  val map=mutableMapOf<String,String>();images(payload){path->map[path]?:run {val f=File(path).canonicalFile;val root=File(app.accountFilesDir,"photos").canonicalFile.toPath();check(f.toPath().startsWith(root)&&f.isFile){"Ảnh chưa sẵn sàng: ${f.name}"};check(f.length()<=10*1024*1024){"Ảnh ${f.name} vượt 10 MB"};val cacheKey=folderAssetKey(remote,module,path,f);val known=cache.getString(cacheKey,null)?:if(!SharedReports.shared(app,place.id))cache.getString(assetKey(module,path,f),null)else null;val id=if(known!=null)known else{progress("Đang đồng bộ ảnh ${map.size+1} • ${place.name}");val data=withContext(Dispatchers.IO){Base64.encodeToString(f.readBytes(),Base64.NO_WRAP)};ServerSession.api("mobile/assets","POST",JSONObject().put("module",module).put("base64",data).apply{if(revision>0)put("folderId",remote)}).getString("id")};check(scope==app.accountScope);check(cache.edit().putString(cacheKey,id).putString("local-${place.id}-$id",path).commit());map[path]=id;id}}
+  val base=baseline(app,place.id)?.takeIf{it.optInt("revision")==revision}
+  val outgoing=if(base!=null)merge(base.getJSONObject("localWire"),payload,base.getJSONObject("wire"))else payload
+  val journal=JSONObject().put("remote",remote).put("signature",signature).put("source",payload).put("request",JSONObject().put("operation",UUID.randomUUID().toString()).put("revision",revision).put("payload",outgoing))
+  base?.optJSONObject("wire")?.let{journal.put("base",it)}
+  savePending(app,place.id,journal)
+  retryPending();app.flushReport();val remainsPending=syncState(app,place).second;if(place.kind=="Tuyến cáp"&&!remainsPending)archiveCompletedCable(app,place,prefs.getString(key,null),true,prefs.getInt("$key-revision",0));progress(if(remainsPending)"Có thay đổi mới đang chờ gửi: ${place.name}" else "Đã đồng bộ ${place.name}")
+ }

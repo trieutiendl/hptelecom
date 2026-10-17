@@ -1,0 +1,241 @@
+{
+  "baseline": {
+    "app": "HP Telecom Android",
+    "version_name": "4.1.4",
+    "version_code": 136,
+    "review_date": "2026-10-12",
+    "purpose": "Relocation UI and data reference; not a standalone Android project"
+  },
+  "files": [
+    {
+      "path": "source/IncidentActivity.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/IncidentActivity.kt",
+      "source_sha256": "195c63449c30c5c166e736962d452f735f1a5810fcd95874aa700b9f88feb360",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/IncidentReport.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/IncidentReport.kt",
+      "source_sha256": "f46d229e5e5e41155323eeb911521f5117a33df4a26bdf6369b25f1bef7e9123",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/IncidentDossier.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/IncidentDossier.kt",
+      "source_sha256": "958be69d63e32b1054598ba8fac909212943e69b318cbd32d072c883f0e47a0c",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/IncidentPhotoGps.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/IncidentPhotoGps.kt",
+      "source_sha256": "c85de058b6a73c4baaacdc3aa2d532681e0f954de3fc8f6df36ab667924291f4",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/SharedReports.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/SharedReports.kt",
+      "source_sha256": "cf0f32afb8591a147b4f75918908e8aab81f9f819ba843778e7b190dc5099648",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/ReportPhotoRemoval.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/ReportPhotoRemoval.kt",
+      "source_sha256": "cdbc5330af58e6536685d3adca4f94e38eeedaf153e12342d44bd63de2ac8d21",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/ReportCompletion.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/ReportCompletion.kt",
+      "source_sha256": "8ef290ceac3972fdfad8add93501f02ed540d609ffc97086164d149397e39ff9",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/ReportMonthSelection.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/ReportMonthSelection.kt",
+      "source_sha256": "c9dadb3dcbbffd572fab531d0a2e3f40e3566921032f302ac239094ad2108795",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/LocalReportRetention.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/LocalReportRetention.kt",
+      "source_sha256": "931e05bc3f521108ccd10652005b16f22ac0589b6e607239b8f79170b2d5a79e",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/PhotoMutationDelta.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/PhotoMutationDelta.kt",
+      "source_sha256": "4b8a26c8f2833c0750427ec471c6c7a077e75d8c4c622922b452d4196d7eea6d",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/MxCoordinates.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MxCoordinates.kt",
+      "source_sha256": "410b57aa5920b70ac7cc846d14d68c0763159e5292371667a15e4ce05b83ff13",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/MxPhotoUpload.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MxPhotoUpload.kt",
+      "source_sha256": "1663f80707e943343c99ed13044ba80f1f636b7c423d8f49b4ed53a31163bed7",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/MxLocalReader.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MxLocalReader.kt",
+      "source_sha256": "bd8365272d186079407c8bb17d807c11541186b0c7daa4dce98a2596846410e2",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/MxLocalParser.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MxLocalParser.kt",
+      "source_sha256": "972acd09724b49406be8253cdc55ec4b016ec0a4256279beb5489958eb7dff87",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/MxLocalCache.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MxLocalCache.kt",
+      "source_sha256": "ff8113a7d1707b2b901a6207a6a16e918ccfc18e08621d2985def247b8bc8e63",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/MxImageRegions.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MxImageRegions.kt",
+      "source_sha256": "ea622908cb9ed6c54a6b8a4e83e01913984b08ca7b189cd5866a1a8906f6c555",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/MxReadEvidence.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MxReadEvidence.kt",
+      "source_sha256": "b8a0ba884326ca4a5fb7c2f889eba0a8b3852174c16e56d06a159a23595818ea",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/MxRefreshSchedule.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MxRefreshSchedule.kt",
+      "source_sha256": "e646487770a09f34058c0567fdac8f5aa7c6407537d350d29482eb748fb13256",
+      "form": "complete source file"
+    },
+    {
+      "path": "source/AutoSync.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/AutoSync.kt",
+      "source_sha256": "7cbee3beb6d69fe5241e531be87cc893d3defcbecc079d2e4aa4450d1499a239",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/RelocationTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/RelocationTest.kt",
+      "source_sha256": "142b46b05364f3b7c072cdc5a11f28d07397d527476391966775baa47e766848",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/IncidentReportTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/IncidentReportTest.kt",
+      "source_sha256": "f0b9c732805bd4290d3647f01a7a10c1b8a81508b819a929cb86af105f6f62e6",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/MxGroupsTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/MxGroupsTest.kt",
+      "source_sha256": "0f058a3ef0069a4e33336f157f5589e030cff25c05ea4425ec477b0a478aaae8",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/MxCoordinatesTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/MxCoordinatesTest.kt",
+      "source_sha256": "57464ccbe64ba153889797f778be30531cdada0c6756757fa7b6f2094467b7bb",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/MxPhotoUploadTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/MxPhotoUploadTest.kt",
+      "source_sha256": "710ea4d6a3892096a2a313d46c46d90f9c402800fac52cb5ff3834957718ec57",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/MxLocalParserTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/MxLocalParserTest.kt",
+      "source_sha256": "9d229df576a39637082c9c0b578235d93c640680039007a7397d105cf5e07d4e",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/MxLocalCacheTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/MxLocalCacheTest.kt",
+      "source_sha256": "a70cbde802c0648d3831bb40c2976b719157ff344863a22648eef035381fba75",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/MxReadingRegressionTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/MxReadingRegressionTest.kt",
+      "source_sha256": "b00dfc202fd2ac918a1465359fad654d16a9b999029bf2e97a99b97182a8aebf",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/MxRefreshScheduleTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/MxRefreshScheduleTest.kt",
+      "source_sha256": "1da5407dc78649969ab80a6874b6ecab9e2a195bb23a6d939e8491f083c6b58f",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/ReportPhotoRemovalTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/ReportPhotoRemovalTest.kt",
+      "source_sha256": "7796bc41c1733017097d32be6630ef7cf2ad170e657eb24f624394302d8eb8f6",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/ReportCompletionTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/ReportCompletionTest.kt",
+      "source_sha256": "802e8bbf9df4549e625c0c382d95bca07ded125ac12b568187edea96b67197c3",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/ReportMonthSelectionTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/ReportMonthSelectionTest.kt",
+      "source_sha256": "34335c27b55cde669984c642b8ceea336fba23a98f0639cae09bbabfc092c381",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/LocalReportRetentionTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/LocalReportRetentionTest.kt",
+      "source_sha256": "33c9a5a5976a43628dbfd308c0bec204f466aca4d9f311f6b98de8297b7a3ee4",
+      "form": "complete source file"
+    },
+    {
+      "path": "tests/PhotoMutationDeltaTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/PhotoMutationDeltaTest.kt",
+      "source_sha256": "58891620eef40e9357bc5738fdfa8246932749409d2d52ea9bcc7d302b444321",
+      "form": "complete source file"
+    },
+    {
+      "path": "excerpts/ServerSync.reportWire.kt.txt",
+      "source_path": "app/src/main/java/vn/vltelecom/ServerSync.kt",
+      "source_sha256": "24e129b39c5fa9caa4703049812b9af6fcab519bda6e05131f91d767e8dfdefe",
+      "form": "excerpt",
+      "source_start_line": 45,
+      "source_end_line": 54
+    },
+    {
+      "path": "excerpts/ServerSync.uploadContribution.kt.txt",
+      "source_path": "app/src/main/java/vn/vltelecom/ServerSync.kt",
+      "source_sha256": "24e129b39c5fa9caa4703049812b9af6fcab519bda6e05131f91d767e8dfdefe",
+      "form": "excerpt",
+      "source_start_line": 63,
+      "source_end_line": 132
+    },
+    {
+      "path": "excerpts/ServerSync.removePastMonthReports.kt.txt",
+      "source_path": "app/src/main/java/vn/vltelecom/ServerSync.kt",
+      "source_sha256": "24e129b39c5fa9caa4703049812b9af6fcab519bda6e05131f91d767e8dfdefe",
+      "form": "excerpt",
+      "source_start_line": 342,
+      "source_end_line": 413
+    },
+    {
+      "path": "excerpts/ServerSync.refreshLinked.kt.txt",
+      "source_path": "app/src/main/java/vn/vltelecom/ServerSync.kt",
+      "source_sha256": "24e129b39c5fa9caa4703049812b9af6fcab519bda6e05131f91d767e8dfdefe",
+      "form": "excerpt",
+      "source_start_line": 257,
+      "source_end_line": 290
+    }
+  ]
+}
