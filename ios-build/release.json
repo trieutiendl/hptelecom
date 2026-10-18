@@ -1,8 +1,8 @@
 {
-  "version": "4.1.17",
-  "build": "46",
+  "version": "4.1.18",
+  "build": "47",
   "bundleIdentifier": "vn.hptelecom.fieldwork.server",
   "teamId": "DX247Z5GQ8",
-  "sourceSha256": "67e45be047fdab705c00d5537b426d91d784a7ab8f94b922ae9e6b5b199ce445",
-  "testsPassed": 124
+  "sourceSha256": "b4ae70148d951b7eeda90342e0106e6bfb5d1dded313e27415cf70db93473f97",
+  "testsPassed": 249
 }
