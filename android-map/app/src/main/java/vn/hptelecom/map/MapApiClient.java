@@ -153,15 +153,31 @@ public final class MapApiClient {
 
     /** Move/copy only explicit shared feature IDs in one scope; patrol reports are never written. */
     public synchronized JSONObject transferSharedFeatures(JSONObject args) throws IOException {
+        return mutateSharedFeatures(args, "transfer");
+    }
+
+    public synchronized JSONObject editSharedFeature(JSONObject args) throws IOException {
+        return mutateSharedFeatures(args, "edit");
+    }
+
+    public synchronized JSONObject deleteSharedFeatures(JSONObject args) throws IOException {
+        return mutateSharedFeatures(args, "delete");
+    }
+
+    private JSONObject mutateSharedFeatures(JSONObject args, String action) throws IOException {
         try {
-            validateTransferArguments(args);
-            if (!isAdmin()) throw new ApiException(403, "Chỉ quản trị viên được sao chép hoặc di chuyển bản đồ.");
+            if ("transfer".equals(action)) validateTransferArguments(args);
+            else if ("edit".equals(action)) validateEditArguments(args);
+            else validateDeleteArguments(args);
+            if (!isAdmin()) throw new ApiException(403, "Chỉ quản trị viên được thay đổi bản đồ.");
             String token = preferences.getString("token", "");
             JSONObject me = request("/api/me", "GET", null, token);
             verifiedRole = me.optString("role", "");
             if (!"admin".equals(verifiedRole))
                 throw new ApiException(403, "Quyền quản trị đã thay đổi. Hãy làm mới bản đồ.");
-            JSONObject plan = prepareSharedTransfer(request("/api/map-layers", "GET", null, token), args);
+            JSONObject data = request("/api/map-layers", "GET", null, token);
+            JSONObject plan = "transfer".equals(action) ? prepareSharedTransfer(data, args)
+                    : "edit".equals(action) ? prepareSharedEdit(data, args) : prepareSharedDelete(data, args);
             JSONObject transfer = plan.getJSONObject("transfer");
             if (!transfer.getBoolean("noop")) {
                 try {
@@ -187,24 +203,32 @@ public final class MapApiClient {
 
     private static JSONObject transferNeedsRefresh(JSONObject transfer, boolean confirmed) throws JSONException {
         transfer.put("saved", confirmed ? true : JSONObject.NULL).put("uncertain", !confirmed);
+        boolean transferMode = "copy".equals(transfer.optString("mode")) || "move".equals(transfer.optString("mode"));
         return new JSONObject().put("ok", true).put("transfer", transfer).put("refreshRequired", true)
                 .put("warning", confirmed ? "Đã lưu thay đổi trên server nhưng chưa tải lại được bản đồ. Hãy làm mới; không thực hiện lại thao tác."
-                        : "Chưa xác nhận được kết quả lưu. Hãy làm mới và kiểm tra thư mục đích trước khi thao tác lại.");
+                        : "Chưa xác nhận được kết quả lưu. Hãy làm mới và kiểm tra " + (transferMode ? "thư mục đích" : "bản đồ") + " trước khi thao tác lại.");
     }
 
-    private static void validateTransferArguments(JSONObject args) throws IOException {
+    private static void validateScopeArguments(JSONObject args) throws IOException {
         if (args == null || !(args.opt("team") instanceof String) || args.optString("team").length() > 100
                 || !args.optString("team").equals(args.optString("team").trim())
                 || args.optString("team").matches("(?s).*[\\x00-\\x1f].*"))
             throw new IOException("Nhóm bản đồ không hợp lệ.");
+        Object revision = args.opt("revision");
+        if (!(revision instanceof Integer || revision instanceof Long) || ((Number)revision).longValue() < 0)
+            throw new IOException("Cần phiên bản bản đồ trước khi thay đổi.");
+    }
+
+    private static void validateTransferArguments(JSONObject args) throws IOException {
+        validateScopeArguments(args);
         String mode = args.optString("mode");
         if (!("copy".equals(mode) || "move".equals(mode))) throw new IOException("Chọn Sao chép hoặc Di chuyển.");
         if (!(args.opt("targetFolderId") instanceof String) || !args.optString("targetFolderId").matches("[A-Za-z0-9_-]{1,80}"))
             throw new IOException("Thư mục đích không hợp lệ.");
-        Object revision = args.opt("revision");
-        if (!(revision instanceof Integer || revision instanceof Long) || ((Number)revision).longValue() < 0)
-            throw new IOException("Cần phiên bản bản đồ trước khi thay đổi.");
-        JSONArray ids = args.optJSONArray("featureIds");
+        validateFeatureIds(args.optJSONArray("featureIds"));
+    }
+
+    private static void validateFeatureIds(JSONArray ids) throws IOException {
         if (ids == null || ids.length() == 0 || ids.length() > 10000)
             throw new IOException("Chọn từ 1 đến 10.000 điểm hoặc đường.");
         Set<String> unique = new HashSet<>();
@@ -215,15 +239,30 @@ public final class MapApiClient {
         }
     }
 
-    /** Pure transform for regression checks; input data is never mutated. */
-    static JSONObject prepareSharedTransfer(JSONObject response, JSONObject args) throws IOException, JSONException {
-        validateTransferArguments(args);
-        String team = args.getString("team"), target = args.getString("targetFolderId"), mode = args.getString("mode");
+    private static void validateDeleteArguments(JSONObject args) throws IOException {
+        validateScopeArguments(args);
+        validateFeatureIds(args.optJSONArray("featureIds"));
+    }
+
+    private static void validateEditArguments(JSONObject args) throws IOException {
+        validateScopeArguments(args);
+        if (!(args.opt("featureId") instanceof String) || !args.optString("featureId").matches("[A-Za-z0-9_-]{1,80}"))
+            throw new IOException("Điểm cần chỉnh sửa không hợp lệ.");
+        Object lat = args.opt("lat"), lon = args.opt("lon");
+        if (!(lat instanceof Number) || !(lon instanceof Number)
+                || !Double.isFinite(((Number)lat).doubleValue()) || !Double.isFinite(((Number)lon).doubleValue())
+                || Math.abs(((Number)lat).doubleValue()) > 90 || Math.abs(((Number)lon).doubleValue()) > 180)
+            throw new IOException("Nhập vĩ độ từ -90 đến 90 và kinh độ từ -180 đến 180.");
+        if (args.has("name") && (!(args.opt("name") instanceof String) || args.optString("name").trim().length() > 200))
+            throw new IOException("Tên điểm tối đa 200 ký tự.");
+    }
+
+    private static JSONObject sharedScope(JSONObject response, JSONObject args) throws IOException, JSONException {
         JSONArray layers = requiredArray(response, "layers");
         JSONObject original = null;
         for (int i = 0; i < layers.length(); i++) {
             JSONObject layer = layers.optJSONObject(i);
-            if (layer != null && team.equals(layer.optString("team"))) {
+            if (layer != null && args.getString("team").equals(layer.optString("team"))) {
                 if (original != null) throw invalidResponse();
                 original = layer;
             }
@@ -231,6 +270,14 @@ public final class MapApiClient {
         if (original == null) throw new ApiException(409, "Nhóm bản đồ không còn tồn tại. Hãy làm mới.");
         if (original.optLong("revision", -1) != args.getLong("revision"))
             throw new ApiException(409, "Bản đồ đã thay đổi. Hãy làm mới và chọn lại đối tượng.");
+        return original;
+    }
+
+    /** Pure transform for regression checks; input data is never mutated. */
+    static JSONObject prepareSharedTransfer(JSONObject response, JSONObject args) throws IOException, JSONException {
+        validateTransferArguments(args);
+        String team = args.getString("team"), target = args.getString("targetFolderId"), mode = args.getString("mode");
+        JSONObject original = sharedScope(response, args);
         JSONArray folders = requiredArray(original, "folders"), features = requiredArray(original, "features");
         boolean targetExists = false;
         for (int i = 0; i < folders.length(); i++) if (target.equals(folders.getJSONObject(i).optString("id"))) targetExists = true;
@@ -271,16 +318,88 @@ public final class MapApiClient {
                         .put("count", changed).put("selectedCount", ids.size()).put("noop", changed == 0));
     }
 
+    static JSONObject prepareSharedDelete(JSONObject response, JSONObject args) throws IOException, JSONException {
+        validateDeleteArguments(args);
+        JSONObject original = sharedScope(response, args);
+        JSONArray folders = requiredArray(original, "folders"), features = requiredArray(original, "features"), requested = args.getJSONArray("featureIds");
+        Set<String> ids = new HashSet<>(), found = new HashSet<>(), allIds = new HashSet<>();
+        for (int i = 0; i < requested.length(); i++) ids.add(requested.getString(i));
+        JSONArray next = new JSONArray();
+        for (int i = 0; i < features.length(); i++) {
+            JSONObject feature = features.getJSONObject(i);
+            String id = feature.getString("id");
+            if (!allIds.add(id)) throw invalidResponse();
+            if (ids.contains(id)) found.add(id);
+            else next.put(new JSONObject(feature.toString()));
+        }
+        if (!found.equals(ids)) throw new ApiException(409, "Có điểm hoặc đường đã thay đổi hoặc bị xóa. Hãy làm mới.");
+        return mutationPlan(args, folders, next, "delete", ids.size()).put("removedIds", new JSONArray(requested.toString()));
+    }
+
+    static JSONObject prepareSharedEdit(JSONObject response, JSONObject args) throws IOException, JSONException {
+        validateEditArguments(args);
+        JSONObject original = sharedScope(response, args);
+        JSONArray folders = requiredArray(original, "folders"), next = new JSONArray(requiredArray(original, "features").toString());
+        JSONObject selected = null;
+        Set<String> allIds = new HashSet<>();
+        for (int i = 0; i < next.length(); i++) {
+            JSONObject feature = next.getJSONObject(i);
+            if (!allIds.add(feature.getString("id"))) throw invalidResponse();
+            if (args.getString("featureId").equals(feature.getString("id"))) selected = feature;
+        }
+        if (selected == null) throw new ApiException(409, "Điểm đã thay đổi hoặc bị xóa. Hãy làm mới.");
+        JSONObject geometry = selected.optJSONObject("geometry");
+        if (geometry == null || !"Point".equals(geometry.optString("type")))
+            throw new IOException("Chỉ điểm được chỉnh sửa vị trí bằng thao tác này.");
+        JSONArray coordinates = geometry.optJSONArray("coordinates");
+        if (coordinates == null || coordinates.length() < 2) throw invalidResponse();
+        double lat = args.getDouble("lat"), lon = args.getDouble("lon");
+        String name = args.has("name") ? args.getString("name").trim() : selected.optString("name");
+        boolean changed = coordinates.getDouble(0) != lon || coordinates.getDouble(1) != lat || !name.equals(selected.optString("name"));
+        coordinates.put(0, lon); coordinates.put(1, lat);
+        if (args.has("name")) selected.put("name", name);
+        return mutationPlan(args, folders, next, "edit", changed ? 1 : 0)
+                .put("editedFeature", new JSONObject(selected.toString()));
+    }
+
+    private static JSONObject mutationPlan(JSONObject args, JSONArray folders, JSONArray features, String mode, int count) throws JSONException {
+        return new JSONObject().put("body", new JSONObject().put("team", args.getString("team")).put("revision", args.getLong("revision"))
+                .put("folders", new JSONArray(folders.toString())).put("features", features))
+                .put("transfer", new JSONObject().put("mode", mode).put("count", count).put("noop", count == 0));
+    }
+
     private static boolean confirmsTransfer(JSONObject response, JSONObject plan) throws IOException, JSONException {
         JSONObject body = plan.getJSONObject("body");
-        JSONArray layers = requiredArray(response, "layers"), ids = plan.getJSONArray("resultIds");
+        JSONArray layers = requiredArray(response, "layers"), ids = plan.optJSONArray("resultIds");
         Set<String> expected = new HashSet<>();
-        for (int i = 0; i < ids.length(); i++) expected.add(ids.getString(i));
+        if (ids != null) for (int i = 0; i < ids.length(); i++) expected.add(ids.getString(i));
         for (int i = 0; i < layers.length(); i++) {
             JSONObject layer = layers.getJSONObject(i);
             if (!body.getString("team").equals(layer.optString("team"))) continue;
             if (layer.optLong("revision", -1) <= body.getLong("revision")) return false;
             JSONArray features = requiredArray(layer, "features");
+            String mode = plan.getJSONObject("transfer").getString("mode");
+            if ("delete".equals(mode)) {
+                JSONArray removed = plan.getJSONArray("removedIds");
+                Set<String> removedIds = new HashSet<>();
+                for (int d = 0; d < removed.length(); d++) removedIds.add(removed.getString(d));
+                for (int f = 0; f < features.length(); f++) if (removedIds.contains(features.getJSONObject(f).optString("id"))) return false;
+                return true;
+            }
+            if ("edit".equals(mode)) {
+                JSONObject wanted = plan.getJSONObject("editedFeature");
+                for (int f = 0; f < features.length(); f++) {
+                    JSONObject saved = features.getJSONObject(f);
+                    if (!wanted.getString("id").equals(saved.optString("id"))) continue;
+                    JSONObject geometry = saved.optJSONObject("geometry");
+                    if (geometry == null || !"Point".equals(geometry.optString("type"))) return false;
+                    JSONArray coords = geometry.optJSONArray("coordinates"), expectedCoords = wanted.getJSONObject("geometry").getJSONArray("coordinates");
+                    return coords != null && coords.length() >= 2 && coords.getDouble(0) == expectedCoords.getDouble(0)
+                            && coords.getDouble(1) == expectedCoords.getDouble(1) && wanted.optString("name").equals(saved.optString("name"))
+                            && wanted.optString("folder_id").equals(saved.optString("folder_id"));
+                }
+                return false;
+            }
             for (int f = 0; f < features.length(); f++) {
                 JSONObject feature = features.getJSONObject(f);
                 if (plan.getString("targetFolderId").equals(feature.optString("folder_id"))) expected.remove(feature.optString("id"));

@@ -30,6 +30,14 @@ public final class MapSmokeRunner extends Instrumentation {
     private void check(String code, String message) throws Exception {
         if (!"true".equals(js(code))) throw new AssertionError(message);
     }
+    private void checkEventually(String code, String message) throws Exception {
+        for (int i = 0; i < 50; i++) {
+            if ("true".equals(js(code))) return;
+            SystemClock.sleep(100);
+        }
+        screenshot("99-shared-action-failure");
+        throw new AssertionError(message + ": " + js("JSON.stringify({selectionHidden:document.getElementById('selection-bar').hidden,modalHidden:document.getElementById('modal-backdrop').hidden,connection:document.getElementById('connection').textContent,toast:document.getElementById('toast').textContent,shared:document.getElementById('shared-list').textContent,error:document.querySelector('.form-error:not([hidden])')&&document.querySelector('.form-error:not([hidden])').textContent})"));
+    }
     private void checkPatrolMarkers() throws Exception {
         check("(function(){var labels=Array.from(document.querySelectorAll('.leaflet-marker-pane .hp-marker')).map(function(e){return e.textContent.trim();});return labels.length===4&&['MX','DP','QA-A','QA-B'].every(function(v){return labels.includes(v);})&&!labels.some(function(v){return v.includes('GPS');});})()",
                 "Map must hide generic GPS while retaining MX, DP and named endpoints");
@@ -106,11 +114,45 @@ public final class MapSmokeRunner extends Instrumentation {
                     "Cannot select shared feature " + id);
         }
         check("document.getElementById('selection-count').textContent.startsWith('2 ')", "Shared selection did not retain point and line");
-        check("(function(){document.getElementById('selection-copy').click();document.getElementById('transfer-target').value='qa-dest';var original=window.HPMap,spy={request:function(id,action,args){if(action!=='transferSharedFeatures')return original.request(id,action,args);window.__qaTransfer=JSON.parse(args);var updated=JSON.parse(JSON.stringify(window.__qaFixture)),source=updated.sharedLayers[0],dest=updated.sharedLayers[1];updated.sharedLayers.forEach(function(l){l.revision=4;});dest.markers=[Object.assign({},source.markers[0],{feature_id:'qa-copy-point'})];dest.lines=JSON.parse(JSON.stringify(source.lines));dest.lineFeatures=[Object.assign({},source.lineFeatures[0],{feature_id:'qa-copy-line'})];updated.transfer={saved:true,mode:'copy',count:2};window.HPMapResult(id,updated);}};try{window.HPMap=spy;if(window.HPMap!==spy)return false;document.getElementById('transfer-confirm').click();var t=window.__qaTransfer;return t&&t.team==='QA'&&t.revision===3&&t.mode==='copy'&&t.targetFolderId==='qa-dest'&&t.featureIds.length===2&&t.featureIds.includes('qa-point')&&t.featureIds.includes('qa-line');}finally{window.HPMap=original;}})()",
+        check("(function(){document.getElementById('selection-copy').click();document.getElementById('transfer-target').value='qa-dest';var original=window.HPMap,spy={request:function(id,action,args){if(action!=='transferSharedFeatures')return original.request(id,action,args);window.__qaTransfer=JSON.parse(args);var updated=JSON.parse(JSON.stringify(window.__qaFixture)),source=updated.sharedLayers[0],dest=updated.sharedLayers[1];updated.sharedLayers.forEach(function(l){l.revision=4;});dest.markers=[Object.assign({},source.markers[0],{feature_id:'qa-copy-point'})];dest.lines=JSON.parse(JSON.stringify(source.lines));dest.lineFeatures=[Object.assign({},source.lineFeatures[0],{feature_id:'qa-copy-line'})];updated.transfer={saved:true,mode:'copy',count:2};window.__qaFixture=updated;setTimeout(function(){window.HPMapResult(id,updated);},50);}};try{window.HPMap=spy;if(window.HPMap!==spy)return false;document.getElementById('transfer-confirm').click();var t=window.__qaTransfer;return t&&t.team==='QA'&&t.revision===3&&t.mode==='copy'&&t.targetFolderId==='qa-dest'&&t.featureIds.length===2&&t.featureIds.includes('qa-point')&&t.featureIds.includes('qa-line');}finally{window.HPMap=original;}})()",
                 "Shared transfer did not use raw feature/folder IDs, selected scope and revision");
-        check("(function(){var rows=Array.from(document.querySelectorAll('.shared-row'));return document.getElementById('selection-bar').hidden&&document.getElementById('modal-backdrop').hidden&&rows.some(function(r){return r.textContent.includes('Đích quản trị kiểm thử')&&r.textContent.includes('1 điểm hiển thị')&&r.textContent.includes('1 đường');})()",
+        checkEventually("(function(){var rows=Array.from(document.querySelectorAll('.shared-row'));return document.getElementById('selection-bar').hidden&&document.getElementById('modal-backdrop').hidden&&rows.some(function(r){return r.textContent.includes('Đích quản trị kiểm thử')&&r.textContent.includes('1 điểm hiển thị')&&r.textContent.includes('1 đường');})()",
                 "Shared transfer response did not clear selection or refresh destination data");
         screenshot("10-shared-transfer-complete");
+    }
+    private void checkLocalEditDelete() throws Exception {
+        check("(function(){document.getElementById('nav-map').click();var p=document.querySelector('.leaflet-marker-pane .hp-marker.local');if(!p)return false;p.click();document.getElementById('edit-feature').click();document.getElementById('point-lat').value='12.691';document.getElementById('point-lon').value='108.061';document.getElementById('feature-name').value='LOCAL-QA-EDIT';document.getElementById('save-feature').click();var s=JSON.parse(localStorage.getItem('hpmap-v2')),f=s.features.find(function(f){return f.id===window.__qaLocalOriginal;});return s.features.length===2&&f&&f.name==='LOCAL-QA-EDIT'&&f.coords[0]===12.691&&f.coords[1]===108.061&&f.folder===window.__qaLocalDest;})()",
+                "Local edit did not preserve original ID/folder and update position");
+        check("(function(){var p=document.querySelector('.leaflet-marker-pane .hp-marker.local');p.click();document.getElementById('delete-feature').click();var guarded=!!document.getElementById('delete-confirm')&&JSON.parse(localStorage.getItem('hpmap-v2')).features.length===2;document.getElementById('delete-cancel').click();return guarded&&JSON.parse(localStorage.getItem('hpmap-v2')).features.length===2;})()",
+                "Local delete cancellation did not preserve points");
+        check("(function(){var p=document.querySelector('.leaflet-marker-pane .hp-marker.local');p.click();document.getElementById('delete-feature').click();document.getElementById('delete-confirm').click();var s=JSON.parse(localStorage.getItem('hpmap-v2'));return s.features.length===1&&!s.features.some(function(f){return f.id===window.__qaLocalOriginal;})&&s.features[0].folder===window.__qaLocalDest&&s.features[0].coords[0]===12.681&&s.features[0].coords[1]===108.051;})()",
+                "Local delete did not remove only the confirmed selection");
+    }
+    private void checkSharedEditDelete() throws Exception {
+        // Fake only writes for the fictional QA scope; no server data is mutated.
+        js("window.__qaOriginalBridge=window.HPMap;window.__qaEdit=null;window.__qaDelete=null;window.HPMap={request:function(id,action,args){if(action!=='editSharedFeature'&&action!=='deleteSharedFeatures')return window.__qaOriginalBridge.request(id,action,args);var a=JSON.parse(args),updated=JSON.parse(JSON.stringify(window.__qaFixture));updated.sharedLayers.forEach(function(l){l.revision++;});if(action==='editSharedFeature'){window.__qaEdit=a;updated.sharedLayers.forEach(function(l){l.markers=l.markers.map(function(p){return p.feature_id===a.featureId?Object.assign({},p,{lat:a.lat,lon:a.lon,label:a.name,position:a.name,name:a.name}):p;});});updated.transfer={saved:true,mode:'edit',count:1};}else{window.__qaDelete=a;updated.sharedLayers.forEach(function(l){l.markers=l.markers.filter(function(p){return !a.featureIds.includes(p.feature_id);});l.lineFeatures=l.lineFeatures.filter(function(f){return !a.featureIds.includes(f.feature_id);});l.lines=l.lineFeatures.map(function(f){return f.coords;});});updated.transfer={saved:true,mode:'delete',count:a.featureIds.length};}window.__qaFixture=updated;setTimeout(function(){window.HPMapResult(id,updated);},50);}};true");
+        try {
+            check("(function(){document.getElementById('nav-map').click();var p=Array.from(document.querySelectorAll('.leaflet-marker-pane .hp-marker')).find(function(e){return e.textContent.trim()==='DP';});if(!p)return false;p.click();var edit=document.getElementById('edit-server-point');if(!edit)return false;edit.click();document.getElementById('shared-point-name').value='Điểm sửa QA';document.getElementById('shared-point-lat').value='91';document.getElementById('shared-point-save').click();return !document.getElementById('shared-point-error').hidden&&window.__qaEdit===null;})()",
+                    "Shared point edit did not reject invalid coordinates before native write");
+            check("(function(){document.getElementById('shared-point-lat').value='12.690';document.getElementById('shared-point-lon').value='108.060';document.getElementById('shared-point-save').click();var a=window.__qaEdit;return a&&a.team==='QA'&&a.featureId==='qa-point'&&a.revision===4&&a.name==='Điểm sửa QA'&&a.lat===12.69&&a.lon===108.06;})()",
+                    "Shared edit did not send raw ID, revision and numeric coordinates");
+            checkEventually("document.getElementById('modal-backdrop').hidden&&Array.from(document.querySelectorAll('.leaflet-marker-pane .hp-marker')).some(function(e){return e.textContent.trim()==='Điểm sửa QA';})",
+                    "Shared point edit response did not update map");
+            screenshot("11-edited-shared-point");
+            js("document.getElementById('nav-routes').click();document.getElementById('shared-tab').click();document.querySelector('.select-shared-features').click();true");
+            for (String id : new String[]{"qa-point", "qa-line"}) {
+                check("(function(){var c=document.querySelector('.feature-choice input[data-source=shared][data-feature-id=\"" + id + "\"]');if(!c)return false;c.click();return document.querySelector('.feature-choice input[data-source=shared][data-feature-id=\"" + id + "\"]').checked;})()",
+                        "Shared delete could not select " + id);
+            }
+            check("(function(){document.getElementById('selection-delete').click();var guarded=!!document.getElementById('delete-confirm')&&window.__qaDelete===null;document.getElementById('delete-cancel').click();return guarded&&window.__qaDelete===null&&document.getElementById('selection-count').textContent.startsWith('2 ');})()",
+                    "Shared delete cancellation sent a write or lost selection");
+            js("document.getElementById('selection-delete').click();true");
+            screenshot("12-delete-selection-confirmation");
+            check("(function(){document.getElementById('delete-confirm').click();var a=window.__qaDelete;return a&&a.team==='QA'&&a.revision===5&&a.featureIds.length===2&&a.featureIds.includes('qa-point')&&a.featureIds.includes('qa-line');})()",
+                    "Shared delete did not send only selected raw IDs at current revision");
+            checkEventually("(function(){var rows=Array.from(document.querySelectorAll('.shared-row'));return document.getElementById('modal-backdrop').hidden&&document.getElementById('selection-bar').hidden&&rows.some(function(r){return r.textContent.includes('Thư mục kiểm thử')&&r.textContent.includes('0 điểm hiển thị')&&r.textContent.includes('0 đường');})&&rows.some(function(r){return r.textContent.includes('Đích quản trị kiểm thử')&&r.textContent.includes('1 điểm hiển thị')&&r.textContent.includes('1 đường');});})()",
+                    "Shared deletion did not remove only source point/line and retain copied destination data");
+        } finally { js("window.HPMap=window.__qaOriginalBridge;delete window.__qaOriginalBridge;true"); }
     }
     private WebView find(View view) {
         if (view instanceof WebView) return (WebView)view;
@@ -179,11 +221,13 @@ public final class MapSmokeRunner extends Instrumentation {
                     "Administrator cannot copy a selected point to a local folder");
             checkDirections(true, false);
             checkLocalTransfers();
+            checkLocalEditDelete();
             checkSharedTransfers(fixture);
+            checkSharedEditDelete();
             js("HPMapApp.receiveSession("+fixture+");true");
             check("document.getElementById('modal-backdrop').hidden&&document.getElementById('creation-tools').hidden","Role downgrade left edit form open");
             checkPatrolMarkers();
-            result.putString("stream","HP_MAP_SMOKE_PASS: login, packaged map, hidden GPS with retained geometry/KML, MX/DP/endpoints, terrain switching/persistence, directions coordinates, local point copy/move, shared point+line selection/transfer/revision refresh, admin/read-only roles.\n");
+            result.putString("stream","HP_MAP_SMOKE_PASS: login, packaged map, hidden GPS with retained geometry/KML, MX/DP/endpoints, terrain switching/persistence, directions coordinates, local copy/move/edit/delete, shared point+line transfer/edit/delete with revision refresh and confirmation, admin/read-only roles.\n");
             finish(Activity.RESULT_OK,result);
         } catch(Throwable failure) {
             result.putString("stream","HP_MAP_SMOKE_FAIL: "+failure.getClass().getSimpleName()+": "+failure.getMessage()+"\n");

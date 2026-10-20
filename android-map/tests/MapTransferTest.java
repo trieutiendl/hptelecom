@@ -201,6 +201,75 @@ public final class MapTransferTest {
         check(!result.getJSONObject("transfer").getBoolean("uncertain") && result.getString("warning").contains("không thực hiện lại"), "User must not repeat confirmed transfer");
         check(posts() == 1 && responses.isEmpty(), "Refresh failure repeated save");
     }
+    private static JSONObject editArgs() throws Exception {
+        return new JSONObject().put("team", "West").put("revision", 7).put("featureId", "point")
+                .put("name", " MX mới ").put("lat", 12.678).put("lon", 108.789);
+    }
+    private static JSONObject deleteArgs() throws Exception {
+        return new JSONObject().put("team", "West").put("revision", 7).put("featureIds", new JSONArray().put("point").put("line"));
+    }
+    private static JSONObject callMutation(MapApiClient client, String mode, JSONObject args) throws IOException {
+        return "edit".equals(mode) ? client.editSharedFeature(args) : client.deleteSharedFeatures(args);
+    }
+    private static void editAndDeleteOnlyTouchExplicitSharedSelection() throws Exception {
+        JSONObject source = data(); String before = source.toString();
+        JSONObject edited = MapApiClient.prepareSharedEdit(source, editArgs()), body = edited.getJSONObject("body");
+        JSONArray originals = source.getJSONArray("layers").getJSONObject(0).getJSONArray("features"), changed = body.getJSONArray("features");
+        JSONObject point = feature(changed, "point"), original = feature(originals, "point");
+        check(changed.length() == originals.length() && point.getString("name").equals("MX mới"), "Point rename failed");
+        check(point.getJSONObject("geometry").getJSONArray("coordinates").getDouble(0) == 108.789
+                && point.getJSONObject("geometry").getJSONArray("coordinates").getDouble(1) == 12.678, "Edit reversed coordinate order");
+        for (String key : new String[]{"id", "folder_id", "color", "note"}) check(point.get(key).equals(original.get(key)), "Edit changed unrelated " + key);
+        for (String id : new String[]{"line", "unselected"}) check(feature(changed, id).toString().equals(feature(originals, id).toString()), "Edit changed another feature");
+        JSONObject same = editArgs(); same.remove("name"); same.put("lat", 12.456).put("lon", 108.123);
+        check(MapApiClient.prepareSharedEdit(source, same).getJSONObject("transfer").getBoolean("noop"), "Unchanged coordinates should be no-op");
+        JSONObject withoutName = editArgs(); withoutName.remove("name");
+        check(feature(MapApiClient.prepareSharedEdit(source, withoutName).getJSONObject("body").getJSONArray("features"), "point").getString("name").equals("MX 17"), "Omitted name was overwritten");
+        JSONObject deleted = MapApiClient.prepareSharedDelete(source, deleteArgs());
+        JSONArray retained = deleted.getJSONObject("body").getJSONArray("features");
+        check(retained.length() == 1 && retained.getJSONObject(0).toString().equals(feature(originals, "unselected").toString()), "Delete touched unselected feature");
+        check(deleted.getJSONObject("body").getJSONArray("folders").toString().equals(source.getJSONArray("layers").getJSONObject(0).getJSONArray("folders").toString()), "Delete touched folders");
+        check(source.toString().equals(before), "Edit/delete mutated original snapshot");
+        status(409, () -> MapApiClient.prepareSharedEdit(data(), editArgs().put("featureId", "patrol-generated-id")));
+        status(409, () -> MapApiClient.prepareSharedDelete(data(), deleteArgs().put("featureIds", new JSONArray().put("patrol-generated-id"))));
+        status(409, () -> MapApiClient.prepareSharedEdit(data(), editArgs().put("revision", 6)));
+        status(409, () -> MapApiClient.prepareSharedDelete(data(), deleteArgs().put("revision", 6)));
+        rejection(() -> MapApiClient.prepareSharedEdit(data(), editArgs().put("featureId", "line")));
+        for (JSONObject invalid : new JSONObject[]{editArgs().put("lat", 90.01), editArgs().put("lon", -180.01),
+                editArgs().put("lat", "12"), editArgs().put("lon", JSONObject.NULL), editArgs().put("name", "x".repeat(201)),
+                editArgs().put("featureId", "https://outside.invalid/id")}) rejection(() -> MapApiClient.prepareSharedEdit(data(), invalid));
+        rejection(() -> MapApiClient.prepareSharedDelete(data(), deleteArgs().put("featureIds", new JSONArray().put("point").put("point"))));
+    }
+    private static void editDeleteSharePermissionConflictAndCommitSafety() throws Exception {
+        for (String mode : new String[]{"edit", "delete"}) {
+            JSONObject args = "edit".equals(mode) ? editArgs() : deleteArgs();
+            reset(); MapApiClient cached = client(); status(403, () -> callMutation(cached, mode, args)); check(connections.isEmpty(), "Unverified mutation made a request");
+            MapApiClient demoted = adminClient(); responses.add(me("staff"));
+            status(403, () -> callMutation(demoted, mode, args)); check(connections.size() == 1, "Demoted mutation reached save");
+            MapApiClient stale = adminClient(); responses.add(me("admin")); responses.add(new Response("/api/map-layers", 200, data().toString()));
+            JSONObject staleArgs = new JSONObject(args.toString()).put("revision", 6);
+            status(409, () -> callMutation(stale, mode, staleArgs)); check(posts() == 0, "Stale mutation was posted");
+            JSONObject plan = "edit".equals(mode) ? MapApiClient.prepareSharedEdit(data(), args) : MapApiClient.prepareSharedDelete(data(), args);
+            JSONObject saved = savedData(plan.getJSONObject("body"));
+            MapApiClient success = adminClient(); responses.add(me("admin")); responses.add(new Response("/api/map-layers", 200, data().toString()));
+            responses.add(new Response("/api/map-layers/save", 200, saved.toString())); queueRefresh("admin", saved);
+            JSONObject result = callMutation(success, mode, args);
+            check(result.getJSONObject("transfer").getBoolean("saved") && result.getJSONObject("transfer").getString("mode").equals(mode), "Mutation did not confirm save");
+            check(result.getJSONArray("sharedLayers").getJSONObject(0).getLong("revision") == 8 && posts() == 1, "Mutation response did not refresh");
+            // A 200 response that still contains the old point/deleted IDs must not count as confirmation.
+            for (Response failure : new Response[]{new Response("/api/map-layers/save", new IOException("lost after mutation")),
+                    new Response("/api/map-layers/save", 200, savedData(data().getJSONArray("layers").getJSONObject(0)).toString())}) {
+                MapApiClient uncertain = adminClient(); responses.add(me("admin")); responses.add(new Response("/api/map-layers", 200, data().toString())); responses.add(failure);
+                result = callMutation(uncertain, mode, args);
+                check(result.getBoolean("refreshRequired") && result.getJSONObject("transfer").isNull("saved")
+                        && result.getJSONObject("transfer").getBoolean("uncertain") && posts() == 1, "Unconfirmed mutation invited replay");
+            }
+            MapApiClient committed = adminClient(); responses.add(me("admin")); responses.add(new Response("/api/map-layers", 200, data().toString()));
+            responses.add(new Response("/api/map-layers/save", 200, saved.toString())); responses.add(new Response("/api/me", new IOException("offline after save")));
+            result = callMutation(committed, mode, args);
+            check(result.getBoolean("refreshRequired") && result.getJSONObject("transfer").getBoolean("saved") && posts() == 1, "Committed mutation lost status when refresh failed");
+        }
+    }
     public static void main(String[] args) throws Exception {
         URL.setURLStreamHandlerFactory(protocol -> "https".equals(protocol) ? new URLStreamHandler() {
             @Override protected URLConnection openConnection(URL url) {
@@ -212,7 +281,8 @@ public final class MapTransferTest {
         pureTransformsPreserveSelectionGeometryAndScope(); invalidSelectionAndStaleDataAreRejectedBeforeSave();
         permissionsAreCheckedAgainAndRevisionConflictsNeverWrite(); successfulMoveReturnsFreshSessionAndNoopDoesNotWrite();
         lostOrInvalidSaveResponseNeverInvitesBlindCopyRetry(); confirmedSaveSurvivesRefreshFailureWithoutDuplicateRetry();
-        System.out.println("PASS: shared transfer selection/metadata/geometry preservation, fresh admin checks, scope/revision conflicts, 10k bound, no-op move, fixed origin and no blind retry after uncertain or confirmed save.");
+        editAndDeleteOnlyTouchExplicitSharedSelection(); editDeleteSharePermissionConflictAndCommitSafety();
+        System.out.println("PASS: shared transfer/edit/delete selection and metadata preservation, coordinate bounds/order, fresh admin checks, scope/revision conflicts, 10k bound, no-op move, fixed origin and no blind retry after uncertain or confirmed save.");
     }
     private static final class Response {
         final String path, body; final int status; final IOException failure;

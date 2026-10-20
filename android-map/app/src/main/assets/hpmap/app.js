@@ -46,9 +46,9 @@
       const id = String(++requestNo);
       const timeout = setTimeout(() => {
         pending.delete(id);
-        const error = new Error(action === "transferSharedFeatures" ? "Chưa xác nhận được kết quả. Hãy cập nhật bản đồ trước khi thao tác tiếp." : "Chưa nhận được phản hồi. Vui lòng thử lại.");
-        error.transferUncertain = action === "transferSharedFeatures"; reject(error);
-      }, ["import", "export", "serverLogin"].includes(action) ? 300000 : action === "transferSharedFeatures" ? 180000 : 60000);
+        const error = new Error(["transferSharedFeatures", "editSharedFeature", "deleteSharedFeatures"].includes(action) ? "Chưa xác nhận được kết quả. Hãy cập nhật bản đồ trước khi thao tác tiếp." : "Chưa nhận được phản hồi. Vui lòng thử lại.");
+        error.transferUncertain = ["transferSharedFeatures", "editSharedFeature", "deleteSharedFeatures"].includes(action); reject(error);
+      }, ["import", "export", "serverLogin"].includes(action) ? 300000 : ["transferSharedFeatures", "editSharedFeature", "deleteSharedFeatures"].includes(action) ? 180000 : 60000);
       pending.set(id, { resolve, reject, timeout, action });
       try { window.HPMap.request(id, action, JSON.stringify(args)); }
       catch (error) { clearTimeout(timeout); pending.delete(id); reject(error); }
@@ -60,9 +60,9 @@
     pending.delete(String(id)); clearTimeout(call.timeout);
     try {
       const result = typeof payload === "string" ? JSON.parse(payload) : payload;
-      if (result && (result.ok === false || result.error)) { const error = new Error(result.error || "Không thực hiện được thao tác."); error.status = result.status || result.code || 0; error.authExpired = result.authExpired || result.status === 401 || result.code === 401; error.transferUncertain = call.action === "transferSharedFeatures" && !error.status && !error.authExpired; call.reject(error); }
+      if (result && (result.ok === false || result.error)) { const error = new Error(result.error || "Không thực hiện được thao tác."); error.status = result.status || result.code || 0; error.authExpired = result.authExpired || result.status === 401 || result.code === 401; error.transferUncertain = ["transferSharedFeatures", "editSharedFeature", "deleteSharedFeatures"].includes(call.action) && !error.status && !error.authExpired; call.reject(error); }
       else call.resolve(result || {});
-    } catch (error) { if (call.action === "transferSharedFeatures") error.transferUncertain = true; call.reject(error); }
+    } catch (error) { if (["transferSharedFeatures", "editSharedFeature", "deleteSharedFeatures"].includes(call.action)) error.transferUncertain = true; call.reject(error); }
   };
   let toastTimer;
   function toast(message, duration = 4200) { $("toast").textContent = message; $("toast").hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => $("toast").hidden = true, duration); }
@@ -500,7 +500,7 @@
     if (!shown) return;
     const count = featureSelection.ids.size;
     $("selection-count").textContent = count + " đã chọn · " + (featureSelection.source === "local" ? "Trên máy" : featureSelection.team || "Dùng chung");
-    ["selection-copy", "selection-move"].forEach(id => $(id).disabled = !count || transferBusy);
+    ["selection-copy", "selection-move", "selection-delete"].forEach(id => $(id).disabled = !count || transferBusy);
     $("selection-cancel").disabled = transferBusy; $("selection-list").disabled = transferBusy;
   }
   function appendFeatureChoices(container, features, source, team, depth) {
@@ -618,6 +618,115 @@
       };
     });
   }
+  function commitLocalState(next) {
+    next.selected = Array.from(selected); next.sharedSelected = Array.from(sharedSelected);
+    localStorage.setItem("hpmap-v2", JSON.stringify(next));
+    state = next;
+  }
+  function localEditSnapshot(current, feature, expectedOriginal) {
+    const existing = current.features.find(item => item.id === feature.id);
+    if ((existing ? JSON.stringify(existing) : null) !== expectedOriginal) throw new Error("Đối tượng đã thay đổi. Hãy mở lại để sửa.");
+    if (!String(feature.name || "").trim() || !current.folders.some(folder => folder.id === feature.folder)) throw new Error("Nhập tên và thư mục hợp lệ.");
+    const valid = feature.kind === "point" ? ll(feature.coords) : feature.kind === "line" && Array.isArray(feature.coords) && feature.coords.length > 1 && feature.coords.every(point => ll(point));
+    if (!valid) throw new Error("Tọa độ không hợp lệ. Vĩ độ từ -90 đến 90; kinh độ từ -180 đến 180.");
+    if (!existing && current.features.length >= 10000) throw new Error("Bản đồ trên máy tối đa 10.000 đối tượng.");
+    const next = JSON.parse(JSON.stringify(current)), saved = JSON.parse(JSON.stringify(feature));
+    const index = next.features.findIndex(item => item.id === saved.id);
+    index >= 0 ? next.features.splice(index, 1, saved) : next.features.push(saved);
+    next.activeFolder = saved.folder;
+    const seen = new Set(); let id = saved.folder;
+    while (id && !seen.has(id)) { seen.add(id); const folder = next.folders.find(item => item.id === id); if (!folder) break; folder.visible = true; id = folder.parent; }
+    return next;
+  }
+  function localDeleteSnapshot(current, ids) {
+    const wanted = new Set(ids);
+    if (!wanted.size || current.features.filter(item => wanted.has(item.id)).length !== wanted.size) throw new Error("Một số đối tượng đã thay đổi. Hãy chọn lại.");
+    const next = JSON.parse(JSON.stringify(current));
+    next.features = next.features.filter(item => !wanted.has(item.id));
+    return next;
+  }
+  function sharedMutationAllowed() {
+    if (!requireAdmin() || transferBusy) return false;
+    if (refreshing || sharedTransferNeedsRefresh) { toast("Bấm Cập nhật và tải lại bản đồ thành công trước khi thay đổi dữ liệu.", 6000); return false; }
+    return true;
+  }
+  async function runSharedMutation(action, args, startingSession, errorBoxId, successMessage) {
+    if (!sharedMutationAllowed()) return;
+    const errorBox = $(errorBoxId), controls = Array.from($("modal-body").querySelectorAll("button,input,select,textarea"));
+    transferBusy = true; errorBox.hidden = true; controls.forEach(control => control.disabled = true); renderSelectionBar();
+    const refreshAfter = async warning => {
+      sharedTransferNeedsRefresh = true; featureSelection = null; cancelDrawing(); closeModal(true); renderMap(); renderShared(); toast(warning, 8000);
+      try { const fresh = await native("refresh"); if (sessionEpoch === startingSession) { receiveSession(fresh, false); sharedTransferNeedsRefresh = false; } }
+      catch (_) { toast(warning + " Bấm Cập nhật để tải lại; không lặp lại thao tác ngay.", 8000); }
+    };
+    try {
+      if (sessionEpoch !== startingSession) throw Object.assign(new Error("Phiên đăng nhập đã thay đổi."), {status:403});
+      const current = sharedLayers.filter(layer => String(layer.team || "") === args.team);
+      if (!current.length || current.some(layer => layer.revision !== args.revision)) throw Object.assign(new Error("Bản đồ đã thay đổi."), {status:409});
+      const result = await native(action, args);
+      if (!result.transfer || (result.transfer.saved !== true && !result.transfer.uncertain)) throw Object.assign(new Error("Phản hồi lưu chưa rõ kết quả."), {transferUncertain:true});
+      featureSelection = null; cancelDrawing(); closeModal(true);
+      if (sessionEpoch !== startingSession || !isAdmin()) { sharedTransferNeedsRefresh = true; toast("Phiên đăng nhập đã thay đổi. Bấm Cập nhật để xem kết quả.", 7000); return; }
+      if (result.refreshRequired) await refreshAfter(result.warning || "Đã gửi thao tác. Đang cập nhật bản đồ để xác nhận.");
+      else { receiveSession(result, false); toast(successMessage); }
+    } catch (error) {
+      if (error.authExpired || error.status === 403) { authExpired = true; featureSelection = null; applyPermissions(); renderMap(); toast("Quyền đăng nhập đã thay đổi. Hãy đăng nhập lại.", 6000); }
+      else if (error.transferUncertain || error.status === 409) await refreshAfter(error.transferUncertain ? "Chưa xác nhận được kết quả. Đang cập nhật bản đồ." : "Bản đồ đã thay đổi. Đang cập nhật; hãy chọn lại đối tượng.");
+      else if (errorBox.isConnected) { errorBox.textContent = error.message || "Chưa lưu được thay đổi."; errorBox.hidden = false; }
+      else toast(error.message || "Chưa thực hiện được thao tác.");
+    } finally {
+      transferBusy = false; controls.forEach(control => { if (control.isConnected) control.disabled = false; }); renderSelectionBar(); renderFolders(); renderShared();
+    }
+  }
+  function confirmFeatureDelete(chosen) {
+    if (!requireAdmin() || transferBusy || !chosen || !chosen.ids.size) return;
+    if (chosen.source === "shared" && !sharedMutationAllowed()) return;
+    const selection = {...chosen,ids:new Set(chosen.ids)}, startingSession = sessionEpoch;
+    const items = selectedFeatureItems(selection), originals = items.map(item => JSON.stringify(item));
+    if (items.length !== selection.ids.size) { toast("Một số đối tượng đã thay đổi. Hãy chọn lại."); return; }
+    const count = items.length, names = items.slice(0,3).map(item => "“" + (item.name || item.position || item.label || "Đối tượng") + "”").join(", ") + (count > 3 ? "…" : "");
+    modal("Xóa " + count + " đối tượng?", "<p>" + esc(names) + '</p><p>Chỉ xóa các điểm/đường đã chọn ' + (selection.source === "local" ? "trên thiết bị này." : "khỏi bản đồ quản trị trên server.") + '</p><p id="delete-error" class="form-error" role="alert" hidden></p><div class="actions"><button id="delete-cancel" class="secondary">Giữ lại</button><button id="delete-confirm" class="secondary danger">Xóa ' + count + " đối tượng</button></div>", () => {
+      $("delete-cancel").onclick = closeModal;
+      $("delete-confirm").onclick = async () => {
+        if (!requireAdmin() || transferBusy) return;
+        if (selection.source === "shared") return runSharedMutation("deleteSharedFeatures", {team:selection.team,featureIds:Array.from(selection.ids),revision:selection.revision}, startingSession, "delete-error", "Đã xóa " + count + " đối tượng trên server.");
+        try {
+          const current = selectedFeatureItems(selection).map(item => JSON.stringify(item));
+          if (current.length !== originals.length || current.some((item,index) => item !== originals[index])) throw new Error("Đối tượng đã thay đổi. Hãy chọn lại.");
+          commitLocalState(localDeleteSnapshot(state,Array.from(selection.ids))); featureSelection = null; closeModal(); renderMap(); toast("Đã xóa " + count + " đối tượng trên thiết bị.");
+        } catch (error) { $("delete-error").textContent = error.name === "QuotaExceededError" ? "Chưa lưu được. Các đối tượng gốc vẫn được giữ." : error.message; $("delete-error").hidden = false; }
+      };
+    });
+  }
+  function previewPointPosition(coords, onUse) {
+    if (!requireAdmin() || transferBusy) return;
+    const point = ll(coords); if (!point) { toast("Tọa độ không hợp lệ."); return; }
+    featureSelection = null; cancelDrawing(); closeModal(); collapseSheet(); renderSelectionBar();
+    map.setView(point,Math.max(map.getZoom(),17));
+    const marker = L.marker(point,{icon:markerIcon("Vị trí mới",true),draggable:true}).addTo(draftLayers);
+    drawing = {mode:"position",coords:point.slice(),marker};
+    marker.on("dragend",() => { if (drawing && drawing.mode === "position") { const pos = marker.getLatLng(); drawing.coords = [pos.lat,pos.lng]; } });
+    drawing.save = () => { if (!requireAdmin() || !drawing) return; const picked = drawing.coords.slice(); cancelDrawing(); onUse(picked); };
+    $("drawing-bar").hidden = false; $("drawing-help").textContent = "Vị trí thử · Chạm bản đồ hoặc kéo ghim"; $("undo-drawing").hidden = true; $("finish-drawing").hidden = false; $("finish-drawing").disabled = false; $("finish-drawing").textContent = "Dùng vị trí này";
+  }
+  function editSharedPoint(route, point, draft) {
+    if (!route.shared || !point.feature_id || !sharedMutationAllowed()) return;
+    const value = draft || {name:point.position || point.name || point.label || "Điểm",coords:point.coords.slice(),session:sessionEpoch};
+    modal("Sửa vị trí", '<label>Tên điểm<input id="shared-point-name" maxlength="200" value="' + esc(value.name) + '"></label><div class="coordinates"><label>Vĩ độ<input id="shared-point-lat" inputmode="decimal" value="' + value.coords[0] + '"></label><label>Kinh độ<input id="shared-point-lon" inputmode="decimal" value="' + value.coords[1] + '"></label></div><button id="shared-point-map" class="secondary wide-button">Chọn lại trên bản đồ</button><p class="note">' + esc(sharedFolderPath(route)) + ' · Chỉ cập nhật server khi bấm Lưu.</p><p id="shared-point-error" class="form-error" role="alert" hidden></p><div class="actions"><button id="shared-point-cancel" class="secondary">Hủy</button><button id="shared-point-save" class="primary">Lưu</button></div>', () => {
+      const coords = () => ll([$("shared-point-lat").value.replace(",","."),$("shared-point-lon").value.replace(",",".")]);
+      $("shared-point-cancel").onclick = closeModal;
+      $("shared-point-map").onclick = () => {
+        const name = $("shared-point-name").value;
+        previewPointPosition(coords() || value.coords, picked => editSharedPoint(route,point,{name,coords:picked,session:value.session}));
+      };
+      $("shared-point-save").onclick = async () => {
+        if (!requireAdmin() || transferBusy) return;
+        const name = $("shared-point-name").value.trim(), position = coords();
+        if (!name || !position) { $("shared-point-error").textContent = "Nhập tên và tọa độ hợp lệ: vĩ độ -90 đến 90, kinh độ -180 đến 180."; $("shared-point-error").hidden = false; return; }
+        await runSharedMutation("editSharedFeature",{team:String(route.team || ""),featureId:point.feature_id,revision:route.revision,name,lat:position[0],lon:position[1]},value.session,"shared-point-error","Đã cập nhật vị trí trên server.");
+      };
+    });
+  }
   function createFolder(parent = "") {
     if (!requireAdmin()) return;
     modal("Tạo thư mục", '<label>Tên thư mục<input id="folder-name" maxlength="80" placeholder="Ví dụ: Khảo sát mới"></label><label>Thư mục cha<select id="folder-parent"><option value="">Không có</option>' + folderOptions(parent) + '</select></label><div class="actions"><button class="secondary" id="cancel-folder">Hủy</button><button class="primary" id="save-folder">Tạo thư mục</button></div>', () => {
@@ -660,7 +769,7 @@
     collapseSheet(); closeModal(); cancelDrawing(); drawing = { mode: "line", coords: feature ? feature.coords.map(coords => coords.slice()) : [], featureId: feature ? feature.id : null };
     $("drawing-bar").hidden = false; $("finish-drawing").hidden = false; $("undo-drawing").hidden = false; $("add-line").classList.add("active"); renderDraft();
   }
-  function cancelDrawing() { drawing = null; draftLayers.clearLayers(); $("drawing-bar").hidden = true; $("add-point").classList.remove("active"); $("add-line").classList.remove("active"); }
+  function cancelDrawing() { drawing = null; $("finish-drawing").textContent = "Lưu"; draftLayers.clearLayers(); $("drawing-bar").hidden = true; $("add-point").classList.remove("active"); $("add-line").classList.remove("active"); }
   function renderDraft() {
     draftLayers.clearLayers(); if (!drawing || drawing.mode !== "line") return;
     if (drawing.coords.length > 1) L.polyline(drawing.coords, { color: "#e95f9e", weight: 5, dashArray: "7 4" }).addTo(draftLayers);
@@ -675,7 +784,8 @@
     if (!drawing || !isAdmin()) return;
     const coords = [event.latlng.lat, event.latlng.lng];
     if (drawing.mode === "point") { cancelDrawing(); editFeature({ id: uid("point"), kind: "point", name: "Điểm mới", label: "MX", coords, folder: state.activeFolder }); }
-    else { drawing.coords.push(coords); renderDraft(); }
+    else if (drawing.mode === "position") { drawing.coords = coords; drawing.marker.setLatLng(coords); }
+    else if (drawing.mode === "line") { drawing.coords.push(coords); renderDraft(); }
   });
   function finishLine() {
     if (!requireAdmin()) return;
@@ -684,29 +794,35 @@
     const feature = { ...(existing || {}), id: existing ? existing.id : uid("line"), kind: "line", name: existing ? existing.name : "Đường mới", folder: existing ? existing.folder : state.activeFolder, coords: drawing.coords.map(coords => coords.slice()) };
     cancelDrawing(); editFeature(feature);
   }
-  function editFeature(feature) {
-    if (!requireAdmin()) return;
+  function editFeature(feature, expectedOriginal) {
+    if (!requireAdmin() || transferBusy) return;
     const existing = state.features.find(item => item.id === feature.id), isPoint = feature.kind === "point";
+    const original = expectedOriginal === undefined ? (existing ? JSON.stringify(existing) : null) : expectedOriginal;
     const html = '<label>Tên ' + (isPoint ? "điểm" : "đường") + '<input id="feature-name" maxlength="120" value="' + esc(feature.name) + '"></label><label>Thư mục<select id="feature-folder">' + folderOptions(feature.folder || state.activeFolder) + "</select></label>" +
-      (isPoint ? '<label>Ký hiệu<select id="feature-label"><option value="MX">MX · Măng xông</option><option value="DP">DP · Dự phòng</option><option value="Điểm">Điểm khác</option></select></label><div class="coordinates"><label>Vĩ độ<input id="point-lat" inputmode="decimal" value="' + Number(feature.coords[0]).toFixed(7) + '"></label><label>Kinh độ<input id="point-lon" inputmode="decimal" value="' + Number(feature.coords[1]).toFixed(7) + '"></label></div>' : "<p>" + feature.coords.length + " đỉnh · " + formatDistance(lineLength(feature.coords)) + "</p>") +
+      (isPoint ? '<label>Ký hiệu<select id="feature-label"><option value="MX">MX · Măng xông</option><option value="DP">DP · Dự phòng</option><option value="Điểm">Điểm khác</option></select></label><div class="coordinates"><label>Vĩ độ<input id="point-lat" inputmode="decimal" value="' + Number(feature.coords[0]).toFixed(7) + '"></label><label>Kinh độ<input id="point-lon" inputmode="decimal" value="' + Number(feature.coords[1]).toFixed(7) + '"></label></div><button id="pick-point-position" class="secondary wide-button">Chọn lại trên bản đồ</button>' : "<p>" + feature.coords.length + " đỉnh · " + formatDistance(lineLength(feature.coords)) + "</p>") +
       '<label>Ghi chú<textarea id="feature-note" rows="2" maxlength="2000">' + esc(feature.note || "") + '</textarea></label><p class="note">Lưu trên thiết bị · Xuất KMZ để chia sẻ. Chưa thay đổi dữ liệu server.</p><p id="feature-error" class="form-error" hidden></p><div class="actions"><button id="cancel-feature" class="secondary">Hủy</button><button id="save-feature" class="primary">Lưu</button></div>';
     modal(existing ? "Chỉnh " + (isPoint ? "điểm" : "đường") : "Thêm " + (isPoint ? "điểm" : "đường"), html, () => {
-      if (isPoint) $("feature-label").value = ["MX", "DP"].includes(feature.label) ? feature.label : "Điểm";
+      if (isPoint) { if (feature.label && !["MX","DP","Điểm"].includes(feature.label)) $("feature-label").add(new Option(feature.label,feature.label)); $("feature-label").value = feature.label || "Điểm"; }
       $("cancel-feature").onclick = closeModal;
+      if (isPoint) $("pick-point-position").onclick = () => {
+        const draft = { ...feature, name: $("feature-name").value, folder: $("feature-folder").value, label: $("feature-label").value, note: $("feature-note").value };
+        previewPointPosition(ll([$("point-lat").value.replace(",", "."), $("point-lon").value.replace(",", ".")]) || feature.coords, coords => editFeature({ ...draft, coords }, original));
+      };
       $("save-feature").onclick = () => {
         if (!requireAdmin()) return;
         const name = $("feature-name").value.trim(), folder = $("feature-folder").value;
         const coords = isPoint ? ll([$("point-lat").value.replace(",", "."), $("point-lon").value.replace(",", ".")]) : feature.coords;
         if (!name || !coords || !state.folders.some(item => item.id === folder)) { $("feature-error").textContent = "Nhập tên, thư mục và tọa độ hợp lệ."; $("feature-error").hidden = false; return; }
-        const label = isPoint ? $("feature-label").value : "";
+        const label = isPoint ? $("feature-label").value : feature.label || "";
         if (isPoint && label === "MX") {
           const duplicate = state.features.find(item => item.id !== feature.id && item.folder === folder && item.kind === "point" && item.label === "MX" && map.distance(item.coords, coords) <= 20);
           if (duplicate) { $("feature-error").textContent = "Đã có MX “" + duplicate.name + "” trong 20 m ở thư mục này. Chỉnh điểm đã có để tránh trùng."; $("feature-error").hidden = false; return; }
         }
-        const saved = { ...feature, name, folder, coords, label, note: $("feature-note").value.trim(), updatedAt: new Date().toISOString() };
-        const index = state.features.findIndex(item => item.id === saved.id); index >= 0 ? state.features.splice(index, 1, saved) : state.features.push(saved);
-        state.activeFolder = folder; const targetFolder = state.folders.find(item => item.id === folder); if (targetFolder) targetFolder.visible = true;
-        persist(); renderMap(); closeModal(); toast("Đã lưu trên thiết bị.");
+        const saved = { ...feature, name, folder, coords, label, note: $("feature-note").value, updatedAt: new Date().toISOString() };
+        try {
+          commitLocalState(localEditSnapshot(state, saved, original));
+          featureSelection = null; renderMap(); closeModal(); toast("Đã lưu trên thiết bị.");
+        } catch (error) { $("feature-error").textContent = error.name === "QuotaExceededError" ? "Bộ nhớ thiết bị đã đầy. Vị trí cũ vẫn được giữ." : error.message; $("feature-error").hidden = false; }
       };
     });
   }
@@ -715,19 +831,16 @@
   function showFeature(feature) {
     if (!requireAdmin()) return;
     const isPoint = feature.kind === "point", folder = state.folders.find(item => item.id === feature.folder);
-    modal(feature.name, '<p>' + esc(folder ? folder.name : "") + ' <span class="badge">Trên máy</span></p><p>' + (isPoint ? feature.coords.map(n => Number(n).toFixed(7)).join(", ") : feature.coords.length + " điểm · " + formatDistance(lineLength(feature.coords))) + "</p>" + (feature.note ? "<p>" + esc(feature.note) + "</p>" : "") + (isPoint ? '<button id="point-directions" class="primary wide-button">' + icon("route") + 'Chỉ đường</button>' : "") + '<button id="select-feature" class="secondary wide-button">Chọn để sao chép / di chuyển</button><div class="actions"><button id="edit-feature" class="secondary">Chỉnh sửa</button><button id="move-feature" class="secondary">' + (isPoint ? "Đổi vị trí" : "Chỉnh đường") + '</button></div><button id="delete-feature" class="text-button danger wide-button">Xóa trên máy</button>', () => {
+    modal(feature.name, '<p>' + esc(folder ? folder.name : "") + ' <span class="badge">Trên máy</span></p><p>' + (isPoint ? feature.coords.map(n => Number(n).toFixed(7)).join(", ") : feature.coords.length + " điểm · " + formatDistance(lineLength(feature.coords))) + "</p>" + (feature.note ? "<p>" + esc(feature.note) + "</p>" : "") + (isPoint ? '<button id="point-directions" class="primary wide-button">' + icon("route") + 'Chỉ đường</button>' : "") + '<button id="select-feature" class="secondary wide-button">Chọn để sao chép / di chuyển</button><div class="actions"><button id="edit-feature" class="secondary">Chỉnh sửa</button><button id="move-feature" class="secondary">' + (isPoint ? "Sửa vị trí" : "Chỉnh đường") + '</button></div><button id="delete-feature" class="text-button danger wide-button">Xóa trên máy</button>', () => {
       if (isPoint) $("point-directions").onclick = event => requestDirections(feature.coords, event.currentTarget);
       $("select-feature").onclick = () => beginFeatureSelection("local", feature.folder, feature.id);
       $("edit-feature").onclick = () => editFeature({ ...feature });
       $("move-feature").onclick = () => {
         if (!isPoint) { startLine(feature); return; }
-        closeModal(); collapseSheet(); map.setView(feature.coords, Math.max(map.getZoom(), 17)); toast("Kéo điểm tím đến vị trí mới rồi bấm Lưu.", 6000);
-        draftLayers.clearLayers(); const marker = L.marker(feature.coords, { icon: markerIcon(feature.label || feature.name, true), draggable: true }).addTo(draftLayers);
-        drawing = { mode: "move", featureId: feature.id };
-        $("drawing-bar").hidden = false; $("drawing-help").textContent = "Kéo điểm tím để đổi vị trí"; $("undo-drawing").hidden = true; $("finish-drawing").hidden = false; $("finish-drawing").disabled = false;
-        drawing.save = () => { const pos = marker.getLatLng(); cancelDrawing(); editFeature({ ...feature, coords: [pos.lat, pos.lng] }); };
+        const original = JSON.stringify(feature);
+        previewPointPosition(feature.coords, coords => editFeature({ ...feature, coords }, original));
       };
-      $("delete-feature").onclick = () => modal("Xóa đối tượng?", "<p>Xóa “" + esc(feature.name) + "” khỏi bản đồ trên máy?</p><div class=\"actions\"><button id=\"keep-feature\" class=\"secondary\">Giữ lại</button><button id=\"confirm-delete-feature\" class=\"secondary danger\">Xóa</button></div>", () => { $("keep-feature").onclick = closeModal; $("confirm-delete-feature").onclick = () => { if (!requireAdmin()) return; state.features = state.features.filter(item => item.id !== feature.id); persist(); renderMap(); closeModal(); }; });
+      $("delete-feature").onclick = () => confirmFeatureDelete({source:"local",ids:new Set([feature.id])});
     });
   }
   function showRoute(route) {
@@ -749,10 +862,14 @@
     modal(point.label, "<p><strong>" + esc(route.name) + "</strong></p>" + (point.position ? "<p>" + esc(point.position) + "</p>" : "") + (point.note ? "<p>" + esc(point.note) + "</p>" : "") + "<p>" + point.coords.map(n => n.toFixed(7)).join(", ") + '</p><p class="note">' + (route.shared ? "Bản đồ quản trị" + (isAdmin() ? "" : " · Chỉ xem") : "Dữ liệu từ HP Telecom Server") + "</p>" +
       (history.length ? '<ul class="detail-list">' + history.slice(0, 30).map(item => "<li>" + esc(item.type || item.category || "Ghi nhận") + "<small>" + esc(item.date || item.created_at || "") + "</small></li>").join("") + "</ul>" : "") +
       '<button id="point-directions" class="primary wide-button">' + icon("route") + 'Chỉ đường</button>' +
-      (isAdmin() && route.shared && point.feature_id ? '<button id="select-server-feature" class="secondary wide-button">Chọn để sao chép / di chuyển</button>' : "") +
+      (isAdmin() && route.shared && point.feature_id ? '<div class="actions"><button id="edit-server-point" class="secondary">Sửa vị trí</button><button id="delete-server-point" class="secondary danger">Xóa điểm</button></div><button id="select-server-feature" class="secondary wide-button">Chọn để sao chép / di chuyển</button>' : "") +
       (isAdmin() ? '<button id="copy-server-point" class="secondary wide-button">Sao chép điểm vào thư mục trên máy</button>' : ""), () => {
         $("point-directions").onclick = event => requestDirections(point.coords, event.currentTarget);
-        if (isAdmin() && route.shared && point.feature_id) $("select-server-feature").onclick = () => beginFeatureSelection("shared", route.key, point.feature_id);
+        if (isAdmin() && route.shared && point.feature_id) {
+          $("select-server-feature").onclick = () => beginFeatureSelection("shared", route.key, point.feature_id);
+          $("edit-server-point").onclick = () => editSharedPoint(route, point);
+          $("delete-server-point").onclick = () => confirmFeatureDelete({source:"shared",team:String(route.team || ""),revision:route.revision,ids:new Set([point.feature_id])});
+        }
         if (isAdmin()) $("copy-server-point").onclick = () => editFeature({ id: uid("point"), kind: "point", name: point.position || point.label, label: point.label, coords: point.coords.slice(), folder: state.activeFolder, sourceRoute: route.key });
       });
   }
@@ -981,6 +1098,7 @@
   $("selection-cancel").onclick = cancelFeatureSelection;
   $("selection-copy").onclick = () => openTransfer("copy");
   $("selection-move").onclick = () => openTransfer("move");
+  $("selection-delete").onclick = () => confirmFeatureDelete(featureSelection);
   $("selection-list").onclick = () => { if (featureSelection) openSheet(featureSelection.source === "local" ? "folders" : "shared"); };
   $("shared-select-all").onchange = () => { const checked = $("shared-select-all").checked; sharedLayers.forEach(layer => checked ? sharedSelected.add(layer.key) : sharedSelected.delete(layer.key)); persist(); renderShared(); renderMap(); };
   $("search").oninput = renderRoutes; $("type-filter").onchange = renderRoutes; $("capacity-filter").onchange = renderRoutes;
