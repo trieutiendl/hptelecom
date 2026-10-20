@@ -301,13 +301,15 @@ public final class MapApiClient {
 
     private static final class Observation {
         final double lat, lon;
-        final String kind, name, note, source, author, report;
+        final String kind, name, note, source, author, report, endpointName;
         final long updated;
         final boolean endpoint;
         Observation(JSONObject point, JSONObject member, String source, String report, boolean endpoint) {
             lat = point.optDouble("lat", Double.NaN); lon = point.optDouble("lon", Double.NaN);
             name = text(point, "name", 120); note = text(point, "note", 300);
             this.source = source; this.report = report; this.endpoint = endpoint;
+            String sequence = point.isNull("seq") ? "" : String.valueOf(point.opt("seq")).trim();
+            endpointName = !name.isEmpty() ? name : sequence.isEmpty() ? "Vị trí" : "Vị trí " + sequence;
             author = text(member, "member_name", 120); updated = member.optLong("updated");
             String match = Normalizer.normalize(name + " " + note, Normalizer.Form.NFD)
                     .replaceAll("\\p{M}", "").replace('đ', 'd').replace('Đ', 'D').toLowerCase(Locale.ROOT);
@@ -407,9 +409,10 @@ public final class MapApiClient {
                     String name = text(feature, "name", 200);
                     String kind = name.matches("(?is).*\\bMX\\b.*") ? "MX" : name.matches("(?is).*\\bDP\\b.*") ? "DP" : "GPS";
                     target.getJSONArray("markers").put(new JSONObject().put("lat", point.getDouble(0))
-                            .put("lon", point.getDouble(1)).put("label", "GPS".equals(kind) ? name : kind)
+                            .put("lon", point.getDouble(1)).put("label", "GPS".equals(kind) ? (name.isEmpty() ? "Điểm" : name) : kind)
                             .put("position", name).put("name", name).put("note", text(feature, "note", 2000))
                             .put("kind", kind).put("color", text(feature, "color", 20)).put("source", "server")
+                            .put("display_on_map", true).put("is_endpoint", false)
                             .put("id", feature.optString("id")));
                 } else if ("LineString".equals(geometry.optString("type"))) {
                     JSONArray line = new JSONArray();
@@ -450,7 +453,9 @@ public final class MapApiClient {
             List<JSONObject> points = new ArrayList<>();
             for (int p = 0; p < raw.length(); p++) {
                 JSONObject point = raw.optJSONObject(p);
-                if (point != null) points.add(point);
+                // Invalid coordinates must not take the first/last valid point's
+                // endpoint role. The same valid points still form the full line.
+                if (point != null && new Observation(point, member, source, report, false).valid()) points.add(point);
             }
             if ("patrol".equals(source)) Collections.sort(points, Comparator.comparingDouble(p -> p.optDouble("seq", 0)));
             JSONArray line = new JSONArray();
@@ -507,14 +512,22 @@ public final class MapApiClient {
         for (List<Observation> cluster : clusters) {
             Observation item = cluster.get(0); Set<String> reports = new HashSet<>();
             String position = "";
+            boolean endpoint = false;
             for (Observation part : cluster) {
                 reports.add(part.report);
-                if (part.endpoint && !part.name.isEmpty() && position.isEmpty()) position = part.name;
+                if (part.endpoint) {
+                    endpoint = true;
+                    if (position.isEmpty()) position = part.endpointName;
+                }
             }
             String label = "GPS".equals(item.kind) ? position : item.kind;
             result.put(new JSONObject().put("lat", item.lat).put("lon", item.lon).put("label", label)
                     .put("position", position).put("name", item.name).put("note", item.note)
                     .put("kind", item.kind).put("source", item.source).put("member_name", item.author)
+                    // Hide only intermediate patrol GPS badges. Keep coordinates
+                    // for the cable line, details and KMZ export; named admin/import
+                    // features are normalized separately and remain visible.
+                    .put("display_on_map", !"GPS".equals(item.kind) || endpoint).put("is_endpoint", endpoint)
                     .put("updated", item.updated).put("history_count", reports.size()));
         }
         return result;

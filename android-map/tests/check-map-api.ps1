@@ -24,8 +24,14 @@ foreach ($mapJsonFile in (Get-ChildItem -LiteralPath $mapSdkSources -Filter '*.j
 }
 $mapJavaSources = @(Get-ChildItem -LiteralPath $mapJsonOutput -Filter '*.java' | Select-Object -ExpandProperty FullName)
 $mapJavaSources += (Join-Path $mapProject 'app\src\main\java\vn\hptelecom\map\MapApiClient.java')
+$mapJavaSources += (Join-Path $mapProject 'app\src\main\java\vn\hptelecom\map\MapDirections.java')
+$mapJavaSources += (Join-Path $mapProject 'app\src\main\java\vn\hptelecom\map\BasemapSettings.java')
 $mapJavaSources += (Join-Path $PSScriptRoot 'MapApiClientTest.java')
+$mapJavaSources += (Join-Path $PSScriptRoot 'MapSettingsTest.java')
+$mapJavaSources += @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'stubs') -Recurse -Filter '*.java' | Select-Object -ExpandProperty FullName)
 & javac -encoding UTF-8 -source 17 -target 17 -classpath $mapAndroidJar -d $mapOutput @mapJavaSources
 if ($LASTEXITCODE -ne 0) { throw 'Map API regression checks did not compile.' }
 & java -classpath "$mapOutput;$mapAndroidJar" vn.hptelecom.map.MapApiClientTest
 if ($LASTEXITCODE -ne 0) { throw 'Map API regression checks failed.' }
+& java -classpath "$mapOutput;$mapAndroidJar" vn.hptelecom.map.MapSettingsTest
+if ($LASTEXITCODE -ne 0) { throw 'Map native settings/directions checks failed.' }

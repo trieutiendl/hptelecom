@@ -54,6 +54,7 @@ public final class MapHomeActivity extends Activity {
     private final Handler ui = new Handler(Looper.getMainLooper());
     private WebView web, authWeb;
     private MapApiClient api;
+    private BasemapSettings basemaps;
     private ImportedMapStore imports;
     private boolean destroyed, fileBusy;
     private String fileRequest, gpsRequest;
@@ -66,6 +67,7 @@ public final class MapHomeActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         api = new MapApiClient(this);
+        basemaps = new BasemapSettings(this);
         imports = new ImportedMapStore(new File(getFilesDir(), "imported-maps"));
         getWindow().setStatusBarColor(Color.rgb(7, 28, 38));
         getWindow().setNavigationBarColor(Color.rgb(7, 28, 38));
@@ -99,7 +101,7 @@ public final class MapHomeActivity extends Activity {
                         String mime = path.endsWith(".html") ? "text/html" : path.endsWith(".css") ? "text/css" :
                             path.endsWith(".js") ? "application/javascript" : path.endsWith(".svg") ? "image/svg+xml" : "image/png";
                         HashMap<String,String> headers = new HashMap<>();
-                        headers.put("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://*.tile.opentopomap.org; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'");
+                        headers.put("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://*.tile.opentopomap.org https://api.maptiler.com; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'");
                         headers.put("X-Content-Type-Options", "nosniff");
                         return new WebResourceResponse(mime, "UTF-8", 200, "OK", headers, getAssets().open(path.substring(1)));
                     } catch (Exception failure) { return blocked(); }
@@ -107,7 +109,9 @@ public final class MapHomeActivity extends Activity {
                 String host = uri.getHost();
                 if (!request.isForMainFrame() && "https".equals(uri.getScheme()) && host != null
                     && (host.equals("tile.openstreetmap.org") || host.endsWith(".tile.openstreetmap.org")
-                        || host.endsWith(".tile.opentopomap.org"))) return null;
+                        || host.endsWith(".tile.opentopomap.org")
+                        || (host.equals("api.maptiler.com") && uri.getPath() != null
+                            && uri.getPath().matches("/maps/(satellite-v4|hybrid-v4)/256/\\d+/\\d+/\\d+\\.(png|jpg)")))) return null;
                 return blocked();
             }
             @Override public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) { handler.cancel(); }
@@ -145,8 +149,10 @@ public final class MapHomeActivity extends Activity {
                             }); return;
                         case "export": export(id, args); return;
                         case "location": locate(id); return;
+                        case "directions": directions(id, args); return;
                         case "serverLogin": serverLogin(id); return;
                         case "session": case "refresh": case "login": case "logout": case "imports": case "removeImport":
+                        case "basemapConfig": case "saveBasemapConfig":
                             worker.execute(() -> {
                                 try {
                                     JSONObject value;
@@ -154,6 +160,10 @@ public final class MapHomeActivity extends Activity {
                                         case "login": value = api.login(args.optString("username"), args.optString("password")); break;
                                         case "logout": api.logout(); value = json("ok", true, "user", JSONObject.NULL, "routes", new JSONArray()); break;
                                         case "refresh": value = api.refresh(); break;
+                                        case "basemapConfig": value = basemaps.read(); break;
+                                        case "saveBasemapConfig":
+                                            if (!api.isAdmin()) throw new java.io.IOException("Chỉ quản trị viên được cấu hình nguồn bản đồ.");
+                                            value = basemaps.save(args.optString("key")); break;
                                         case "imports":
                                             value = api.isAdmin() ? importedMaps() : json("ok", true, "maps", new JSONArray()); break;
                                         case "removeImport":
@@ -194,6 +204,16 @@ public final class MapHomeActivity extends Activity {
         JSONObject obj = new JSONObject();
         try { for (int i = 0; i < pairs.length; i += 2) obj.put((String)pairs[i], pairs[i+1]); } catch (Exception ignored) { }
         return obj;
+    }
+    private void directions(String id, JSONObject args) throws Exception {
+        double lat = args.optDouble("lat", Double.NaN), lon = args.optDouble("lon", Double.NaN);
+        Uri uri = Uri.parse(MapDirections.url(lat, lon));
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, uri));
+            result(id, json("ok", true));
+        } catch (android.content.ActivityNotFoundException failure) {
+            result(id, json("ok", false, "error", "Hãy cài Google Maps hoặc trình duyệt để mở chỉ đường."));
+        }
     }
     private JSONObject importedMaps() throws Exception {
         JSONArray maps = new JSONArray();

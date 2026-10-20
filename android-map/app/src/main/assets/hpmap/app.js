@@ -86,10 +86,97 @@
     return true;
   }
   const map = L.map("map", { zoomControl: false, attributionControl: true }).setView([12.68, 108.05], 11);
-  const tiles = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
-  let lastTileError = 0;
-  tiles.on("tileerror", () => { if (Date.now() - lastTileError > 60000) { lastTileError = Date.now(); toast("Chưa tải được nền bản đồ. Kiểm tra kết nối mạng; điểm đã lưu vẫn được giữ."); } });
+  const baseMapChoices = [
+    { id: "street", title: "Đường phố", source: "OpenStreetMap", icon: "map" },
+    { id: "satellite", title: "Vệ tinh", source: "MapTiler", icon: "layers", requiresKey: true },
+    { id: "hybrid", title: "Vệ tinh + đường phố", source: "MapTiler · Có tên đường", icon: "layers", requiresKey: true },
+    { id: "terrain", title: "Địa hình", source: "OpenTopoMap", icon: "map" }
+  ];
+  let baseMapConfig = { provider: "maptiler", configured: false, key: "", satelliteAttribution: "", hybridAttribution: "" };
+  let baseMapKey = "", baseMapLayer = null, baseMapGeneration = 0, baseMapTimer = null, configGeneration = 0, lastTileError = 0;
+  if (!baseMapChoices.some(choice => choice.id === state.basemap)) state.basemap = "street";
+  function tileSource(key) {
+    const osm = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>';
+    if (key === "street") return { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", maxNativeZoom: 19, attribution: osm };
+    if (key === "terrain") return { url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", maxNativeZoom: 17, attribution: osm + ', SRTM | © <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)' };
+    if (!baseMapConfig.configured || !baseMapConfig.key) return null;
+    const style = key === "satellite" ? "satellite-v4" : key === "hybrid" ? "hybrid-v4" : "";
+    if (!style) return null;
+    return {
+      url: "https://api.maptiler.com/maps/" + style + "/256/{z}/{x}/{y}." + (key === "satellite" ? "jpg" : "png") + "?key=" + encodeURIComponent(baseMapConfig.key),
+      maxNativeZoom: 19,
+      attribution: '© <a href="https://www.maptiler.com/copyright/">MapTiler</a>' + (baseMapConfig[key + "Attribution"] ? " | " + esc(baseMapConfig[key + "Attribution"]) : " | " + osm)
+    };
+  }
+  function setBaseMap(key, options = {}) {
+    const source = tileSource(key);
+    if (!source) return false;
+    if (baseMapKey === key && baseMapLayer && !options.reload) {
+      if (options.persist !== false && state.basemap !== key) { state.basemap = key; persist(); }
+      return true;
+    }
+    const generation = ++baseMapGeneration, previous = baseMapLayer;
+    clearTimeout(baseMapTimer);
+    let loaded = 0, failed = 0, previousRemoved = false;
+    const next = L.tileLayer(source.url, { maxZoom: 19, maxNativeZoom: source.maxNativeZoom, attribution: source.attribution, zIndex: 1, keepBuffer: 2, updateWhenIdle: true });
+    const removePrevious = () => { if (previous && !previousRemoved) { map.removeLayer(previous); previousRemoved = true; } };
+    const notifyFailure = () => {
+      if (generation !== baseMapGeneration) return;
+      clearTimeout(baseMapTimer); removePrevious();
+      if (key !== "street") {
+        setBaseMap("street");
+        toast("Chưa tải được lớp " + baseMapChoices.find(choice => choice.id === key).title + ". Đã chuyển về Đường phố; tuyến và điểm vẫn được giữ.", 6500);
+      } else if (Date.now() - lastTileError > 30000) {
+        lastTileError = Date.now();
+        toast("Chưa tải được nền bản đồ. Kiểm tra kết nối mạng; tuyến và điểm vẫn được giữ.", 6000);
+      }
+    };
+    next.on("tileload", () => {
+      if (generation !== baseMapGeneration) return;
+      loaded++; clearTimeout(baseMapTimer);
+    });
+    next.on("loading", () => { if (generation === baseMapGeneration) { loaded = 0; failed = 0; } });
+    next.on("tileerror", () => { if (generation === baseMapGeneration) { failed++; if (!loaded && failed >= 3) notifyFailure(); } });
+    next.on("load", () => {
+      if (generation !== baseMapGeneration) return;
+      if (loaded) {
+        removePrevious();
+        if (failed && Date.now() - lastTileError > 30000) { lastTileError = Date.now(); toast("Một phần nền bản đồ chưa tải được. Có thể chọn lại lớp hoặc kiểm tra mạng."); }
+      } else if (failed) notifyFailure();
+    });
+    removePrevious();
+    baseMapLayer = next; baseMapKey = key; next.addTo(map);
+    if (options.persist !== false) { state.basemap = key; persist(); }
+    $("layers").setAttribute("aria-label", "Lớp bản đồ: " + baseMapChoices.find(choice => choice.id === key).title);
+    baseMapTimer = setTimeout(() => { if (!loaded) notifyFailure(); }, 16000);
+    return true;
+  }
+  function acceptBaseMapConfig(result) {
+    baseMapConfig = {
+      provider: "maptiler",
+      configured: !!result && result.provider === "maptiler" && result.configured === true && typeof result.key === "string" && !!result.key,
+      key: result && typeof result.key === "string" ? result.key : "",
+      satelliteAttribution: result && typeof result.satelliteAttribution === "string" ? result.satelliteAttribution.slice(0, 2048) : "",
+      hybridAttribution: result && typeof result.hybridAttribution === "string" ? result.hybridAttribution.slice(0, 2048) : ""
+    };
+    if (!baseMapConfig.configured) baseMapConfig.key = "";
+  }
+  async function loadBaseMapConfig() {
+    const generation = ++configGeneration;
+    if (!user) return;
+    try {
+      const result = await native("basemapConfig");
+      if (generation !== configGeneration || !user) return;
+      const oldKey = baseMapConfig.key;
+      acceptBaseMapConfig(result);
+      if (!setBaseMap(state.basemap, { reload: oldKey !== baseMapConfig.key && ["satellite", "hybrid"].includes(state.basemap) })) setBaseMap("street", { persist: false });
+    } catch (_) {
+      if (generation === configGeneration && ["satellite", "hybrid"].includes(baseMapKey)) setBaseMap("street", { persist: false });
+    }
+  }
+  setBaseMap(state.basemap === "terrain" ? "terrain" : "street", { persist: false });
   const serverLayers = L.featureGroup().addTo(map), localLayers = L.featureGroup().addTo(map), draftLayers = L.featureGroup().addTo(map);
+  const visibleMarkers = route => route.markers.filter(point => point.display_on_map !== false);
   function ll(value) {
     if (!value) return null;
     const rawLat = Array.isArray(value) ? value[0] : (value.lat ?? value.latitude ?? value.latitude_value);
@@ -119,7 +206,7 @@
     const convert = coords => ll(Array.isArray(coords) ? [coords[1], coords[0]] : null);
     features.forEach(feature => {
       const geometry = feature.geometry || {}, properties = feature.properties || {};
-      if (geometry.type === "Point") { const coords = convert(geometry.coordinates); if (coords) normalized.markers.push({ coords, label: String(properties.label || properties.kind || properties.name || "Điểm"), position: String(properties.name || properties.position || ""), note: String(properties.note || properties.description || "") }); }
+      if (geometry.type === "Point") { const coords = convert(geometry.coordinates); if (coords) normalized.markers.push({ coords, display_on_map: properties.display_on_map, label: String(properties.label || properties.kind || properties.name || "Điểm"), position: String(properties.name || properties.position || ""), note: String(properties.note || properties.description || "") }); }
       else if (geometry.type === "LineString") { const coords = (geometry.coordinates || []).map(convert).filter(Boolean); if (coords.length > 1) normalized.lines.push(coords); }
       else if (geometry.type === "MultiLineString") (geometry.coordinates || []).forEach(line => { const coords = line.map(convert).filter(Boolean); if (coords.length > 1) normalized.lines.push(coords); });
     });
@@ -136,7 +223,11 @@
       const validShared = new Set(sharedLayers.map(layer => layer.key)); sharedSelected.forEach(key => { if (!validShared.has(key)) sharedSelected.delete(key); });
       sharedLoaded = true;
     }
-    if (!user) { selected.clear(); sharedSelected.clear(); sharedLayers = []; }
+    if (!user) {
+      selected.clear(); sharedSelected.clear(); sharedLayers = [];
+      configGeneration++; acceptBaseMapConfig(null);
+      if (["satellite", "hybrid"].includes(baseMapKey)) setBaseMap("street", { persist: false });
+    }
     const validKeys = new Set(routes.map(route => route.key));
     selected.forEach(key => { if (!validKeys.has(key)) selected.delete(key); });
     loadedOnce = true;
@@ -152,6 +243,7 @@
     if (!user) importsLoaded = false;
     if (fit && (routes.length || sharedLayers.length)) fitMap();
     $("login").hidden = !!user; $("password").value = "";
+    if (user) loadBaseMapConfig();
   }
   function updateFilters() {
     const setOptions = (id, values) => {
@@ -179,7 +271,7 @@
       check.onchange = () => { check.checked ? selected.add(route.key) : selected.delete(route.key); persist(); renderRoutes(); renderMap(); };
       wrap.appendChild(check);
       const button = document.createElement("button"); button.className = "route-open";
-      button.innerHTML = '<span class="route-line" style="background:' + route.color + '"></span><span class="route-copy"><strong>' + esc(route.name) + "</strong><small>" + esc([route.type, route.capacity, route.markers.length + " điểm"].filter(Boolean).join(" · ")) + "</small></span>" + icon("right");
+      button.innerHTML = '<span class="route-line" style="background:' + route.color + '"></span><span class="route-copy"><strong>' + esc(route.name) + "</strong><small>" + esc([route.type, route.capacity, visibleMarkers(route).length + " điểm hiển thị"].filter(Boolean).join(" · ")) + "</small></span>" + icon("right");
       button.onclick = () => { activeRoute = route.key; if (!selected.has(route.key)) { selected.add(route.key); persist(); renderRoutes(); renderMap(); } fitRoute(route); updateCaption(route); collapseSheet(); };
       row.append(wrap, button); list.appendChild(row);
     });
@@ -198,7 +290,7 @@
   }
   function updateCaption(route) {
     const current = route || routes.find(item => item.key === activeRoute && selected.has(item.key));
-    const localCount = isAdmin() ? state.features.filter(feature => folderVisible(feature.folder)).length : 0;
+    const localCount = isAdmin() ? state.features.filter(feature => folderVisible(feature.folder) && feature.display_on_map !== false).length : 0;
     const totalSelected = selected.size + sharedSelected.size;
     $("caption").innerHTML = '<span class="dot"></span><strong>' + esc(current ? current.name : totalSelected ? totalSelected + " tuyến / lớp đã chọn" : "HP Map") + "</strong><small>" + esc(current ? [current.type, current.capacity].filter(Boolean).join(" · ") : localCount ? localCount + " đối tượng trên máy" : isAdmin() ? "Tạo điểm · Vẽ đường · Nhập KMZ" : "Bản đồ tuyến cáp") + "</small>";
   }
@@ -211,12 +303,12 @@
     serverLayers.clearLayers(); localLayers.clearLayers();
     [...routes.filter(route => selected.has(route.key)), ...sharedLayers.filter(layer => sharedSelected.has(layer.key))].forEach(route => {
       route.lines.forEach(line => L.polyline(line, { color: route.color, weight: 4 }).addTo(serverLayers).on("click", () => { activeRoute = route.key; updateCaption(route); showRoute(route); }));
-      route.markers.forEach(point => {
+      visibleMarkers(route).forEach(point => {
         const marker = L.marker(point.coords, { icon: markerIcon(point.label) }).addTo(serverLayers);
         marker.on("click", () => showServerPoint(route, point));
       });
     });
-    (isAdmin() ? state.features : []).filter(feature => folderVisible(feature.folder)).forEach(feature => {
+    (isAdmin() ? state.features : []).filter(feature => folderVisible(feature.folder) && feature.display_on_map !== false).forEach(feature => {
       if (feature.kind === "point" && ll(feature.coords)) {
         L.marker(feature.coords, { icon: markerIcon(feature.label || feature.name, true) }).addTo(localLayers).on("click", () => showFeature(feature));
       } else if (feature.kind === "line" && feature.coords.length > 1) {
@@ -225,7 +317,7 @@
     });
     updateCaption(); renderFolders();
   }
-  function boundsFor(route) { const points = [...route.lines.flat(), ...route.markers.map(point => point.coords)]; return points.length ? L.latLngBounds(points) : null; }
+  function boundsFor(route) { const points = [...route.lines.flat(), ...visibleMarkers(route).map(point => point.coords)]; return points.length ? L.latLngBounds(points) : null; }
   function fitRoute(route) { const bounds = boundsFor(route); if (bounds && bounds.isValid()) map.fitBounds(bounds, { paddingTopLeft: [50, 70], paddingBottomRight: [55, 45], maxZoom: 17 }); else toast("Tuyến này chưa có tọa độ."); }
   function fitMap() {
     const bounds = L.latLngBounds([]);
@@ -262,7 +354,7 @@
       label.appendChild(checkbox);
       const open = document.createElement("button"); open.className = "route-open";
       const sourceName = /kml|upload|import/i.test(layer.sourceType) ? "KMZ / KML" : /draw|manual/i.test(layer.sourceType) ? "Vẽ trên server" : "Được chia sẻ";
-      open.innerHTML = icon("folder") + '<span class="route-copy"><strong>' + esc(layer.name) + "</strong><small>" + esc(sourceName) + " · " + layer.markers.length + " điểm · " + layer.lines.length + " đường</small></span>" + icon("right");
+      open.innerHTML = icon("folder") + '<span class="route-copy"><strong>' + esc(layer.name) + "</strong><small>" + esc(sourceName) + " · " + visibleMarkers(layer).length + " điểm hiển thị · " + layer.lines.length + " đường</small></span>" + icon("right");
       open.onclick = () => {
         descendants.forEach(item => sharedSelected.add(item.key)); persist(); renderShared(); renderMap(); collapseSheet();
         const bounds = L.latLngBounds([]); descendants.forEach(item => { const b = boundsFor(item); if (b && b.isValid()) bounds.extend(b); }); if (bounds.isValid()) map.fitBounds(bounds, { padding: [55, 70], maxZoom: 17 }); else toast("Lớp này chưa có tọa độ.");
@@ -406,7 +498,8 @@
   function showFeature(feature) {
     if (!requireAdmin()) return;
     const isPoint = feature.kind === "point", folder = state.folders.find(item => item.id === feature.folder);
-    modal(feature.name, '<p>' + esc(folder ? folder.name : "") + ' <span class="badge">Trên máy</span></p><p>' + (isPoint ? feature.coords.map(n => Number(n).toFixed(7)).join(", ") : feature.coords.length + " điểm · " + formatDistance(lineLength(feature.coords))) + "</p>" + (feature.note ? "<p>" + esc(feature.note) + "</p>" : "") + '<div class="actions"><button id="edit-feature" class="primary">Chỉnh sửa</button><button id="move-feature" class="secondary">' + (isPoint ? "Đổi vị trí" : "Chỉnh đường") + '</button></div><button id="delete-feature" class="text-button danger wide-button">Xóa trên máy</button>', () => {
+    modal(feature.name, '<p>' + esc(folder ? folder.name : "") + ' <span class="badge">Trên máy</span></p><p>' + (isPoint ? feature.coords.map(n => Number(n).toFixed(7)).join(", ") : feature.coords.length + " điểm · " + formatDistance(lineLength(feature.coords))) + "</p>" + (feature.note ? "<p>" + esc(feature.note) + "</p>" : "") + (isPoint ? '<button id="point-directions" class="primary wide-button">' + icon("route") + 'Chỉ đường</button>' : "") + '<div class="actions"><button id="edit-feature" class="secondary">Chỉnh sửa</button><button id="move-feature" class="secondary">' + (isPoint ? "Đổi vị trí" : "Chỉnh đường") + '</button></div><button id="delete-feature" class="text-button danger wide-button">Xóa trên máy</button>', () => {
+      if (isPoint) $("point-directions").onclick = event => requestDirections(feature.coords, event.currentTarget);
       $("edit-feature").onclick = () => editFeature({ ...feature });
       $("move-feature").onclick = () => {
         if (!isPoint) { startLine(feature); return; }
@@ -420,7 +513,7 @@
     });
   }
   function showRoute(route) {
-    modal(route.name, "<p>" + esc([route.type, route.capacity].filter(Boolean).join(" · ")) + '</p><p>' + route.markers.length + " điểm · " + route.lines.length + ' đường</p><p class="note">' + (isAdmin() ? "Dữ liệu server. Tạo bản sao trên máy để chỉnh tuyến và xuất KMZ." : "Dữ liệu từ HP Telecom Server · Chỉ xem") + '</p><div class="actions"><button id="view-route" class="secondary">Xem tuyến</button>' + (isAdmin() ? '<button id="copy-route" class="primary">Tạo bản sao</button>' : "") + "</div>", () => {
+    modal(route.name, "<p>" + esc([route.type, route.capacity].filter(Boolean).join(" · ")) + '</p><p>' + visibleMarkers(route).length + " điểm hiển thị · " + route.lines.length + ' đường</p><p class="note">' + (isAdmin() ? "Dữ liệu server. Tạo bản sao trên máy để chỉnh tuyến và xuất KMZ." : "Dữ liệu từ HP Telecom Server · Chỉ xem") + '</p><div class="actions"><button id="view-route" class="secondary">Xem tuyến</button>' + (isAdmin() ? '<button id="copy-route" class="primary">Tạo bản sao</button>' : "") + "</div>", () => {
       $("view-route").onclick = () => { closeModal(); collapseSheet(); fitRoute(route); };
       if (isAdmin()) $("copy-route").onclick = () => copyRoute(route);
     });
@@ -430,16 +523,26 @@
     if (!route.lines.length && !route.markers.length) { toast("Tuyến chưa có tọa độ để sao chép."); return; }
     const folder = { id: uid("folder"), name: route.name + " · Bản chỉnh", parent: "", visible: true }; state.folders.push(folder);
     route.lines.forEach((coords, index) => state.features.push({ id: uid("line"), kind: "line", name: route.name + (route.lines.length > 1 ? " " + (index + 1) : ""), coords: coords.map(point => point.slice()), folder: folder.id, sourceRoute: route.key, color: route.color }));
-    route.markers.forEach(point => state.features.push({ id: uid("point"), kind: "point", name: point.position || point.label, label: point.label, coords: point.coords.slice(), folder: folder.id, sourceRoute: route.key }));
+    route.markers.forEach(point => state.features.push({ id: uid("point"), kind: "point", name: point.position || point.label, label: point.label, display_on_map: point.display_on_map, coords: point.coords.slice(), folder: folder.id, sourceRoute: route.key }));
     state.activeFolder = folder.id; route.shared ? sharedSelected.delete(route.key) : selected.delete(route.key); openedFolders.add(folder.id); persist(); renderRoutes(); renderShared(); renderMap(); closeModal(); openSheet("folders"); toast("Đã tạo bản sao. Chọn đường hoặc điểm để chỉnh.");
   }
   function showServerPoint(route, point) {
     const history = Array.isArray(point.history) ? point.history : Array.isArray(point.records) ? point.records : [];
     modal(point.label, "<p><strong>" + esc(route.name) + "</strong></p>" + (point.position ? "<p>" + esc(point.position) + "</p>" : "") + (point.note ? "<p>" + esc(point.note) + "</p>" : "") + "<p>" + point.coords.map(n => n.toFixed(7)).join(", ") + '</p><p class="note">' + (route.shared ? "Bản đồ quản trị · Chỉ xem" : "Dữ liệu từ HP Telecom Server") + "</p>" +
       (history.length ? '<ul class="detail-list">' + history.slice(0, 30).map(item => "<li>" + esc(item.type || item.category || "Ghi nhận") + "<small>" + esc(item.date || item.created_at || "") + "</small></li>").join("") + "</ul>" : "") +
+      '<button id="point-directions" class="primary wide-button">' + icon("route") + 'Chỉ đường</button>' +
       (isAdmin() ? '<button id="copy-server-point" class="secondary wide-button">Sao chép điểm vào thư mục trên máy</button>' : ""), () => {
+        $("point-directions").onclick = event => requestDirections(point.coords, event.currentTarget);
         if (isAdmin()) $("copy-server-point").onclick = () => editFeature({ id: uid("point"), kind: "point", name: point.position || point.label, label: point.label, coords: point.coords.slice(), folder: state.activeFolder, sourceRoute: route.key });
       });
+  }
+  async function requestDirections(coords, button) {
+    const point = ll(coords);
+    if (!point) { toast("Điểm chưa có tọa độ hợp lệ để chỉ đường."); return; }
+    if (button) button.disabled = true;
+    try { await native("directions", { lat: point[0], lon: point[1] }); }
+    catch (error) { toast(error.message || "Chưa mở được ứng dụng chỉ đường."); }
+    finally { if (button && button.isConnected) button.disabled = false; }
   }
   function openEditor() {
     if (!requireAdmin()) return;
@@ -450,7 +553,51 @@
     });
   }
   function openLayers() {
-    modal("Lớp bản đồ", '<div class="option">' + icon("map") + "<span>Đường phố<small>OpenStreetMap</small></span>" + icon("check") + '</div><button class="option" disabled>' + icon("layers") + '<span>Vệ tinh<small>Chưa cấu hình nhà cung cấp</small></span></button><button class="option" disabled>' + icon("layers") + '<span>Vệ tinh + đường phố<small>Chưa cấu hình nhà cung cấp</small></span></button><button class="option" disabled>' + icon("map") + '<span>Địa hình<small>Chưa cấu hình nhà cung cấp</small></span></button><p class="note">Điểm và đường đã lưu vẫn dùng được khi mất mạng. Nền bản đồ cần kết nối internet.</p>');
+    modal("Lớp bản đồ", baseMapChoices.map(choice => {
+      const available = !choice.requiresKey || baseMapConfig.configured;
+      return '<button id="basemap-' + choice.id + '" class="option layer-option' + (baseMapKey === choice.id ? " selected" : "") + '" aria-pressed="' + (baseMapKey === choice.id) + '">' + icon(choice.icon) + "<span>" + esc(choice.title) + "<small>" + esc(available ? choice.source : isAdmin() ? "Cần kết nối MapTiler · Chạm để cấu hình" : "Quản trị chưa kết nối nguồn vệ tinh") + "</small></span>" + (baseMapKey === choice.id ? icon("check") : "") + "</button>";
+    }).join("") + (isAdmin() ? '<button id="configure-basemap" class="text-button wide-button">' + (baseMapConfig.configured ? "Quản lý nguồn vệ tinh" : "Kết nối nguồn vệ tinh") + "</button>" : "") + '<p class="note">Các điểm GPS dọc tuyến được ẩn; đường cáp, MX, DP và tên hai đầu tuyến vẫn hiển thị. KMZ giữ nguyên toàn bộ tọa độ.</p><p class="note">Đổi lớp nền không thay đổi dữ liệu tuyến. Nền bản đồ cần internet.</p>', () => {
+      baseMapChoices.forEach(choice => $("basemap-" + choice.id).onclick = () => {
+        if (choice.requiresKey && !baseMapConfig.configured) {
+          if (isAdmin()) configureBaseMap();
+          else toast("Quản trị cần kết nối nguồn vệ tinh để sử dụng lớp này.");
+          return;
+        }
+        if (setBaseMap(choice.id)) closeModal();
+      });
+      if (isAdmin()) $("configure-basemap").onclick = configureBaseMap;
+    });
+  }
+  function configureBaseMap() {
+    if (!requireAdmin()) return;
+    modal("Kết nối nguồn vệ tinh", '<p>Nhập khóa MapTiler có quyền sử dụng cho HP Telecom để mở Vệ tinh và Vệ tinh + đường phố trên thiết bị này.</p><label>Khóa MapTiler<input id="basemap-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="256" placeholder="' + (baseMapConfig.configured ? "Nhập khóa mới để thay thế" : "Nhập khóa MapTiler") + '"></label><p id="basemap-config-error" class="form-error" role="alert" hidden></p><div class="actions"><button id="cancel-basemap-config" class="secondary">Quay lại</button><button id="save-basemap-config" class="primary">Kiểm tra & lưu</button></div>' + (baseMapConfig.configured ? '<button id="clear-basemap-config" class="text-button danger wide-button">Ngắt nguồn vệ tinh trên máy</button>' : "") + '<p class="note">Dùng tài khoản dịch vụ bản đồ đã có. Ứng dụng không đăng ký hay mua gói tự động.</p>', () => {
+      $("cancel-basemap-config").onclick = openLayers;
+      const save = async key => {
+        if (!requireAdmin()) return;
+        const input = $("basemap-key"), saveButton = $("save-basemap-config"), clearButton = $("clear-basemap-config"), errorBox = $("basemap-config-error");
+        input.disabled = true; saveButton.disabled = true; if (clearButton) clearButton.disabled = true; errorBox.hidden = true;
+        try {
+          const result = await native("saveBasemapConfig", { key });
+          if (!isAdmin()) return;
+          acceptBaseMapConfig(result);
+          if (["satellite", "hybrid"].includes(baseMapKey)) setBaseMap(baseMapConfig.configured ? baseMapKey : "street", { reload: true });
+          if (saveButton.isConnected) { input.value = ""; openLayers(); }
+          toast(baseMapConfig.configured ? "Đã kết nối nguồn vệ tinh. Chọn lớp để xem." : "Đã ngắt nguồn vệ tinh trên máy.");
+        } catch (error) {
+          if (errorBox.isConnected) { errorBox.textContent = error.message || "Chưa kiểm tra được khóa. Vui lòng thử lại."; errorBox.hidden = false; }
+        } finally {
+          if (input.isConnected) input.disabled = false;
+          if (saveButton.isConnected) saveButton.disabled = false;
+          if (clearButton && clearButton.isConnected) clearButton.disabled = false;
+        }
+      };
+      $("save-basemap-config").onclick = () => {
+        const key = $("basemap-key").value.trim();
+        if (!key) { $("basemap-config-error").textContent = "Hãy nhập khóa MapTiler."; $("basemap-config-error").hidden = false; $("basemap-key").focus(); return; }
+        save(key);
+      };
+      if ($("clear-basemap-config")) $("clear-basemap-config").onclick = () => save("");
+    });
   }
   function openLogin() { $("login-error").hidden = true; $("login").hidden = false; $("password").value = ""; $("close-login").hidden = !user; $("continue-local").hidden = !user; }
   function account() {
@@ -638,7 +785,7 @@
     return false;
   }
   document.addEventListener("keydown", event => { if (event.key === "Escape") back(); if (event.key === "Tab" && !$("modal-backdrop").hidden) { const items = Array.from($("modal").querySelectorAll("button:not([disabled]),input,select,textarea")).filter(item => item.offsetParent !== null); if (!items.length) return; if (event.shiftKey && document.activeElement === items[0]) { event.preventDefault(); items[items.length - 1].focus(); } else if (!event.shiftKey && document.activeElement === items[items.length - 1]) { event.preventDefault(); items[0].focus(); } } });
-  window.HPMapApp = { receiveSession, back, parseKml, makeKml };
+  window.HPMapApp = { receiveSession, back, parseKml, makeKml, getBasemap: () => baseMapKey };
   applyPermissions(); openSheet("routes"); renderRoutes(); renderMap(); openLogin();
   native("session").then(receiveSession).catch(error => { $("connection").textContent = "Chưa kết nối server"; toast(error.message, 6000); });
   setInterval(() => { if (user && !authExpired && !drawing && $("login").hidden && $("modal-backdrop").hidden && document.visibilityState !== "hidden") refresh(true); }, 60000);

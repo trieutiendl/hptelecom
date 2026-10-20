@@ -91,6 +91,62 @@ public class MapApiClientTest {
     public void emptyServerDoesNotInventExampleRoutes() throws Exception {
         assertEquals(0, MapApiClient.normalizeRoutes(new JSONArray(), catalog()).length());
     }
+    public void patrolGpsBadgesAreHiddenWithoutDroppingGeometryOrExportPoints() throws Exception {
+        // The mobile map API sends seq/name/note for every patrol photo. A named
+        // intermediate photo is still a route sample, not an admin-created point.
+        JSONArray raw = new JSONArray()
+                .put(point(999, 108, "Invalid start", 0))
+                .put(point(12, 108, "ODF A", 1))
+                .put(point(12.001, 108, "", 2))
+                .put(point(12.002, 108, "Trụ 17", 3))
+                .put(point(12.003, 108, "Dự phòng", 4))
+                .put(point(12.004, 108, "Măng xông", 5))
+                .put(point(12.005, 108, "", 6))
+                .put(point(999, 108, "Invalid end", 7));
+        JSONObject result = MapApiClient.normalizeRoutes(new JSONArray().put(route("task", "A-B|West",
+                "completed", new JSONArray().put(report("patrol", 1, raw)), new JSONArray())), catalog()).getJSONObject(0);
+        JSONArray markers = result.getJSONArray("markers"), line = result.getJSONArray("lines").getJSONArray(0);
+        assertEquals(6, line.length());
+        assertEquals(6, markers.length()); // Hidden markers remain available to KMZ export.
+        int visible = 0, endpoints = 0, hidden = 0;
+        for (int i = 0; i < markers.length(); i++) {
+            JSONObject marker = markers.getJSONObject(i);
+            if (marker.getBoolean("display_on_map")) visible++; else hidden++;
+            if (marker.getBoolean("is_endpoint")) {
+                endpoints++;
+                assertTrue(marker.getBoolean("display_on_map"));
+                assertTrue(!marker.getString("label").isEmpty());
+            }
+            if (marker.getString("name").equals("Trụ 17")) assertTrue(!marker.getBoolean("display_on_map"));
+            if (marker.getString("kind").equals("MX") || marker.getString("kind").equals("DP"))
+                assertTrue(marker.getBoolean("display_on_map"));
+            if (marker.getDouble("lat") == 12.005) assertEquals("Vị trí 6", marker.getString("label"));
+        }
+        assertEquals(4, visible);
+        assertEquals(2, hidden);
+        assertEquals(2, endpoints);
+    }
+    public void olderEndpointRetainsItsLabelWhenLatestReportPassesThroughThatPoint() throws Exception {
+        JSONObject old = report("old", 1, new JSONArray()
+                .put(point(12.001, 108, "ODF A", 1)).put(point(12.01, 108, "ODF B", 2)));
+        JSONObject latest = report("latest", 2, new JSONArray()
+                .put(point(12, 108, "ODF C", 1)).put(point(12.001, 108, "", 2)).put(point(12.02, 108, "ODF D", 3)));
+        JSONArray markers = MapApiClient.normalizeRoutes(new JSONArray().put(route("task", "A-B|West",
+                "completed", new JSONArray().put(old).put(latest), new JSONArray())), catalog())
+                .getJSONObject(0).getJSONArray("markers");
+        boolean found = false;
+        for (int i = 0; i < markers.length(); i++) {
+            JSONObject marker = markers.getJSONObject(i);
+            if (marker.getDouble("lat") == 12.001) {
+                found = true;
+                assertTrue(marker.getBoolean("display_on_map"));
+                assertTrue(marker.getBoolean("is_endpoint"));
+                assertEquals("ODF A", marker.getString("label"));
+                assertEquals(2, marker.getInt("history_count"));
+            }
+        }
+        assertTrue(found);
+    }
     public void sharedFoldersKeepHierarchyAndConvertGeoJsonCoordinateOrder() throws Exception {
         JSONObject source = new JSONObject().put("layers", new JSONArray().put(new JSONObject()
                 .put("team", "West").put("revision", 2)
@@ -110,6 +166,26 @@ public class MapApiClientTest {
         assertEquals(12.0, result.getJSONObject(0).getJSONArray("lines").getJSONArray(0).getJSONArray(0).getDouble(0), 0);
         assertEquals(108.0, result.getJSONObject(1).getJSONArray("markers").getJSONObject(0).getDouble("lon"), 0);
         assertEquals("MX", result.getJSONObject(1).getJSONArray("markers").getJSONObject(0).getString("label"));
+        assertTrue(result.getJSONObject(1).getJSONArray("markers").getJSONObject(0).getBoolean("display_on_map"));
+    }
+    public void adminCreatedGenericAndNamedPointsRemainVisible() throws Exception {
+        JSONArray features = new JSONArray();
+        for (String name : new String[]{"GPS", "Tủ cáp mới", ""}) {
+            features.put(new JSONObject().put("id", "p" + features.length()).put("folder_id", "root").put("name", name)
+                    .put("geometry", new JSONObject().put("type", "Point").put("coordinates", new JSONArray().put(108).put(12))));
+        }
+        JSONObject response = new JSONObject().put("layers", new JSONArray().put(new JSONObject()
+                .put("team", "West")
+                .put("folders", new JSONArray().put(new JSONObject().put("id", "root").put("name", "Imported KML").put("parent_id", JSONObject.NULL)))
+                .put("features", features)));
+        JSONArray markers = MapApiClient.normalizeSharedLayers(response).getJSONObject(0).getJSONArray("markers");
+        assertEquals(3, markers.length());
+        for (int i = 0; i < markers.length(); i++) {
+            assertTrue(markers.getJSONObject(i).getBoolean("display_on_map"));
+            assertTrue(!markers.getJSONObject(i).getBoolean("is_endpoint"));
+            assertTrue(!markers.getJSONObject(i).getString("label").isEmpty());
+        }
+        assertEquals("Tủ cáp mới", markers.getJSONObject(1).getString("label"));
     }
     public static void main(String[] args) throws Exception {
         MapApiClientTest test = new MapApiClientTest();
@@ -117,7 +193,10 @@ public class MapApiClientTest {
         test.repeatedMonthlyOverlayIsOneObservationAndMxDoesNotChainBeyondTwentyMetres();
         test.sameNameAcrossTeamsNeverMergesOrGuessesCatalogMetadata();
         test.emptyServerDoesNotInventExampleRoutes();
+        test.patrolGpsBadgesAreHiddenWithoutDroppingGeometryOrExportPoints();
+        test.olderEndpointRetainsItsLabelWhenLatestReportPassesThroughThatPoint();
         test.sharedFoldersKeepHierarchyAndConvertGeoJsonCoordinateOrder();
-        System.out.println("PASS: completed and unfinished monthly history, empty routes, catalog metadata, endpoint names, 20m complete-link MX, report deduplication, team isolation and shared server geometry.");
+        test.adminCreatedGenericAndNamedPointsRemainVisible();
+        System.out.println("PASS: monthly history, catalog, named endpoints, hidden intermediate GPS with intact geometry/export points, admin point visibility, 20m MX, team isolation and shared server geometry.");
     }
 }
