@@ -14,6 +14,8 @@ jobs:
   build:
     name: Build installable Android APK
     runs-on: ubuntu-latest
+    env:
+      ANDROID_AVD_HOME: ${{ github.workspace }}/.android-avd
     steps:
       - name: Check out source
         uses: actions/checkout@v7
@@ -43,7 +45,9 @@ jobs:
         run: |
           sudo chmod 666 /dev/kvm
           sdkmanager "system-images;android-35;google_apis;x86_64" "emulator"
-          echo no | avdmanager create avd -n HPMapQA -k "system-images;android-35;google_apis;x86_64" --force
+          mkdir -p "$ANDROID_AVD_HOME"
+          echo no | avdmanager create avd -n HPMapQA -p "$ANDROID_AVD_HOME/HPMapQA.avd" -k "system-images;android-35;google_apis;x86_64" --force
+          test -f "$ANDROID_AVD_HOME/HPMapQA.ini"
 
       - name: Check installed app and capture its screens
         timeout-minutes: 10
@@ -81,3 +85,4 @@ jobs:
           path: qa/
           if-no-files-found: ignore
           retention-days: 14
+
