@@ -163,7 +163,15 @@ public class MapApiClientTest {
         assertEquals(2, result.length());
         assertEquals("server:West:root", result.getJSONObject(1).getString("parent_id"));
         assertEquals("server", result.getJSONObject(0).getString("source_type"));
+        assertEquals("root", result.getJSONObject(0).getString("folder_id"));
+        assertEquals("West", result.getJSONObject(0).getString("team"));
+        assertEquals(2, result.getJSONObject(0).getInt("revision"));
         assertEquals(12.0, result.getJSONObject(0).getJSONArray("lines").getJSONArray(0).getJSONArray(0).getDouble(0), 0);
+        JSONObject lineFeature = result.getJSONObject(0).getJSONArray("lineFeatures").getJSONObject(0);
+        assertEquals("l", lineFeature.getString("feature_id"));
+        assertEquals("Cable", lineFeature.getString("name"));
+        assertEquals(12.0, lineFeature.getJSONArray("coords").getJSONArray(0).getDouble(0), 0);
+        assertEquals("p", result.getJSONObject(1).getJSONArray("markers").getJSONObject(0).getString("feature_id"));
         assertEquals(108.0, result.getJSONObject(1).getJSONArray("markers").getJSONObject(0).getDouble("lon"), 0);
         assertEquals("MX", result.getJSONObject(1).getJSONArray("markers").getJSONObject(0).getString("label"));
         assertTrue(result.getJSONObject(1).getJSONArray("markers").getJSONObject(0).getBoolean("display_on_map"));

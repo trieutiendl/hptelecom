@@ -28,6 +28,7 @@ $mapJavaSources += (Join-Path $mapProject 'app\src\main\java\vn\hptelecom\map\Ma
 $mapJavaSources += (Join-Path $mapProject 'app\src\main\java\vn\hptelecom\map\BasemapSettings.java')
 $mapJavaSources += (Join-Path $PSScriptRoot 'MapApiClientTest.java')
 $mapJavaSources += (Join-Path $PSScriptRoot 'MapSettingsTest.java')
+$mapJavaSources += (Join-Path $PSScriptRoot 'MapTransferTest.java')
 $mapJavaSources += @(Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'stubs') -Recurse -Filter '*.java' | Select-Object -ExpandProperty FullName)
 & javac -encoding UTF-8 -source 17 -target 17 -classpath $mapAndroidJar -d $mapOutput @mapJavaSources
 if ($LASTEXITCODE -ne 0) { throw 'Map API regression checks did not compile.' }
@@ -35,3 +36,5 @@ if ($LASTEXITCODE -ne 0) { throw 'Map API regression checks did not compile.' }
 if ($LASTEXITCODE -ne 0) { throw 'Map API regression checks failed.' }
 & java -classpath "$mapOutput;$mapAndroidJar" vn.hptelecom.map.MapSettingsTest
 if ($LASTEXITCODE -ne 0) { throw 'Map native settings/directions checks failed.' }
+& java -classpath "$mapOutput;$mapAndroidJar" vn.hptelecom.map.MapTransferTest
+if ($LASTEXITCODE -ne 0) { throw 'Map shared folder transfer checks failed.' }

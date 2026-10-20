@@ -152,7 +152,7 @@ public final class MapHomeActivity extends Activity {
                         case "directions": directions(id, args); return;
                         case "serverLogin": serverLogin(id); return;
                         case "session": case "refresh": case "login": case "logout": case "imports": case "removeImport":
-                        case "basemapConfig": case "saveBasemapConfig":
+                        case "basemapConfig": case "saveBasemapConfig": case "transferSharedFeatures":
                             worker.execute(() -> {
                                 try {
                                     JSONObject value;
@@ -160,6 +160,7 @@ public final class MapHomeActivity extends Activity {
                                         case "login": value = api.login(args.optString("username"), args.optString("password")); break;
                                         case "logout": api.logout(); value = json("ok", true, "user", JSONObject.NULL, "routes", new JSONArray()); break;
                                         case "refresh": value = api.refresh(); break;
+                                        case "transferSharedFeatures": value = api.transferSharedFeatures(args); break;
                                         case "basemapConfig": value = basemaps.read(); break;
                                         case "saveBasemapConfig":
                                             if (!api.isAdmin()) throw new java.io.IOException("Chỉ quản trị viên được cấu hình nguồn bản đồ.");

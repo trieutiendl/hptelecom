@@ -36,6 +36,10 @@
         <button id="cancel-drawing" class="icon-button" aria-label="Hủy"></button>
         <button id="finish-drawing" class="primary" hidden>Lưu</button>
       </div>
+      <div id="selection-bar" class="selection-bar" hidden aria-label="Đối tượng đã chọn">
+        <div class="selection-summary"><button id="selection-list" class="text-button"><strong id="selection-count">0 đã chọn</strong></button><button id="selection-cancel" class="text-button">Hủy chọn</button></div>
+        <div class="selection-actions"><button id="selection-copy" class="secondary">Sao chép</button><button id="selection-move" class="primary">Di chuyển</button></div>
+      </div>
       <section id="sheet" class="sheet" aria-label="Danh sách tuyến">
         <button id="sheet-handle" class="handle" aria-label="Thu gọn danh sách"><span></span></button>
         <div class="sheet-heading"><h1 id="sheet-title">Tuyến cáp</h1><span id="route-count" class="muted"></span><button id="close-sheet" class="icon-button" aria-label="Thu gọn danh sách"></button></div>
@@ -53,6 +57,7 @@
         </div>
         <div id="folders-panel" hidden>
           <div class="folder-toolbar"><span class="muted">Lưu trên thiết bị này</span><button id="new-folder" class="small-button">＋ Tạo thư mục</button></div>
+          <button id="select-local-features" class="secondary wide-button" hidden>Chọn điểm / đường</button>
           <div id="folder-list"></div>
         </div>
         <div id="shared-panel" hidden>

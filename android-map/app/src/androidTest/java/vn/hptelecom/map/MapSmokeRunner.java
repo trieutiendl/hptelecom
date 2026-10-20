@@ -76,6 +76,32 @@ public final class MapSmokeRunner extends Instrumentation {
                     "Administrator map source configuration missing");
         }
     }
+    private void checkLocalTransfers() throws Exception {
+        check("(function(){document.getElementById('open-folders').click();document.getElementById('new-folder').click();document.getElementById('folder-name').value='DEST-QA';document.getElementById('folder-parent').value='';document.getElementById('save-folder').click();var s=JSON.parse(localStorage.getItem('hpmap-v2')),p=s.features.find(function(f){return f.name==='LOCAL-QA';}),d=s.folders.find(function(f){return f.name==='DEST-QA';});if(!p||!d)return false;window.__qaLocalOriginal=p.id;window.__qaLocalSource=p.folder;window.__qaLocalDest=d.id;return true;})()",
+                "Cannot create local transfer destination");
+        check("(function(){document.getElementById('nav-map').click();var p=document.querySelector('.leaflet-marker-pane .hp-marker.local');if(!p)return false;p.click();document.getElementById('select-feature').click();return !document.getElementById('selection-bar').hidden&&document.getElementById('selection-count').textContent.startsWith('1 ');})()",
+                "Local point could not enter selection mode");
+        screenshot("08-selected-point");
+        check("(function(){document.getElementById('selection-copy').click();document.getElementById('transfer-target').value=window.__qaLocalDest;return !document.getElementById('modal-backdrop').hidden&&document.getElementById('transfer-confirm').textContent==='Sao chép';})()",
+                "Local copy target dialog missing");
+        screenshot("09-transfer-destination");
+        check("(function(){document.getElementById('transfer-confirm').click();var s=JSON.parse(localStorage.getItem('hpmap-v2')),a=s.features.find(function(f){return f.id===window.__qaLocalOriginal;}),b=s.features.find(function(f){return f.folder===window.__qaLocalDest;});return s.features.length===2&&a&&b&&a.id!==b.id&&a.folder===window.__qaLocalSource&&JSON.stringify(a.coords)===JSON.stringify(b.coords)&&document.getElementById('selection-bar').hidden;})()",
+                "Local copy did not retain source and create a distinct point with identical coordinates");
+        check("(function(){document.getElementById('nav-map').click();var p=document.querySelector('.leaflet-marker-pane .hp-marker.local');if(!p)return false;p.click();document.getElementById('select-feature').click();var s=document.querySelector('.feature-choice input[data-feature-id=\"'+window.__qaLocalOriginal+'\"]');return !!s&&s.checked;})()",
+                "Cannot select original local point for move");
+        check("(function(){document.getElementById('selection-move').click();document.getElementById('transfer-target').value=window.__qaLocalDest;document.getElementById('transfer-confirm').click();var s=JSON.parse(localStorage.getItem('hpmap-v2'));return s.features.length===2&&new Set(s.features.map(function(f){return f.id;})).size===2&&s.features.every(function(f){return f.folder===window.__qaLocalDest;})&&s.features.some(function(f){return f.id===window.__qaLocalOriginal;})&&JSON.stringify(s.features[0].coords)===JSON.stringify(s.features[1].coords)&&document.getElementById('selection-bar').hidden;})()",
+                "Local move did not preserve IDs or remove original from source folder");
+    }
+    private void checkSharedTransfers(String fixture) throws Exception {
+        js("window.__qaFixture=" + fixture.replace("role:'staff'", "role:'admin'") + ";HPMapApp.receiveSession(window.__qaFixture);document.getElementById('nav-routes').click();document.getElementById('shared-tab').click();true");
+        check("(function(){var select=document.querySelector('.select-shared-features');if(!select)return false;select.click();var checks=Array.from(document.querySelectorAll('.feature-choice input[data-source=shared]'));checks.forEach(function(c){c.click();});return checks.length===2&&document.getElementById('selection-count').textContent.startsWith('2 ');})()",
+                "Shared point and line selection controls missing");
+        check("(function(){document.getElementById('selection-copy').click();document.getElementById('transfer-target').value='qa-dest';var original=window.HPMap,spy={request:function(id,action,args){if(action!=='transferSharedFeatures')return original.request(id,action,args);window.__qaTransfer=JSON.parse(args);var updated=JSON.parse(JSON.stringify(window.__qaFixture)),source=updated.sharedLayers[0],dest=updated.sharedLayers[1];updated.sharedLayers.forEach(function(l){l.revision=4;});dest.markers=[Object.assign({},source.markers[0],{feature_id:'qa-copy-point'})];dest.lines=JSON.parse(JSON.stringify(source.lines));dest.lineFeatures=[Object.assign({},source.lineFeatures[0],{feature_id:'qa-copy-line'})];updated.transfer={saved:true,mode:'copy',count:2};window.HPMapResult(id,updated);}};try{window.HPMap=spy;if(window.HPMap!==spy)return false;document.getElementById('transfer-confirm').click();var t=window.__qaTransfer;return t&&t.team==='QA'&&t.revision===3&&t.mode==='copy'&&t.targetFolderId==='qa-dest'&&t.featureIds.length===2&&t.featureIds.includes('qa-point')&&t.featureIds.includes('qa-line');}finally{window.HPMap=original;}})()",
+                "Shared transfer did not use raw feature/folder IDs, selected scope and revision");
+        check("(function(){var rows=Array.from(document.querySelectorAll('.shared-row'));return document.getElementById('selection-bar').hidden&&document.getElementById('modal-backdrop').hidden&&rows.some(function(r){return r.textContent.includes('Đích quản trị kiểm thử')&&r.textContent.includes('1 điểm hiển thị')&&r.textContent.includes('1 đường');})()",
+                "Shared transfer response did not clear selection or refresh destination data");
+        screenshot("10-shared-transfer-complete");
+    }
     private WebView find(View view) {
         if (view instanceof WebView) return (WebView)view;
         if (view instanceof ViewGroup) for (int i=0;i<((ViewGroup)view).getChildCount();i++) {
@@ -113,8 +139,10 @@ public final class MapSmokeRunner extends Instrumentation {
                     +"{lat:12.681,lon:108.051,kind:'MX',label:'MX',position:'Vị trí kiểm thử',display_on_map:true,is_endpoint:false},"
                     +"{lat:12.682,lon:108.052,kind:'GPS',label:'GPS-QA-HIDDEN',position:'Điểm trung gian cần ẩn',display_on_map:false,is_endpoint:false},"
                     +"{lat:12.684,lon:108.054,kind:'GPS',label:'QA-B',position:'Địa điểm QA-B',display_on_map:true,is_endpoint:true}"
-                    +"]}],sharedLayers:[{key:'qa-shared',name:'Thư mục kiểm thử',parent_id:'',source_type:'server',team:'',lines:[],"
-                    +"markers:[{lat:12.683,lon:108.053,label:'DP',position:'Dự phòng kiểm thử',display_on_map:true}]}]}";
+                    +"]}],sharedLayers:[{key:'qa-shared',folder_id:'qa-source',revision:3,name:'Thư mục kiểm thử',parent_id:'',source_type:'server',team:'QA',"
+                    +"lines:[[[12.683,108.053],[12.6835,108.0535]]],lineFeatures:[{feature_id:'qa-line',name:'Đường quản trị kiểm thử',note:'Ghi chú đường',color:'#008080',coords:[[12.683,108.053],[12.6835,108.0535]]}],"
+                    +"markers:[{feature_id:'qa-point',lat:12.683,lon:108.053,label:'DP',position:'Dự phòng kiểm thử',display_on_map:true}]},"
+                    +"{key:'qa-dest-layer',folder_id:'qa-dest',revision:3,name:'Đích quản trị kiểm thử',parent_id:'',source_type:'server',team:'QA',lines:[],lineFeatures:[],markers:[]}]}";
             js("HPMapApp.receiveSession("+fixture+");true");
             check("document.getElementById('login').hidden","Login did not return to map");
             check("document.getElementById('route-list').textContent.includes('TUYẾN KIỂM THỬ')","Server route missing");
@@ -127,6 +155,7 @@ public final class MapSmokeRunner extends Instrumentation {
             checkDirections(false, true);
             checkLayers(false);
             js("document.getElementById('shared-tab').click();true");
+            check("document.querySelectorAll('.select-shared-features').length===0", "Staff can select shared features for editing");
             screenshot("03-shared-folders-test-data");
             js("HPMapApp.receiveSession("+fixture.replace("role:'staff'","role:'admin'")+");document.getElementById('routes-tab').click();true");
             check("!document.getElementById('creation-tools').hidden&&!document.getElementById('nav-import').hidden","Admin tools missing");
@@ -139,10 +168,12 @@ public final class MapSmokeRunner extends Instrumentation {
             check("(function(){var point=Array.from(document.querySelectorAll('.leaflet-marker-pane .hp-marker')).find(function(e){return e.textContent.trim()==='MX';});if(!point)return false;point.click();document.getElementById('copy-server-point').click();document.getElementById('feature-name').value='LOCAL-QA';document.getElementById('feature-label').value='Điểm';document.getElementById('save-feature').click();return !!document.querySelector('.leaflet-marker-pane .hp-marker.local');})()",
                     "Administrator cannot copy a selected point to a local folder");
             checkDirections(true, false);
+            checkLocalTransfers();
+            checkSharedTransfers(fixture);
             js("HPMapApp.receiveSession("+fixture+");true");
             check("document.getElementById('modal-backdrop').hidden&&document.getElementById('creation-tools').hidden","Role downgrade left edit form open");
             checkPatrolMarkers();
-            result.putString("stream","HP_MAP_SMOKE_PASS: login, packaged map, hidden GPS with retained geometry/KML, MX/DP/endpoints, terrain switching/persistence, directions coordinates, shared folders, admin/read-only roles.\n");
+            result.putString("stream","HP_MAP_SMOKE_PASS: login, packaged map, hidden GPS with retained geometry/KML, MX/DP/endpoints, terrain switching/persistence, directions coordinates, local point copy/move, shared point+line selection/transfer/revision refresh, admin/read-only roles.\n");
             finish(Activity.RESULT_OK,result);
         } catch(Throwable failure) {
             result.putString("stream","HP_MAP_SMOKE_FAIL: "+failure.getClass().getSimpleName()+": "+failure.getMessage()+"\n");

@@ -44,8 +44,12 @@
         return reject(new Error("Chức năng này cần mở trong ứng dụng HP Map."));
       }
       const id = String(++requestNo);
-      const timeout = setTimeout(() => { pending.delete(id); reject(new Error("Chưa nhận được phản hồi. Vui lòng thử lại.")); }, ["import", "export", "serverLogin"].includes(action) ? 300000 : 60000);
-      pending.set(id, { resolve, reject, timeout });
+      const timeout = setTimeout(() => {
+        pending.delete(id);
+        const error = new Error(action === "transferSharedFeatures" ? "Chưa xác nhận được kết quả. Hãy cập nhật bản đồ trước khi thao tác tiếp." : "Chưa nhận được phản hồi. Vui lòng thử lại.");
+        error.transferUncertain = action === "transferSharedFeatures"; reject(error);
+      }, ["import", "export", "serverLogin"].includes(action) ? 300000 : action === "transferSharedFeatures" ? 180000 : 60000);
+      pending.set(id, { resolve, reject, timeout, action });
       try { window.HPMap.request(id, action, JSON.stringify(args)); }
       catch (error) { clearTimeout(timeout); pending.delete(id); reject(error); }
     });
@@ -56,9 +60,9 @@
     pending.delete(String(id)); clearTimeout(call.timeout);
     try {
       const result = typeof payload === "string" ? JSON.parse(payload) : payload;
-      if (result && (result.ok === false || result.error)) { const error = new Error(result.error || "Không thực hiện được thao tác."); error.authExpired = result.authExpired || result.status === 401 || result.code === 401; call.reject(error); }
+      if (result && (result.ok === false || result.error)) { const error = new Error(result.error || "Không thực hiện được thao tác."); error.status = result.status || result.code || 0; error.authExpired = result.authExpired || result.status === 401 || result.code === 401; error.transferUncertain = call.action === "transferSharedFeatures" && !error.status && !error.authExpired; call.reject(error); }
       else call.resolve(result || {});
-    } catch (error) { call.reject(error); }
+    } catch (error) { if (call.action === "transferSharedFeatures") error.transferUncertain = true; call.reject(error); }
   };
   let toastTimer;
   function toast(message, duration = 4200) { $("toast").textContent = message; $("toast").hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => $("toast").hidden = true, duration); }
@@ -69,14 +73,15 @@
   if (!Array.isArray(state.importedIds)) state.importedIds = [];
   if (!Array.isArray(state.dismissedImports)) state.dismissedImports = [];
   let routes = [], sharedLayers = [], user = null, selected = new Set(Array.isArray(state.selected) ? state.selected : []), sharedSelected = new Set(Array.isArray(state.sharedSelected) ? state.sharedSelected : []), loadedOnce = false, sharedLoaded = false, importsLoaded = false, activeRoute = "", drawing = null, locationLayer = null, modalCloseAction = null, lastFocus = null, refreshing = false, authExpired = false;
+  let featureSelection = null, transferBusy = false, sharedTransferNeedsRefresh = false, sessionEpoch = 0;
   const openedFolders = new Set(), routeColors = ["#16b4c6", "#f6b44a", "#a18bea", "#e384a9", "#54bc87"];
   function isAdmin() { return !!user && user.role === "admin" && !authExpired; }
   function requireAdmin() { if (isAdmin()) return true; toast("Chỉ quản trị viên được thay đổi bản đồ."); return false; }
   function applyPermissions() {
     const admin = isAdmin();
-    ["creation-tools", "edit", "nav-import", "folders-tab", "new-folder"].forEach(id => $(id).hidden = !admin);
+    ["creation-tools", "edit", "nav-import", "folders-tab", "new-folder", "select-local-features"].forEach(id => $(id).hidden = !admin);
     $("close-login").hidden = !user; $("continue-local").hidden = !user;
-    if (!admin) { cancelDrawing(); if (!$("modal-backdrop").hidden) closeModal(); if (!$("folders-panel").hidden) changePanel("routes"); }
+    if (!admin) { featureSelection = null; renderSelectionBar(); cancelDrawing(); if (!$("modal-backdrop").hidden) closeModal(true); if (!$("folders-panel").hidden) changePanel("routes"); }
   }
   function persist() {
     state.selected = Array.from(selected);
@@ -199,6 +204,12 @@
   function normalizeShared(layer, index) {
     const normalized = normalizeRoute(layer, index);
     normalized.shared = true;
+    normalized.folderId = String(layer.folder_id || "");
+    normalized.revision = Number.isInteger(layer.revision) ? layer.revision : null;
+    normalized.lineFeatures = (Array.isArray(layer.lineFeatures) ? layer.lineFeatures : []).map(feature => ({
+      ...feature, feature_id: String(feature.feature_id || ""),
+      coords: (Array.isArray(feature.coords) ? feature.coords : []).map(ll).filter(Boolean)
+    })).filter(feature => feature.coords.length > 1);
     normalized.parent = String(layer.parent_id || layer.parent || layer.folder_id || "");
     normalized.sourceType = String(layer.source_type || layer.source || "");
     const collection = layer.geojson || layer.data || layer.feature_collection;
@@ -214,6 +225,8 @@
   }
   function receiveSession(result, fit = true) {
     const hadUser = !!user;
+    const identity = account => account ? String(account.username || account.id || account.name || account.display_name || "") + "|" + String(account.role || "") : "";
+    if (identity(user) !== identity(result.user)) sessionEpoch++;
     user = result.user || null;
     routes = (Array.isArray(result.routes) ? result.routes : []).map(normalizeRoute);
     if ((!loadedOnce || !hadUser) && selected.size === 0) routes.forEach(route => selected.add(route.key));
@@ -224,6 +237,7 @@
       sharedLoaded = true;
     }
     if (!user) {
+      featureSelection = null;
       selected.clear(); sharedSelected.clear(); sharedLayers = [];
       configGeneration++; acceptBaseMapConfig(null);
       if (["satellite", "hybrid"].includes(baseMapKey)) setBaseMap("street", { persist: false });
@@ -232,6 +246,13 @@
     selected.forEach(key => { if (!validKeys.has(key)) selected.delete(key); });
     loadedOnce = true;
     authExpired = false;
+    if (featureSelection && featureSelection.source === "shared") {
+      const current = sharedLayers.filter(layer => String(layer.team || "") === featureSelection.team);
+      if (!current.length || current.some(layer => layer.revision !== featureSelection.revision)) {
+        featureSelection = null;
+        if (!transferBusy) toast("Bản đồ đã thay đổi. Hãy chọn lại đối tượng cần sao chép hoặc di chuyển.");
+      }
+    }
     applyPermissions();
     $("connection").textContent = user ? ("Đã kết nối · " + (user.display_name || user.name || user.username || "HP Telecom")) : "Bản đồ trên máy";
     $("server-warning").hidden = !result.warning;
@@ -284,9 +305,9 @@
     empty.replaceChildren(document.createTextNode(user ? "Không có tuyến phù hợp hoặc chưa có tọa độ được cấp quyền." : "Đăng nhập HP Telecom để xem bản đồ được chia sẻ."));
     if (!user) { const login = document.createElement("button"); login.className = "secondary"; login.textContent = "Đăng nhập HP Telecom"; login.onclick = openLogin; empty.appendChild(login); }
   }
-  function markerIcon(label, local = false) {
+  function markerIcon(label, local = false, picked = false) {
     const text = String(label || "Điểm").slice(0, 24);
-    return L.divIcon({ className: "hp-marker " + (local ? "local" : /MX/i.test(text) ? "mx" : /DP|DỰ PHÒNG/i.test(text) ? "dp" : ""), html: "<span>" + esc(text) + "</span>", iconSize: null, iconAnchor: [14, 15] });
+    return L.divIcon({ className: "hp-marker " + (picked ? "picked " : "") + (local ? "local" : /MX/i.test(text) ? "mx" : /DP|DỰ PHÒNG/i.test(text) ? "dp" : ""), html: "<span>" + esc(text) + "</span>", iconSize: null, iconAnchor: [14, 15] });
   }
   function updateCaption(route) {
     const current = route || routes.find(item => item.key === activeRoute && selected.has(item.key));
@@ -302,20 +323,29 @@
   function renderMap() {
     serverLayers.clearLayers(); localLayers.clearLayers();
     [...routes.filter(route => selected.has(route.key)), ...sharedLayers.filter(layer => sharedSelected.has(layer.key))].forEach(route => {
-      route.lines.forEach(line => L.polyline(line, { color: route.color, weight: 4 }).addTo(serverLayers).on("click", () => { activeRoute = route.key; updateCaption(route); showRoute(route); }));
+      route.lines.forEach((line, index) => {
+        const feature = route.shared && route.lineFeatures && route.lineFeatures[index];
+        const picked = feature && featurePicked("shared", feature.feature_id, route.team);
+        L.polyline(line, { color: picked ? "#ffce56" : route.color, weight: picked ? 7 : 4 }).addTo(serverLayers).on("click", () => {
+          if (feature && toggleFeatureSelection("shared", feature.feature_id, route.team)) return;
+          activeRoute = route.key; updateCaption(route); showRoute(route);
+        });
+      });
       visibleMarkers(route).forEach(point => {
-        const marker = L.marker(point.coords, { icon: markerIcon(point.label) }).addTo(serverLayers);
-        marker.on("click", () => showServerPoint(route, point));
+        const picked = route.shared && featurePicked("shared", point.feature_id, route.team);
+        const marker = L.marker(point.coords, { icon: markerIcon(point.label, false, picked) }).addTo(serverLayers);
+        marker.on("click", () => { if (route.shared && toggleFeatureSelection("shared", point.feature_id, route.team)) return; showServerPoint(route, point); });
       });
     });
     (isAdmin() ? state.features : []).filter(feature => folderVisible(feature.folder) && feature.display_on_map !== false).forEach(feature => {
+      const picked = featurePicked("local", feature.id);
       if (feature.kind === "point" && ll(feature.coords)) {
-        L.marker(feature.coords, { icon: markerIcon(feature.label || feature.name, true) }).addTo(localLayers).on("click", () => showFeature(feature));
+        L.marker(feature.coords, { icon: markerIcon(feature.label || feature.name, true, picked) }).addTo(localLayers).on("click", () => { if (!toggleFeatureSelection("local", feature.id)) showFeature(feature); });
       } else if (feature.kind === "line" && feature.coords.length > 1) {
-        L.polyline(feature.coords, { color: feature.color || "#9a73d3", weight: 4, dashArray: feature.sourceRoute ? "8 5" : null }).addTo(localLayers).on("click", () => showFeature(feature));
+        L.polyline(feature.coords, { color: picked ? "#ffce56" : feature.color || "#9a73d3", weight: picked ? 7 : 4, dashArray: feature.sourceRoute ? "8 5" : null }).addTo(localLayers).on("click", () => { if (!toggleFeatureSelection("local", feature.id)) showFeature(feature); });
       }
     });
-    updateCaption(); renderFolders();
+    updateCaption(); renderFolders(); renderSelectionBar();
   }
   function boundsFor(route) { const points = [...route.lines.flat(), ...visibleMarkers(route).map(point => point.coords)]; return points.length ? L.latLngBounds(points) : null; }
   function fitRoute(route) { const bounds = boundsFor(route); if (bounds && bounds.isValid()) map.fitBounds(bounds, { paddingTopLeft: [50, 70], paddingBottomRight: [55, 45], maxZoom: 17 }); else toast("Tuyến này chưa có tọa độ."); }
@@ -360,7 +390,16 @@
         const bounds = L.latLngBounds([]); descendants.forEach(item => { const b = boundsFor(item); if (b && b.isValid()) bounds.extend(b); }); if (bounds.isValid()) map.fitBounds(bounds, { padding: [55, 70], maxZoom: 17 }); else toast("Lớp này chưa có tọa độ.");
         updateCaption(layer);
       };
-      row.append(label, open); list.appendChild(row);
+      row.append(label, open);
+      if (isAdmin() && layer.folderId && layer.revision !== null) {
+        const select = document.createElement("button"); select.className = "small-button select-shared-features"; select.textContent = "Chọn";
+        select.setAttribute("aria-label", "Chọn đối tượng trong " + layer.name); select.onclick = () => beginFeatureSelection("shared", layer.key);
+        row.appendChild(select);
+      }
+      list.appendChild(row);
+      if (featureSelection && featureSelection.source === "shared" && featureSelection.team === String(layer.team || "")) {
+        appendFeatureChoices(list, sharedFeatures(layer), "shared", layer.team, depth + 1);
+      }
       sharedLayers.filter(item => item.parent === layer.key).forEach(item => append(item, depth + 1));
     };
     sharedLayers.filter(layer => !layer.parent || !valid.has(layer.parent)).forEach(layer => append(layer, 0));
@@ -375,7 +414,7 @@
     lastFocus = document.activeElement; $("modal-title").textContent = title; $("modal-body").innerHTML = html; $("modal-backdrop").hidden = false; modalCloseAction = onClose || null;
     if (setup) setup(); $("close-modal").focus();
   }
-  function closeModal() { const action = modalCloseAction; modalCloseAction = null; $("modal-backdrop").hidden = true; if (action) action(); if (lastFocus && lastFocus.isConnected) lastFocus.focus(); }
+  function closeModal(force = false) { if (transferBusy && force !== true) return; const action = modalCloseAction; modalCloseAction = null; $("modal-backdrop").hidden = true; if (action) action(); if (lastFocus && lastFocus.isConnected) lastFocus.focus(); }
   function folderOptions(value) {
     const path = folder => { const names = [folder.name]; let p = folder.parent, seen = new Set([folder.id]); while (p && !seen.has(p)) { seen.add(p); const parent = state.folders.find(item => item.id === p); if (!parent) break; names.unshift(parent.name); p = parent.parent; } return names.join(" / "); };
     return state.folders.map(folder => '<option value="' + esc(folder.id) + '"' + (folder.id === value ? " selected" : "") + ">" + esc(path(folder)) + "</option>").join("");
@@ -392,7 +431,9 @@
         const open = document.createElement("button"); open.className = "folder-open"; open.innerHTML = icon("folder") + "<span><strong>" + esc(folder.name) + "</strong><small>" + count + " đối tượng" + (folder.id === state.activeFolder ? " · Đang chọn" : "") + "</small></span>"; open.onclick = () => { state.activeFolder = folder.id; openedFolders.has(folder.id) ? openedFolders.delete(folder.id) : openedFolders.add(folder.id); persist(); renderFolders(); };
         const more = document.createElement("button"); more.className = "icon-button"; more.innerHTML = icon("more"); more.setAttribute("aria-label", "Tùy chọn thư mục " + folder.name); more.onclick = () => editFolder(folder);
         row.append(visible, open, more); container.appendChild(row);
-        if (openedFolders.has(folder.id)) state.features.filter(feature => feature.folder === folder.id).forEach(feature => {
+        if (openedFolders.has(folder.id) && featureSelection && featureSelection.source === "local") {
+          appendFeatureChoices(container, state.features.filter(feature => feature.folder === folder.id).map(feature => ({...feature, feature_id: feature.id})), "local", "", depth + 1);
+        } else if (openedFolders.has(folder.id)) state.features.filter(feature => feature.folder === folder.id).forEach(feature => {
           const entry = document.createElement("div"); entry.className = "feature-row"; entry.style.marginLeft = Math.min(depth + 1, 6) * 12 + "px"; entry.innerHTML = icon(feature.kind === "point" ? "pin" : "line");
           const button = document.createElement("button"); button.textContent = feature.name; button.onclick = () => { collapseSheet(); feature.kind === "point" ? map.setView(feature.coords, Math.max(map.getZoom(), 17)) : map.fitBounds(feature.coords, { padding: [50, 70] }); showFeature(feature); }; entry.appendChild(button); container.appendChild(entry);
         });
@@ -400,6 +441,181 @@
       });
     };
     render("", 0, new Set());
+  }
+  function featurePicked(source, featureId, team = "") {
+    return !!featureSelection && featureSelection.source === source && (source !== "shared" || featureSelection.team === String(team || "")) && featureSelection.ids.has(String(featureId || ""));
+  }
+  function sharedFeatures(layer) {
+    return [
+      ...layer.markers.filter(point => point.feature_id).map(point => ({ ...point, kind: "point", name: point.position || point.name || point.label })),
+      ...(layer.lineFeatures || []).filter(line => line.feature_id).map(line => ({ ...line, kind: "line" }))
+    ];
+  }
+  function selectedFeatureItems(selection = featureSelection) {
+    if (!selection) return [];
+    if (selection.source === "local") return state.features.filter(feature => selection.ids.has(feature.id));
+    return sharedLayers.filter(layer => String(layer.team || "") === selection.team).flatMap(layer => sharedFeatures(layer)).filter(feature => selection.ids.has(feature.feature_id));
+  }
+  function beginFeatureSelection(source, folderKey, initialId) {
+    if (!requireAdmin() || transferBusy) return;
+    if (refreshing) { toast("Đang cập nhật bản đồ. Hãy chờ xong rồi chọn đối tượng."); return; }
+    if (source === "shared" && sharedTransferNeedsRefresh) { toast("Cần bấm Cập nhật và tải lại bản đồ thành công trước khi sao chép hoặc di chuyển tiếp.", 7000); return; }
+    cancelDrawing(); closeModal();
+    if (source === "shared") {
+      const layer = sharedLayers.find(item => item.key === folderKey);
+      if (!layer || !layer.folderId || !Number.isInteger(layer.revision)) { toast("Cập nhật bản đồ trước khi chọn đối tượng."); return; }
+      const team = String(layer.team || "");
+      if (!featureSelection || featureSelection.source !== source || featureSelection.team !== team) featureSelection = { source, team, revision: layer.revision, ids: new Set() };
+      sharedSelected.add(layer.key); persist();
+    } else {
+      if (!state.folders.some(folder => folder.id === folderKey)) { toast("Thư mục không còn tồn tại."); return; }
+      if (!featureSelection || featureSelection.source !== "local") featureSelection = { source: "local", ids: new Set() };
+      state.activeFolder = folderKey; openedFolders.add(folderKey);
+    }
+    if (initialId) featureSelection.ids.add(String(initialId));
+    openSheet(source === "local" ? "folders" : "shared"); renderMap(); renderShared();
+    toast("Đánh dấu điểm hoặc đường trong danh sách; có thể chạm đối tượng trên bản đồ để chọn.", 5000);
+  }
+  function cancelFeatureSelection() {
+    if (transferBusy) return;
+    featureSelection = null; renderSelectionBar(); renderMap(); renderShared();
+  }
+  function toggleFeatureSelection(source, featureId, team = "") {
+    if (!featureSelection) return false;
+    if (!requireAdmin() || transferBusy) return true;
+    if (featureSelection.source !== source || (source === "shared" && featureSelection.team !== String(team || ""))) {
+      toast("Hãy hoàn tất hoặc hủy lựa chọn hiện tại trước khi chọn nhóm dữ liệu khác."); return true;
+    }
+    const id = String(featureId || "");
+    if (!id) { toast("Đối tượng này chưa hỗ trợ chọn để di chuyển."); return true; }
+    featureSelection.ids.has(id) ? featureSelection.ids.delete(id) : featureSelection.ids.add(id);
+    renderMap(); renderShared(); return true;
+  }
+  function renderSelectionBar() {
+    const shown = isAdmin() && !!featureSelection;
+    $("close-modal").disabled = transferBusy;
+    $("selection-bar").hidden = !shown;
+    document.querySelector(".workspace").classList.toggle("selecting-features", shown);
+    if (!shown) return;
+    const count = featureSelection.ids.size;
+    $("selection-count").textContent = count + " đã chọn · " + (featureSelection.source === "local" ? "Trên máy" : featureSelection.team || "Dùng chung");
+    ["selection-copy", "selection-move"].forEach(id => $(id).disabled = !count || transferBusy);
+    $("selection-cancel").disabled = transferBusy; $("selection-list").disabled = transferBusy;
+  }
+  function appendFeatureChoices(container, features, source, team, depth) {
+    if (!features.length) return;
+    const all = document.createElement("label"); all.className = "feature-pick-all"; all.style.marginLeft = Math.min(depth, 6) * 12 + "px";
+    const checkAll = document.createElement("input"); checkAll.type = "checkbox";
+    const picked = features.filter(feature => featurePicked(source, feature.feature_id, team)).length;
+    checkAll.checked = picked === features.length; checkAll.indeterminate = picked > 0 && !checkAll.checked; checkAll.disabled = transferBusy;
+    checkAll.onchange = () => {
+      if (!requireAdmin() || transferBusy || !featureSelection || featureSelection.source !== source || (source === "shared" && featureSelection.team !== String(team || ""))) return;
+      features.forEach(feature => checkAll.checked ? featureSelection.ids.add(feature.feature_id) : featureSelection.ids.delete(feature.feature_id));
+      renderMap(); renderShared();
+    };
+    all.append(checkAll, document.createTextNode("Chọn tất cả trong thư mục (" + features.length + ")")); container.appendChild(all);
+    features.forEach(feature => {
+      const row = document.createElement("label"); row.className = "feature-choice" + (featurePicked(source, feature.feature_id, team) ? " picked" : ""); row.style.marginLeft = Math.min(depth, 6) * 12 + "px";
+      const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.checked = featurePicked(source, feature.feature_id, team); checkbox.disabled = transferBusy; checkbox.setAttribute("aria-label", "Chọn " + (feature.name || "Đối tượng")); checkbox.dataset.featureId = String(feature.feature_id); checkbox.dataset.source = source;
+      checkbox.onchange = () => toggleFeatureSelection(source, feature.feature_id, team);
+      const title = document.createElement("span"); title.innerHTML = "<strong>" + esc(feature.name || feature.label || "Đối tượng") + "</strong><small>" + (feature.kind === "point" ? "Điểm" : "Đường") + (feature.display_on_map === false ? " · Đang ẩn trên bản đồ" : "") + "</small>";
+      row.append(checkbox, title); container.appendChild(row);
+    });
+  }
+  function sharedFolderPath(layer) {
+    const names = [layer.name], seen = new Set([layer.key]); let parentKey = layer.parent;
+    while (parentKey && !seen.has(parentKey)) { seen.add(parentKey); const parent = sharedLayers.find(item => item.key === parentKey && String(item.team || "") === String(layer.team || "")); if (!parent) break; names.unshift(parent.name); parentKey = parent.parent; }
+    return names.join(" / ");
+  }
+  function localTransferSnapshot(current, ids, targetId, mode, newId, now) {
+    if (!["copy", "move"].includes(mode) || !current.folders.some(folder => folder.id === targetId)) throw new Error("Thư mục đích không còn tồn tại.");
+    const wanted = new Set(ids), originals = current.features.filter(feature => wanted.has(feature.id));
+    if (!wanted.size || originals.length !== wanted.size) throw new Error("Một số đối tượng đã thay đổi. Hãy chọn lại.");
+    const next = JSON.parse(JSON.stringify(current));
+    let count = 0;
+    if (mode === "move") {
+      next.features.forEach(feature => { if (wanted.has(feature.id) && feature.folder !== targetId) { feature.folder = targetId; feature.updatedAt = now; count++; } });
+    } else {
+      if (next.features.length + originals.length > 10000) throw new Error("Bản đồ trên máy tối đa 10.000 đối tượng. Hãy giảm số lượng sao chép.");
+      const usedIds = new Set(next.features.map(feature => feature.id));
+      originals.forEach(feature => {
+        const copy = JSON.parse(JSON.stringify(feature));
+        copy.id = newId(feature.kind || "feature");
+        if (!copy.id || usedIds.has(copy.id)) throw new Error("Không tạo được mã bản sao. Hãy thử lại.");
+        usedIds.add(copy.id); copy.folder = targetId; copy.updatedAt = now;
+        const stem = copy.name || "Đối tượng"; let name = stem, suffix = 1;
+        while (next.features.some(item => item.folder === targetId && item.name === name)) { suffix++; name = stem + " · Bản sao" + (suffix > 2 ? " " + (suffix - 1) : ""); }
+        copy.name = name; next.features.push(copy); count++;
+      });
+    }
+    next.activeFolder = targetId;
+    const seen = new Set(); let currentId = targetId;
+    while (currentId && !seen.has(currentId)) { seen.add(currentId); const folder = next.folders.find(item => item.id === currentId); if (!folder) break; folder.visible = true; currentId = folder.parent; }
+    return { state: next, count };
+  }
+  function openTransfer(mode) {
+    if (!requireAdmin() || transferBusy || !featureSelection || !featureSelection.ids.size) return;
+    const selection = { ...featureSelection, ids: new Set(featureSelection.ids) }, startingSession = sessionEpoch;
+    const count = selection.ids.size, local = selection.source === "local";
+    const targets = local ? state.folders : sharedLayers.filter(layer => String(layer.team || "") === selection.team && layer.folderId);
+    if (!targets.length) { toast("Chưa có thư mục đích."); return; }
+    const options = local ? folderOptions(state.activeFolder) : targets.map(layer => '<option value="' + esc(layer.folderId) + '">' + esc(sharedFolderPath(layer)) + "</option>").join("");
+    const action = mode === "copy" ? "Sao chép" : "Di chuyển";
+    const originals = selectedFeatureItems(selection).map(item => JSON.stringify(item));
+    modal(action + " " + count + " đối tượng", '<label>Thư mục đích<select id="transfer-target">' + options + '</select></label><p class="note">' + (local ? "Lưu trên thiết bị này." : "Cập nhật bản đồ quản trị trên server trong nhóm " + esc(selection.team || "Dùng chung") + ".") + " " + (mode === "copy" ? "Giữ nguyên bản gốc." : "Đối tượng được chuyển khỏi thư mục cũ; giữ nguyên tọa độ và nội dung.") + '</p><p id="transfer-error" class="form-error" role="alert" hidden></p><div class="actions"><button id="transfer-back" class="secondary">Quay lại</button><button id="transfer-confirm" class="primary">' + action + "</button></div>", () => {
+      $("transfer-back").onclick = closeModal;
+      $("transfer-confirm").onclick = async () => {
+        if (!requireAdmin() || transferBusy) return;
+        if (!featureSelection || featureSelection.source !== selection.source || featureSelection.team !== selection.team || featureSelection.ids.size !== count || Array.from(selection.ids).some(id => !featureSelection.ids.has(id))) { $("transfer-error").textContent = "Lựa chọn đã thay đổi. Hãy mở lại thao tác."; $("transfer-error").hidden = false; return; }
+        const target = $("transfer-target").value, errorBox = $("transfer-error"), confirm = $("transfer-confirm"), back = $("transfer-back"), targetSelect = $("transfer-target");
+        errorBox.hidden = true; transferBusy = true; renderSelectionBar(); confirm.disabled = back.disabled = targetSelect.disabled = true;
+        try {
+          if (local) {
+            const current = selectedFeatureItems(selection).map(item => JSON.stringify(item));
+            if (current.length !== originals.length || current.some((value, index) => value !== originals[index])) throw new Error("Đối tượng đã thay đổi. Hãy chọn lại.");
+            const result = localTransferSnapshot(state, Array.from(selection.ids), target, mode, uid, new Date().toISOString());
+            result.state.selected = Array.from(selected); result.state.sharedSelected = Array.from(sharedSelected);
+            // Commit storage before changing any live object; quota errors preserve the source.
+            localStorage.setItem("hpmap-v2", JSON.stringify(result.state));
+            state = result.state; featureSelection = null; openedFolders.add(target); closeModal(true); renderMap(); openSheet("folders");
+            toast(result.count ? "Đã " + action.toLocaleLowerCase("vi") + " " + result.count + " đối tượng." : "Các đối tượng đã nằm trong thư mục này.");
+          } else {
+            const layer = sharedLayers.find(item => String(item.team || "") === selection.team && item.folderId === target);
+            if (!layer || layer.revision !== selection.revision) throw new Error("Bản đồ đã thay đổi. Hãy cập nhật rồi chọn lại.");
+            const result = await native("transferSharedFeatures", { team: selection.team, featureIds: Array.from(selection.ids), targetFolderId: target, mode, revision: selection.revision });
+            if (!result.transfer || (result.transfer.saved !== true && !result.transfer.uncertain)) { const error = new Error("Phản hồi lưu chưa rõ kết quả."); error.transferUncertain = true; throw error; }
+            featureSelection = null; closeModal(true);
+            if (sessionEpoch !== startingSession || !isAdmin()) { sharedTransferNeedsRefresh = true; toast("Phiên đăng nhập đã thay đổi. Bấm Cập nhật để xem kết quả.", 7000); return; }
+            if (result.refreshRequired) {
+              sharedTransferNeedsRefresh = true;
+              toast(result.warning || "Đã gửi thao tác. Đang tải lại bản đồ để xác nhận.", 8000);
+              renderMap(); renderShared();
+              try { const fresh = await native("refresh"); if (sessionEpoch === startingSession) { receiveSession(fresh, false); sharedTransferNeedsRefresh = false; } } catch (_) { toast(result.warning || "Hãy bấm Cập nhật để xác nhận kết quả; không lặp lại sao chép ngay.", 8000); }
+            } else {
+              receiveSession(result, false);
+              const destination = sharedLayers.find(item => String(item.team || "") === selection.team && item.folderId === target);
+              if (destination) sharedSelected.add(destination.key);
+              persist(); renderMap(); renderShared(); openSheet("shared");
+              toast(result.transfer && result.transfer.noop ? "Các đối tượng đã nằm trong thư mục này." : "Đã " + action.toLocaleLowerCase("vi") + " trên server.");
+            }
+          }
+        } catch (error) {
+          if (error.authExpired || error.status === 403) { authExpired = true; featureSelection = null; applyPermissions(); renderMap(); toast("Quyền đăng nhập đã thay đổi. Hãy đăng nhập lại.", 6000); }
+          else if (error.transferUncertain || error.status === 409) {
+            sharedTransferNeedsRefresh = true;
+            featureSelection = null; closeModal(true); renderMap(); renderShared();
+            const warning = error.transferUncertain ? "Chưa xác nhận được kết quả. Đang cập nhật bản đồ; không lặp lại sao chép ngay." : "Bản đồ trên server đã thay đổi. Đang cập nhật; hãy chọn lại đối tượng.";
+            toast(warning, 8000);
+            try { const fresh = await native("refresh"); if (sessionEpoch === startingSession) { receiveSession(fresh, false); sharedTransferNeedsRefresh = false; } } catch (_) { toast(warning + " Bấm Cập nhật để thử tải lại.", 8000); }
+          }
+          else if (errorBox.isConnected) { errorBox.textContent = error.name === "QuotaExceededError" ? "Bộ nhớ thiết bị đã đầy. Dữ liệu gốc vẫn được giữ." : error.message || "Chưa lưu được. Dữ liệu gốc vẫn được giữ."; errorBox.hidden = false; }
+          else toast(error.message || "Chưa thực hiện được thao tác.", 6000);
+        } finally {
+          transferBusy = false; if (confirm.isConnected) confirm.disabled = false; if (back.isConnected) back.disabled = false; if (targetSelect.isConnected) targetSelect.disabled = false;
+          renderSelectionBar(); renderFolders(); renderShared();
+        }
+      };
+    });
   }
   function createFolder(parent = "") {
     if (!requireAdmin()) return;
@@ -437,9 +653,9 @@
       };
     });
   }
-  function startPoint() { if (!requireAdmin()) return; collapseSheet(); closeModal(); cancelDrawing(); drawing = { mode: "point", coords: [] }; $("drawing-bar").hidden = false; $("drawing-help").textContent = "Chạm bản đồ để đặt điểm"; $("finish-drawing").hidden = true; $("undo-drawing").hidden = true; $("add-point").classList.add("active"); }
+  function startPoint() { if (!requireAdmin() || transferBusy) return; cancelFeatureSelection(); collapseSheet(); closeModal(); cancelDrawing(); drawing = { mode: "point", coords: [] }; $("drawing-bar").hidden = false; $("drawing-help").textContent = "Chạm bản đồ để đặt điểm"; $("finish-drawing").hidden = true; $("undo-drawing").hidden = true; $("add-point").classList.add("active"); }
   function startLine(feature) {
-    if (!requireAdmin()) return;
+    if (!requireAdmin() || transferBusy) return; cancelFeatureSelection();
     collapseSheet(); closeModal(); cancelDrawing(); drawing = { mode: "line", coords: feature ? feature.coords.map(coords => coords.slice()) : [], featureId: feature ? feature.id : null };
     $("drawing-bar").hidden = false; $("finish-drawing").hidden = false; $("undo-drawing").hidden = false; $("add-line").classList.add("active"); renderDraft();
   }
@@ -498,8 +714,9 @@
   function showFeature(feature) {
     if (!requireAdmin()) return;
     const isPoint = feature.kind === "point", folder = state.folders.find(item => item.id === feature.folder);
-    modal(feature.name, '<p>' + esc(folder ? folder.name : "") + ' <span class="badge">Trên máy</span></p><p>' + (isPoint ? feature.coords.map(n => Number(n).toFixed(7)).join(", ") : feature.coords.length + " điểm · " + formatDistance(lineLength(feature.coords))) + "</p>" + (feature.note ? "<p>" + esc(feature.note) + "</p>" : "") + (isPoint ? '<button id="point-directions" class="primary wide-button">' + icon("route") + 'Chỉ đường</button>' : "") + '<div class="actions"><button id="edit-feature" class="secondary">Chỉnh sửa</button><button id="move-feature" class="secondary">' + (isPoint ? "Đổi vị trí" : "Chỉnh đường") + '</button></div><button id="delete-feature" class="text-button danger wide-button">Xóa trên máy</button>', () => {
+    modal(feature.name, '<p>' + esc(folder ? folder.name : "") + ' <span class="badge">Trên máy</span></p><p>' + (isPoint ? feature.coords.map(n => Number(n).toFixed(7)).join(", ") : feature.coords.length + " điểm · " + formatDistance(lineLength(feature.coords))) + "</p>" + (feature.note ? "<p>" + esc(feature.note) + "</p>" : "") + (isPoint ? '<button id="point-directions" class="primary wide-button">' + icon("route") + 'Chỉ đường</button>' : "") + '<button id="select-feature" class="secondary wide-button">Chọn để sao chép / di chuyển</button><div class="actions"><button id="edit-feature" class="secondary">Chỉnh sửa</button><button id="move-feature" class="secondary">' + (isPoint ? "Đổi vị trí" : "Chỉnh đường") + '</button></div><button id="delete-feature" class="text-button danger wide-button">Xóa trên máy</button>', () => {
       if (isPoint) $("point-directions").onclick = event => requestDirections(feature.coords, event.currentTarget);
+      $("select-feature").onclick = () => beginFeatureSelection("local", feature.folder, feature.id);
       $("edit-feature").onclick = () => editFeature({ ...feature });
       $("move-feature").onclick = () => {
         if (!isPoint) { startLine(feature); return; }
@@ -528,11 +745,13 @@
   }
   function showServerPoint(route, point) {
     const history = Array.isArray(point.history) ? point.history : Array.isArray(point.records) ? point.records : [];
-    modal(point.label, "<p><strong>" + esc(route.name) + "</strong></p>" + (point.position ? "<p>" + esc(point.position) + "</p>" : "") + (point.note ? "<p>" + esc(point.note) + "</p>" : "") + "<p>" + point.coords.map(n => n.toFixed(7)).join(", ") + '</p><p class="note">' + (route.shared ? "Bản đồ quản trị · Chỉ xem" : "Dữ liệu từ HP Telecom Server") + "</p>" +
+    modal(point.label, "<p><strong>" + esc(route.name) + "</strong></p>" + (point.position ? "<p>" + esc(point.position) + "</p>" : "") + (point.note ? "<p>" + esc(point.note) + "</p>" : "") + "<p>" + point.coords.map(n => n.toFixed(7)).join(", ") + '</p><p class="note">' + (route.shared ? "Bản đồ quản trị" + (isAdmin() ? "" : " · Chỉ xem") : "Dữ liệu từ HP Telecom Server") + "</p>" +
       (history.length ? '<ul class="detail-list">' + history.slice(0, 30).map(item => "<li>" + esc(item.type || item.category || "Ghi nhận") + "<small>" + esc(item.date || item.created_at || "") + "</small></li>").join("") + "</ul>" : "") +
       '<button id="point-directions" class="primary wide-button">' + icon("route") + 'Chỉ đường</button>' +
+      (isAdmin() && route.shared && point.feature_id ? '<button id="select-server-feature" class="secondary wide-button">Chọn để sao chép / di chuyển</button>' : "") +
       (isAdmin() ? '<button id="copy-server-point" class="secondary wide-button">Sao chép điểm vào thư mục trên máy</button>' : ""), () => {
         $("point-directions").onclick = event => requestDirections(point.coords, event.currentTarget);
+        if (isAdmin() && route.shared && point.feature_id) $("select-server-feature").onclick = () => beginFeatureSelection("shared", route.key, point.feature_id);
         if (isAdmin()) $("copy-server-point").onclick = () => editFeature({ id: uid("point"), kind: "point", name: point.position || point.label, label: point.label, coords: point.coords.slice(), folder: state.activeFolder, sourceRoute: route.key });
       });
   }
@@ -607,10 +826,10 @@
     });
   }
   async function refresh(background = false) {
-    if (refreshing) return;
+    if (refreshing || transferBusy) return;
     refreshing = true;
     $("refresh").disabled = true;
-    try { receiveSession(await native("refresh"), !background); if (!background) toast(user ? "Đã cập nhật tuyến từ server." : "Đăng nhập để xem tuyến server."); }
+    try { receiveSession(await native("refresh"), !background); sharedTransferNeedsRefresh = false; if (!background) toast(user ? "Đã cập nhật tuyến từ server." : "Đăng nhập để xem tuyến server."); }
     catch (error) {
       authExpired = !!error.authExpired || /hết hạn|đăng nhập lại|unauthorized/i.test(error.message);
       applyPermissions(); renderMap();
@@ -757,6 +976,11 @@
   $("add-point").onclick = startPoint; $("add-line").onclick = () => startLine(); $("open-folders").onclick = () => openSheet("folders"); $("new-folder").onclick = () => createFolder();
   $("nav-map").onclick = collapseSheet; $("nav-routes").onclick = () => openSheet("routes"); $("nav-import").onclick = importFile; $("nav-export").onclick = openExport;
   $("sheet-handle").onclick = collapseSheet; $("close-sheet").onclick = collapseSheet; $("routes-tab").onclick = () => changePanel("routes"); $("folders-tab").onclick = () => changePanel("folders"); $("shared-tab").onclick = () => changePanel("shared");
+  $("select-local-features").onclick = () => beginFeatureSelection("local", state.activeFolder);
+  $("selection-cancel").onclick = cancelFeatureSelection;
+  $("selection-copy").onclick = () => openTransfer("copy");
+  $("selection-move").onclick = () => openTransfer("move");
+  $("selection-list").onclick = () => { if (featureSelection) openSheet(featureSelection.source === "local" ? "folders" : "shared"); };
   $("shared-select-all").onchange = () => { const checked = $("shared-select-all").checked; sharedLayers.forEach(layer => checked ? sharedSelected.add(layer.key) : sharedSelected.delete(layer.key)); persist(); renderShared(); renderMap(); };
   $("search").oninput = renderRoutes; $("type-filter").onchange = renderRoutes; $("capacity-filter").onchange = renderRoutes;
   $("select-all").onchange = () => { const checked = $("select-all").checked; filteredRoutes().forEach(route => checked ? selected.add(route.key) : selected.delete(route.key)); persist(); renderRoutes(); renderMap(); };
@@ -781,6 +1005,7 @@
     if (!$("login").hidden) { if (!user) return false; $("login").hidden = true; return true; }
     if (!$("modal-backdrop").hidden) { closeModal(); return true; }
     if (drawing) { cancelDrawing(); return true; }
+    if (featureSelection && !transferBusy) { cancelFeatureSelection(); return true; }
     if (!$("sheet").classList.contains("collapsed")) { collapseSheet(); return true; }
     return false;
   }
@@ -788,6 +1013,6 @@
   window.HPMapApp = { receiveSession, back, parseKml, makeKml, getBasemap: () => baseMapKey };
   applyPermissions(); openSheet("routes"); renderRoutes(); renderMap(); openLogin();
   native("session").then(receiveSession).catch(error => { $("connection").textContent = "Chưa kết nối server"; toast(error.message, 6000); });
-  setInterval(() => { if (user && !authExpired && !drawing && $("login").hidden && $("modal-backdrop").hidden && document.visibilityState !== "hidden") refresh(true); }, 60000);
+  setInterval(() => { if (user && !authExpired && !drawing && !featureSelection && !transferBusy && $("login").hidden && $("modal-backdrop").hidden && document.visibilityState !== "hidden") refresh(true); }, 60000);
   window.addEventListener("resize", () => map.invalidateSize());
 })();
