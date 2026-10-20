@@ -33,16 +33,51 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Build debug APK
+      - name: Build APK and device checks
         working-directory: android-map
         run: |
           chmod +x ./gradlew
-          ./gradlew --no-daemon :app:assembleDebug
+          ./gradlew --no-daemon :app:assembleDebug :app:assembleDebugAndroidTest :app:assembleRelease
+
+      - name: Enable KVM for Android verification
+        run: |
+          sudo chmod 666 /dev/kvm
+          sdkmanager "system-images;android-35;google_apis;x86_64" "emulator"
+          echo no | avdmanager create avd -n HPMapQA -k "system-images;android-35;google_apis;x86_64" --force
+
+      - name: Check installed app and capture its screens
+        timeout-minutes: 10
+        run: |
+          mkdir -p qa
+          "$ANDROID_HOME/emulator/emulator" -avd HPMapQA -no-window -no-audio -no-snapshot -no-boot-anim -gpu swiftshader_indirect > qa/emulator.log 2>&1 &
+          timeout 240 adb wait-for-device
+          for i in $(seq 1 120); do
+            [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1" ] && break
+            sleep 2
+          done
+          test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1"
+          adb shell wm size 720x1600
+          adb shell wm density 320
+          adb shell input keyevent 82
+          adb install -r android-map/app/build/outputs/apk/debug/app-debug.apk
+          adb install -r android-map/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          adb shell am instrument -w vn.hptelecom.map.test/vn.hptelecom.map.MapSmokeRunner | tee qa/result.txt
+          adb pull /sdcard/Android/data/vn.hptelecom.map/files/qa qa/screens
+          grep -q HP_MAP_SMOKE_PASS qa/result.txt
 
       - name: Save APK as workflow artifact
         uses: actions/upload-artifact@v7
         with:
           name: HP-Telecom-Map-Android
-          path: android-map/app/build/outputs/apk/debug/app-debug.apk
+          path: android-map/app/build/outputs/apk/release/app-release-unsigned.apk
           if-no-files-found: error
+          retention-days: 14
+
+      - name: Save verification evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: HP-Map-device-checks
+          path: qa/
+          if-no-files-found: ignore
           retention-days: 14

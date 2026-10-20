@@ -1,284 +1,382 @@
 package vn.hptelecom.map;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Canvas;
+import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PointF;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.net.http.SslError;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowInsets;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.OpenableColumns;
+import android.webkit.JavascriptInterface;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-/** Native HP Map screen. Route content is clearly marked as a local sample until a server API exists. */
+/** Packaged HP Map UI. The server supplies data, never the main app's interface. */
+@SuppressWarnings("deprecation")
 public final class MapHomeActivity extends Activity {
-    private static final int PICK_MAP = 210, LOCATION_PERMISSION = 211;
-    private static final int BG = Color.rgb(8, 43, 57), PANEL = Color.rgb(12, 58, 72), ACCENT = Color.rgb(25, 200, 218), INK = Color.rgb(236, 248, 250), MUTED = Color.rgb(160, 194, 202);
-    private final List<Route> routes = new ArrayList<>();
-    private final List<String> folders = new ArrayList<>();
-    private final List<Boolean> folderVisibility = new ArrayList<>();
-    private final List<PointF> points = new ArrayList<>(), drawnLine = new ArrayList<>();
-    private final List<List<PointF>> localLines = new ArrayList<>();
-    private final List<PointF> routePoints = new ArrayList<>();
-    private LinearLayout list, root;
-    private MapCanvas map;
-    private TextView selectedRouteLabel, sampleLabel, modeLabel;
-    private EditText search;
-    private Spinner typeFilter, capacityFilter;
-    private Route selectedRoute;
-    private String mode = "";
-    private String basemap = "Đường phố";
+    private static final String ORIGIN = "https://appassets.androidplatform.net";
+    private static final String START = ORIGIN + "/hpmap/index.html";
+    private static final int PICK = 301, SAVE = 302, GPS = 303;
+    private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private final Handler ui = new Handler(Looper.getMainLooper());
+    private WebView web, authWeb;
+    private MapApiClient api;
     private ImportedMapStore imports;
+    private boolean destroyed, fileBusy;
+    private String fileRequest, gpsRequest;
+    private byte[] exportBytes;
+    private LocationListener locationListener;
+    private Runnable locationTimeout;
+    private AlertDialog authDialog;
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
-        getWindow().setStatusBarColor(BG); getWindow().setNavigationBarColor(BG);
-        folders.add("Default folder"); folderVisibility.add(true);
-        seedRoutes(); imports = new ImportedMapStore(new java.io.File(getFilesDir(), "imported-maps")); loadLocalMap();
-        buildScreen(); renderRoutes();
-    }
-
-    private void seedRoutes() {
-        routes.add(new Route("DLA01-DLA02", "DWDM", "24FO"));
-        routes.add(new Route("DLB01-DLB07", "CSG", "24FO"));
-        routes.add(new Route("DLC03-DLC09", "Lastmile", "12FO"));
-        routes.add(new Route("DLD02-DLD04", "Lastmile", "12FO"));
-        routes.add(new Route("DLE06-DLE11", "AGG", "48FO"));
-        routes.add(new Route("Tuyến mẫu khu vực A", "FTTH", "4FO"));
-        selectedRoute = routes.get(2);
-    }
-
-    private void buildScreen() {
-        root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setBackgroundColor(BG);
-        root.setOnApplyWindowInsetsListener((v, insets) -> {
+        api = new MapApiClient(this);
+        imports = new ImportedMapStore(new File(getFilesDir(), "imported-maps"));
+        getWindow().setStatusBarColor(Color.rgb(7, 28, 38));
+        getWindow().setNavigationBarColor(Color.rgb(7, 28, 38));
+        FrameLayout root = new FrameLayout(this);
+        root.setBackgroundColor(Color.rgb(7, 28, 38));
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
             if (android.os.Build.VERSION.SDK_INT >= 30) {
-                android.graphics.Insets bars = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
-                v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            } else v.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+                android.graphics.Insets bars = insets.getInsets(
+                    android.view.WindowInsets.Type.systemBars() | android.view.WindowInsets.Type.displayCutout());
+                view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            } else view.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
+                insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
             return insets;
         });
-        root.addView(buildToolbar());
-        FrameLayout mapFrame = new FrameLayout(this);
-        map = new MapCanvas(); mapFrame.addView(map, new FrameLayout.LayoutParams(-1, -1));
-        LinearLayout mapTop = new LinearLayout(this); mapTop.setGravity(Gravity.CENTER_VERTICAL); mapTop.setPadding(dp(12), dp(8), dp(12), dp(8));
-        mapTop.setBackgroundColor(0xCC08303E);
-        selectedRouteLabel = label(selectedRoute.name, 15, true, INK); mapTop.addView(selectedRouteLabel, new LinearLayout.LayoutParams(0, dp(38), 1));
-        Button edit = chip("✎"); edit.setContentDescription("Chỉnh tuyến"); edit.setOnClickListener(v -> editRoute()); mapTop.addView(edit);
-        Button layer = chip("▤  " + basemap); layer.setOnClickListener(v -> chooseLayer()); mapTop.addView(layer);
-        FrameLayout.LayoutParams topParams = new FrameLayout.LayoutParams(-1, dp(54), Gravity.TOP); mapFrame.addView(mapTop, topParams);
-        LinearLayout mapTools = new LinearLayout(this); mapTools.setOrientation(LinearLayout.VERTICAL); mapTools.setPadding(dp(8), dp(8), dp(8), dp(8));
-        mapTools.addView(tool("＋", "Thêm điểm", () -> setMode("point")));
-        mapTools.addView(tool("／", "Vẽ đường", () -> setMode("line")));
-        mapTools.addView(tool("✓", "Hoàn tất vẽ đường", this::finishLine));
-        mapTools.addView(tool("▰", "Thư mục", this::showFolders));
-        mapTools.addView(tool("◎", "Vị trí của tôi", this::locate));
-        FrameLayout.LayoutParams toolsParams = new FrameLayout.LayoutParams(dp(56), -2, Gravity.START | Gravity.CENTER_VERTICAL); mapFrame.addView(mapTools, toolsParams);
-        LinearLayout mapCaption = new LinearLayout(this); mapCaption.setGravity(Gravity.CENTER_VERTICAL); mapCaption.setPadding(dp(13), dp(5), dp(13), dp(5)); mapCaption.setBackgroundColor(0xDD08303E);
-        TextView dot = label("●", 13, true, ACCENT); mapCaption.addView(dot); TextView name = label("  " + selectedRoute.name, 13, true, INK); mapCaption.addView(name);
-        TextView type = label("  " + selectedRoute.type, 11, false, MUTED); mapCaption.addView(type); 
-        FrameLayout.LayoutParams capParams = new FrameLayout.LayoutParams(-2, dp(34), Gravity.BOTTOM | Gravity.START); capParams.setMargins(dp(12), 0, 0, dp(12)); mapFrame.addView(mapCaption, capParams);
-        root.addView(mapFrame, new LinearLayout.LayoutParams(-1, 0, 1.12f));
-
-        LinearLayout sheet = new LinearLayout(this); sheet.setOrientation(LinearLayout.VERTICAL); sheet.setPadding(dp(14), dp(8), dp(14), dp(7)); sheet.setBackgroundColor(PANEL);
-        LinearLayout handleRow = new LinearLayout(this); handleRow.setGravity(Gravity.CENTER_VERTICAL);
-        TextView heading = label("Tuyến cáp", 18, true, INK); handleRow.addView(heading, new LinearLayout.LayoutParams(0, dp(32), 1));
-        sampleLabel = label("DỮ LIỆU MẪU", 10, true, ACCENT); handleRow.addView(sampleLabel);
-        sheet.addView(handleRow);
-        search = new EditText(this); search.setSingleLine(true); search.setTextColor(INK); search.setHintTextColor(MUTED); search.setHint("⌕  Tìm tên tuyến…"); search.setTextSize(14); search.setPadding(dp(12), 0, dp(12), 0); search.setBackground(round(0xFF0A3442, 12, 0xFF286171));
-        LinearLayout.LayoutParams searchParams = new LinearLayout.LayoutParams(-1, dp(43)); searchParams.topMargin = dp(5); sheet.addView(search, searchParams);
-        LinearLayout filters = new LinearLayout(this); filters.setGravity(Gravity.CENTER_VERTICAL); filters.setWeightSum(2);
-        typeFilter = spinner(new String[]{"Loại: Tất cả", "DWDM", "CSG", "AGG", "Lastmile", "FTTH"}); capacityFilter = spinner(new String[]{"Cáp: Tất cả", "4FO", "6FO", "8FO", "12FO", "24FO", "48FO"});
-        filters.addView(typeFilter, new LinearLayout.LayoutParams(0, dp(40), 1)); LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(0, dp(40), 1); cp.leftMargin = dp(8); filters.addView(capacityFilter, cp); sheet.addView(filters);
-        LinearLayout selectRow = new LinearLayout(this); selectRow.setGravity(Gravity.CENTER_VERTICAL); Button all = chip("Chọn tất cả"); all.setOnClickListener(v -> { for (Route route : routes) route.checked = true; renderRoutes(); }); selectRow.addView(all);
-        TextView count = label("  6 tuyến", 12, false, MUTED); selectRow.addView(count); Button importButton = chip("＋ KMZ"); importButton.setOnClickListener(v -> pickMap()); LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(-2, dp(38)); ip.leftMargin = dp(8); selectRow.addView(importButton, ip); Button share = chip("Chia sẻ"); share.setOnClickListener(v -> shareMap()); LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(-2, dp(38)); sp.leftMargin = dp(6); selectRow.addView(share, sp); sheet.addView(selectRow);
-        ScrollView scroll = new ScrollView(this); scroll.setFillViewport(false); list = new LinearLayout(this); list.setOrientation(LinearLayout.VERTICAL); scroll.addView(list); sheet.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
-        modeLabel = label("Danh sách tuyến theo dữ liệu minh họa · Chưa đồng bộ server", 10, false, MUTED); modeLabel.setGravity(Gravity.CENTER); sheet.addView(modeLabel, new LinearLayout.LayoutParams(-1, dp(25)));
-        root.addView(sheet, new LinearLayout.LayoutParams(-1, 0, 1)); setContentView(root);
-        search.addTextChangedListener(watcher()); typeFilter.setOnItemSelectedListener(filterListener()); capacityFilter.setOnItemSelectedListener(filterListener());
+        web = new WebView(this);
+        configure(web);
+        web.setBackgroundColor(Color.rgb(7, 28, 38));
+        WebView.setWebContentsDebuggingEnabled(false);
+        web.addJavascriptInterface(new AppBridge(), "HPMap");
+        web.setWebViewClient(new WebViewClient() {
+            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return !START.equals(request.getUrl().toString());
+            }
+            @Override public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                Uri uri = request.getUrl();
+                if ("https".equals(uri.getScheme()) && "appassets.androidplatform.net".equals(uri.getHost())) {
+                    String path = uri.getPath();
+                    if (!"GET".equals(request.getMethod()) || path == null || path.contains("..")
+                            || !path.matches("/(?:hpmap|vendor)/[A-Za-z0-9_./-]+")) return blocked();
+                    try {
+                        String mime = path.endsWith(".html") ? "text/html" : path.endsWith(".css") ? "text/css" :
+                            path.endsWith(".js") ? "application/javascript" : path.endsWith(".svg") ? "image/svg+xml" : "image/png";
+                        HashMap<String,String> headers = new HashMap<>();
+                        headers.put("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://*.tile.opentopomap.org; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'");
+                        headers.put("X-Content-Type-Options", "nosniff");
+                        return new WebResourceResponse(mime, "UTF-8", 200, "OK", headers, getAssets().open(path.substring(1)));
+                    } catch (Exception failure) { return blocked(); }
+                }
+                String host = uri.getHost();
+                if (!request.isForMainFrame() && "https".equals(uri.getScheme()) && host != null
+                    && (host.equals("tile.openstreetmap.org") || host.endsWith(".tile.openstreetmap.org")
+                        || host.endsWith(".tile.opentopomap.org"))) return null;
+                return blocked();
+            }
+            @Override public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) { handler.cancel(); }
+        });
+        root.addView(web, new FrameLayout.LayoutParams(-1, -1));
+        setContentView(root);
+        web.loadUrl(START);
     }
-
-    private View buildToolbar() {
-        LinearLayout bar = new LinearLayout(this); bar.setGravity(Gravity.CENTER_VERTICAL); bar.setPadding(dp(12), 0, dp(8), 0); bar.setBackgroundColor(BG);
-        ImageView logo = new ImageView(this); logo.setImageResource(R.drawable.hp_icon); logo.setScaleType(ImageView.ScaleType.FIT_CENTER); logo.setContentDescription("HP");
-        LinearLayout.LayoutParams logoP = new LinearLayout.LayoutParams(dp(36), dp(36)); logoP.setMarginEnd(dp(9)); bar.addView(logo, logoP);
-        LinearLayout title = new LinearLayout(this); title.setOrientation(LinearLayout.VERTICAL); TextView name = label("HP Map", 17, true, INK); TextView subtitle = label("Bản đồ tuyến cáp", 10, false, MUTED); title.addView(name); title.addView(subtitle); bar.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
-        Button login = chip("Đăng nhập server"); login.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class))); bar.addView(login);
-        Button share = tool("↗", "Chia sẻ", this::shareMap); bar.addView(share);
-        return bar;
+    @SuppressLint("SetJavaScriptEnabled")
+    private void configure(WebView target) {
+        WebSettings settings = target.getSettings();
+        settings.setJavaScriptEnabled(true); settings.setDomStorageEnabled(true);
+        settings.setAllowFileAccess(false); settings.setAllowContentAccess(false);
+        settings.setAllowFileAccessFromFileURLs(false); settings.setAllowUniversalAccessFromFileURLs(false);
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        settings.setSupportMultipleWindows(false); settings.setJavaScriptCanOpenWindowsAutomatically(false);
+        settings.setUserAgentString(settings.getUserAgentString() + " HPMapAndroid/" + BuildConfig.VERSION_NAME);
     }
-
-    private void renderRoutes() {
-        if (list == null) return; list.removeAllViews(); String query = search == null ? "" : search.getText().toString().trim().toLowerCase(java.util.Locale.ROOT);
-        String type = typeFilter == null || typeFilter.getSelectedItemPosition() == 0 ? "" : String.valueOf(typeFilter.getSelectedItem());
-        String cap = capacityFilter == null || capacityFilter.getSelectedItemPosition() == 0 ? "" : String.valueOf(capacityFilter.getSelectedItem());
-        int total = 0, checked = 0;
-        for (Route route : routes) {
-            if (!route.name.toLowerCase(java.util.Locale.ROOT).contains(query) || !type.isEmpty() && !route.type.equals(type) || !cap.isEmpty() && !route.capacity.equals(cap)) continue;
-            total++; if (route.checked) checked++;
-            LinearLayout card = new LinearLayout(this); card.setGravity(Gravity.CENTER_VERTICAL); card.setPadding(dp(11), dp(6), dp(10), dp(6)); card.setBackground(round(route == selectedRoute ? 0xFF104858 : 0xFF0A3442, 11, route == selectedRoute ? ACCENT : 0xFF225362));
-            LinearLayout words = new LinearLayout(this); words.setOrientation(LinearLayout.VERTICAL); TextView routeName = label(route.name, 14, true, INK); TextView sub = label(route.type + "  ·  " + route.capacity, 11, false, MUTED); words.addView(routeName); words.addView(sub); card.addView(words, new LinearLayout.LayoutParams(0, -2, 1));
-            TextView status = label(route.checked ? "●" : "○", 17, true, route.checked ? ACCENT : MUTED); card.addView(status);
-            card.setOnClickListener(v -> { selectedRoute = route; selectedRouteLabel.setText(route.name); map.invalidate(); renderRoutes(); });
-            LinearLayout.LayoutParams cardP = new LinearLayout.LayoutParams(-1, dp(56)); cardP.topMargin = dp(5); list.addView(card, cardP);
+    private WebResourceResponse blocked() {
+        return new WebResourceResponse("text/plain", "UTF-8", 403, "Forbidden",
+            Collections.emptyMap(), new ByteArrayInputStream(new byte[0]));
+    }
+    private final class AppBridge {
+        @JavascriptInterface public void request(String id, String action, String payload) {
+            if (id == null || !id.matches("[A-Za-z0-9_-]{1,80}") || payload == null || payload.length() > BridgePolicy.MAX_KML) return;
+            ui.post(() -> {
+                if (destroyed || !START.equals(web.getUrl())) return;
+                try {
+                    JSONObject args = new JSONObject(payload);
+                    switch (action) {
+                        case "import":
+                            worker.execute(() -> {
+                                if (api.isAdmin()) ui.post(() -> chooseFile(id));
+                                else result(id, json("ok", false, "error", "Chỉ quản trị viên được nhập bản đồ."));
+                            }); return;
+                        case "export": export(id, args); return;
+                        case "location": locate(id); return;
+                        case "serverLogin": serverLogin(id); return;
+                        case "session": case "refresh": case "login": case "logout": case "imports": case "removeImport":
+                            worker.execute(() -> {
+                                try {
+                                    JSONObject value;
+                                    switch (action) {
+                                        case "login": value = api.login(args.optString("username"), args.optString("password")); break;
+                                        case "logout": api.logout(); value = json("ok", true, "user", JSONObject.NULL, "routes", new JSONArray()); break;
+                                        case "refresh": value = api.refresh(); break;
+                                        case "imports":
+                                            value = api.isAdmin() ? importedMaps() : json("ok", true, "maps", new JSONArray()); break;
+                                        case "removeImport":
+                                            if (!api.isAdmin()) throw new java.io.IOException("Chỉ quản trị viên được xóa bản đồ.");
+                                            imports.remove(args.optString("id")); value = json("ok", true); break;
+                                        default: value = api.session();
+                                    }
+                                    result(id, value);
+                                } catch (Exception failure) { fail(id, failure); }
+                            }); return;
+                        default: result(id, json("ok", false, "error", "Thao tác chưa được hỗ trợ."));
+                    }
+                } catch (Exception failure) { fail(id, failure); }
+            });
         }
-        if (total == 0) { TextView empty = label("Không có tuyến phù hợp", 12, false, MUTED); empty.setGravity(Gravity.CENTER); list.addView(empty, new LinearLayout.LayoutParams(-1, dp(55))); }
     }
-
-    private void setMode(String next) {
-        mode = mode.equals(next) ? "" : next;
-        if (mode.equals("point")) toast("Chạm vào bản đồ để thêm điểm.");
-        else if (mode.equals("line")) toast("Chạm liên tiếp để vẽ đường; nhấn dấu ✓ để lưu.");
-        else if (mode.equals("adjust")) toast("Chạm vào bản đồ để thêm một điểm vào tuyến.");
-        modeLabel.setText(mode.isEmpty() ? "Danh sách tuyến mẫu · Chưa đồng bộ server" : mode.equals("point") ? "Chế độ thêm điểm · Chạm vào bản đồ" : mode.equals("adjust") ? "Chỉnh tuyến · Chạm để thêm điểm" : "Chế độ vẽ đường · Chạm để đặt các điểm");
-        map.invalidate();
+    private void result(String id, JSONObject value) {
+        ui.post(() -> {
+            if (destroyed || !START.equals(web.getUrl())) return;
+            String encoded = android.util.Base64.encodeToString(value.toString().getBytes(StandardCharsets.UTF_8), android.util.Base64.NO_WRAP);
+            web.evaluateJavascript("window.__hpNativeChunks=window.__hpNativeChunks||{};window.__hpNativeChunks[" + JSONObject.quote(id) + "]='';", null);
+            for (int offset = 0; offset < encoded.length(); offset += 48000) {
+                String chunk = encoded.substring(offset, Math.min(encoded.length(), offset + 48000));
+                web.evaluateJavascript("window.__hpNativeChunks[" + JSONObject.quote(id) + "]+=" + JSONObject.quote(chunk) + ";", null);
+            }
+            web.evaluateJavascript("(function(){var k=" + JSONObject.quote(id) + ",b=atob(window.__hpNativeChunks[k]);delete window.__hpNativeChunks[k];"
+                + "var a=Uint8Array.from(b,function(c){return c.charCodeAt(0)});window.HPMapResult(k,JSON.parse(new TextDecoder().decode(a)));})()", null);
+        });
     }
-
-    private void editRoute() {
-        String[] choices = {"Thêm vị trí", "Đổi tuyến"};
-        new AlertDialog.Builder(this).setTitle("Chỉnh tuyến · " + selectedRoute.name).setItems(choices, (d, which) -> setMode(which == 0 ? "point" : "adjust")).setNegativeButton("Đóng", null).show();
+    private void fail(String id, Exception failure) {
+        String message = failure.getMessage();
+        if (message == null || message.trim().isEmpty()) message = "Không thực hiện được. Hãy thử lại.";
+        int status = failure instanceof MapApiClient.ApiException ? ((MapApiClient.ApiException)failure).status : 0;
+        result(id, json("ok", false, "error", message.substring(0, Math.min(350, message.length())),
+            "status", status, "authExpired", status == 401));
     }
-
-    private void finishLine() {
-        if (!mode.equals("line") || drawnLine.size() < 2) { toast("Cần ít nhất 2 điểm để lưu đường."); return; }
-        localLines.add(new ArrayList<>(drawnLine)); drawnLine.clear(); mode = ""; persistLocalMap(); map.invalidate();
-        modeLabel.setText("Đường đã lưu trên thiết bị · Chưa đồng bộ server"); toast("Đã lưu đường trên thiết bị.");
+    private static JSONObject json(Object... pairs) {
+        JSONObject obj = new JSONObject();
+        try { for (int i = 0; i < pairs.length; i += 2) obj.put((String)pairs[i], pairs[i+1]); } catch (Exception ignored) { }
+        return obj;
     }
-
-    private void createFolder() {
-        EditText input = new EditText(this); input.setHint("Tên thư mục"); input.setSingleLine(true);
-        new AlertDialog.Builder(this).setTitle("Tạo thư mục").setView(input).setNegativeButton("Hủy", null).setPositiveButton("Tạo", (d, w) -> {
-            String value = input.getText().toString().trim(); if (value.isEmpty()) { toast("Nhập tên thư mục."); return; }
-            if (!folders.contains(value)) { folders.add(value); folderVisibility.add(true); } persistLocalMap(); toast("Đã tạo thư mục " + value + " trên thiết bị.");
-        }).show();
+    private JSONObject importedMaps() throws Exception {
+        JSONArray maps = new JSONArray();
+        for (ImportedMapStore.MapFile file : imports.list()) maps.put(json("id", file.id, "name", file.name, "kml", new String(file.kml, StandardCharsets.UTF_8)));
+        return json("ok", true, "maps", maps);
     }
-
-    private void showFolders() {
-        String[] items = new String[folders.size()]; boolean[] checked = new boolean[folders.size()];
-        for(int i=0;i<folders.size();i++){int visibleCount=i==0?points.size()+localLines.size():0;items[i]=folders.get(i)+" · "+visibleCount+" mục";checked[i]=i<folderVisibility.size()&&folderVisibility.get(i);}
-        new AlertDialog.Builder(this).setTitle("Thư mục bản đồ").setMultiChoiceItems(items, checked, (dialog, which, isChecked) -> { while(folderVisibility.size()<=which)folderVisibility.add(true);folderVisibility.set(which,isChecked);persistLocalMap();map.invalidate(); })
-            .setPositiveButton("＋ Tạo thư mục", (dialog, which) -> createFolder()).setNegativeButton("Đóng", null).show();
-    }
-
-    private void chooseLayer() {
-        String[] layers = {"Đường phố", "Vệ tinh", "Vệ tinh + đường phố", "Địa hình"};
-        new AlertDialog.Builder(this).setTitle("Lớp bản đồ").setSingleChoiceItems(layers, java.util.Arrays.asList(layers).indexOf(basemap), (d, which) -> { basemap = layers[which]; map.invalidate(); d.dismiss(); toast("Đang xem lớp: " + basemap + " (bản đồ mẫu)."); }).setNegativeButton("Đóng", null).show();
-    }
-
-    private void pickMap() {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/vnd.google-earth.kmz", "application/vnd.google-earth.kml+xml", "application/zip", "application/xml"});
-        startActivityForResult(intent, PICK_MAP);
-    }
-
-    @Override protected void onActivityResult(int request, int result, Intent data) {
-        super.onActivityResult(request, result, data);
-        if (request != PICK_MAP || result != RESULT_OK || data == null || data.getData() == null) return;
-        Uri uri = data.getData();
-        new Thread(() -> {
-            try (InputStream in = getContentResolver().openInputStream(uri)) {
-                byte[] bytes = BridgePolicy.readBounded(in, BridgePolicy.MAX_FILE);
-                String name = "Bản đồ đã nhập";
-                try (android.database.Cursor c = getContentResolver().query(uri, new String[]{android.provider.OpenableColumns.DISPLAY_NAME}, null, null, null)) { if (c != null && c.moveToFirst()) name = c.getString(0); }
-                ImportedMapStore.MapFile file = imports.add(name, bytes); String shown = file.name;
-                runOnUiThread(() -> toast(file.duplicate ? "Bản đồ này đã được nhập." : "Đã nhập " + shown + " vào thiết bị."));
-            } catch (Exception e) { runOnUiThread(() -> toast(e.getMessage() == null ? "Không đọc được KMZ/KML." : e.getMessage())); }
-        }).start();
-    }
-
-    private void shareMap() {
-        String text = "HP Map · " + selectedRoute.name + "\nLoại: " + selectedRoute.type + " · Cáp: " + selectedRoute.capacity + "\nBản đồ tuyến cáp mẫu.";
-        Intent send = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text);
-        startActivity(Intent.createChooser(send, "Chia sẻ bản đồ HP Map"));
-    }
-
-    private void loadLocalMap() {
-        android.content.SharedPreferences prefs = getSharedPreferences("hp-map-local", MODE_PRIVATE);
+    private void chooseFile(String id) {
+        if (fileBusy) { result(id, json("ok", false, "error", "Đang xử lý một tệp khác.")); return; }
+        fileBusy = true; fileRequest = id;
         try {
-            org.json.JSONArray names = new org.json.JSONArray(prefs.getString("folders", "[]"));
-            org.json.JSONArray vis = new org.json.JSONArray(prefs.getString("folderVisibility", "[]"));
-            for (int i=0;i<names.length() && folders.size()<50;i++) { String name=names.optString(i, ""); if(!name.isEmpty()&&!folders.contains(name)){folders.add(name);folderVisibility.add(vis.optBoolean(i,true));} }
-            readPoints(new org.json.JSONArray(prefs.getString("points", "[]")), points);
-            readPoints(new org.json.JSONArray(prefs.getString("route", "[]")), routePoints);
-            org.json.JSONArray lines = new org.json.JSONArray(prefs.getString("lines", "[]"));
-            for (int i=0;i<lines.length() && localLines.size()<100;i++) { ArrayList<PointF> line=new ArrayList<>(); readPoints(lines.optJSONArray(i),line); if(line.size()>1)localLines.add(line); }
-        } catch (Exception ignored) { points.clear(); localLines.clear(); routePoints.clear(); }
-        if (routePoints.size()<2) { routePoints.add(new PointF(.08f,.78f)); routePoints.add(new PointF(.24f,.66f)); routePoints.add(new PointF(.43f,.61f)); routePoints.add(new PointF(.62f,.48f)); routePoints.add(new PointF(.92f,.22f)); }
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/vnd.google-earth.kmz", "application/vnd.google-earth.kml+xml", "application/zip", "application/octet-stream", "application/xml", "text/xml"});
+            startActivityForResult(intent, PICK);
+        } catch (Exception error) { fileBusy = false; fail(id, error); }
     }
-    private void readPoints(org.json.JSONArray array, List<PointF> into) {
-        if(array==null)return; for(int i=0;i<array.length()&&into.size()<300;i++){org.json.JSONArray pair=array.optJSONArray(i);if(pair!=null&&pair.length()==2){double x=pair.optDouble(0,-1),y=pair.optDouble(1,-1);if(x>=0&&x<=1&&y>=0&&y<=1)into.add(new PointF((float)x,(float)y));}}
+    private String displayName(Uri uri) {
+        try (Cursor cursor = getContentResolver().query(uri, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) return cursor.getString(0);
+        } catch (Exception ignored) { }
+        return "Ban-do.kmz";
     }
-    private org.json.JSONArray pointsJson(List<PointF> list) { org.json.JSONArray out=new org.json.JSONArray();for(PointF point:list){try{org.json.JSONArray pair=new org.json.JSONArray();pair.put(point.x);pair.put(point.y);out.put(pair);}catch(org.json.JSONException ignored){}}return out; }
-    private void persistLocalMap() {
-        try { org.json.JSONArray names=new org.json.JSONArray(), visibility=new org.json.JSONArray();for(int i=0;i<folders.size();i++){names.put(folders.get(i));visibility.put(i>=folderVisibility.size()||folderVisibility.get(i));}org.json.JSONArray lines=new org.json.JSONArray();for(List<PointF> line:localLines)lines.put(pointsJson(line));getSharedPreferences("hp-map-local",MODE_PRIVATE).edit().putString("folders",names.toString()).putString("folderVisibility",visibility.toString()).putString("points",pointsJson(points).toString()).putString("route",pointsJson(routePoints).toString()).putString("lines",lines.toString()).apply(); } catch (Exception ignored) { }
+    private void export(String id, JSONObject args) {
+        if (fileBusy) { result(id, json("ok", false, "error", "Đang xử lý một tệp khác.")); return; }
+        fileBusy = true; fileRequest = id;
+        worker.execute(() -> {
+            try {
+                byte[] kml = args.optString("kml").getBytes(StandardCharsets.UTF_8);
+                BridgePolicy.utf8Kml(kml);
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                try (ZipOutputStream zip = new ZipOutputStream(bytes)) { zip.putNextEntry(new ZipEntry("doc.kml")); zip.write(kml); zip.closeEntry(); }
+                String name = BridgePolicy.fileName(args.optString("name", "HP-Map"), ".kmz");
+                if (args.optBoolean("share")) {
+                    String key = UUID.randomUUID().toString();
+                    File directory = new File(getCacheDir(), "exports/" + key);
+                    if (!directory.mkdirs()) throw new java.io.IOException("Không tạo được tệp chia sẻ.");
+                    try (FileOutputStream output = new FileOutputStream(new File(directory, name))) { bytes.writeTo(output); }
+                    Uri uri = new Uri.Builder().scheme("content").authority(getPackageName()+".files").appendPath("exports").appendPath(key).appendPath(name).build();
+                    ui.post(() -> {
+                        fileBusy = false;
+                        try {
+                            Intent share = new Intent(Intent.ACTION_SEND).setType("application/vnd.google-earth.kmz").putExtra(Intent.EXTRA_STREAM, uri)
+                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            share.setClipData(ClipData.newRawUri("HP Map", uri));
+                            startActivity(Intent.createChooser(share, "Chia sẻ KMZ"));
+                            result(id, json("ok", true));
+                        } catch (Exception failure) { fail(id, failure); }
+                    });
+                } else {
+                    exportBytes = bytes.toByteArray();
+                    ui.post(() -> {
+                        try { startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE)
+                            .setType("application/vnd.google-earth.kmz").putExtra(Intent.EXTRA_TITLE, name), SAVE); }
+                        catch (Exception failure) { exportBytes = null; fileBusy = false; fail(id, failure); }
+                    });
+                }
+            } catch (Exception error) { ui.post(() -> fileBusy = false); fail(id, error); }
+        });
     }
-
-    private void locate() {
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION); return;
+    @Override protected void onActivityResult(int request, int code, Intent data) {
+        super.onActivityResult(request, code, data);
+        if (request != PICK && request != SAVE) return;
+        String id = fileRequest;
+        if (code != RESULT_OK || data == null || data.getData() == null) {
+            fileBusy = false; exportBytes = null;
+            result(id, json("ok", false, "cancelled", true, "error", "Đã hủy chọn tệp.")); return;
         }
-        try {
-            LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE); Location found = null;
-            for (String provider : manager.getProviders(true)) { Location loc = manager.getLastKnownLocation(provider); if (loc != null && (found == null || loc.getTime() > found.getTime())) found = loc; }
-            if (found == null) toast("Chưa có vị trí GPS gần đây."); else toast(String.format(java.util.Locale.US, "Vị trí: %.6f, %.6f", found.getLatitude(), found.getLongitude()));
-        } catch (SecurityException e) { toast("Chưa được cấp quyền vị trí."); }
+        Uri uri = data.getData(); byte[] saving = exportBytes; exportBytes = null;
+        worker.execute(() -> {
+            try {
+                if (request == PICK) {
+                    ImportedMapStore.MapFile file;
+                    try (InputStream input = getContentResolver().openInputStream(uri)) { file = imports.add(displayName(uri), BridgePolicy.readBounded(input, BridgePolicy.MAX_FILE)); }
+                    result(id, json("ok", true, "maps", new JSONArray().put(json("id", file.id, "name", file.name,
+                        "kml", new String(file.kml, StandardCharsets.UTF_8)))));
+                } else {
+                    if (saving == null) throw new java.io.IOException("Hãy xuất lại tệp KMZ.");
+                    try (OutputStream output = getContentResolver().openOutputStream(uri, "wt")) {
+                        if (output == null) throw new java.io.IOException("Không mở được nơi lưu.");
+                        output.write(saving); output.flush();
+                    }
+                    result(id, json("ok", true));
+                }
+            } catch (Exception error) { fail(id, error); }
+            finally { ui.post(() -> fileBusy = false); }
+        });
     }
-
-    @Override public void onRequestPermissionsResult(int request, String[] permissions, int[] results) { super.onRequestPermissionsResult(request, permissions, results); if (request == LOCATION_PERMISSION) { if (results.length > 0 && results[0] == PackageManager.PERMISSION_GRANTED) locate(); else toast("Chưa cấp quyền vị trí."); } }
-
-    private Button tool(String text, String description, Runnable action) { Button b = new Button(this); b.setText(text); b.setTextSize(21); b.setTextColor(Color.rgb(31, 54, 60)); b.setContentDescription(description); b.setBackground(round(0xFFF7F3FA, 28, 0xFFE9F7FA)); b.setMinWidth(0); b.setMinimumWidth(0); b.setPadding(0, 0, 0, 0); LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(dp(44), dp(44)); p.bottomMargin = dp(8); b.setLayoutParams(p); b.setOnClickListener(v -> action.run()); return b; }
-    private Button chip(String text) { Button b = new Button(this); b.setText(text); b.setTextSize(11); b.setTextColor(INK); b.setAllCaps(false); b.setMinWidth(0); b.setMinimumWidth(0); b.setPadding(dp(8), 0, dp(8), 0); b.setBackground(round(0xFF174959, 9, 0xFF2B6676)); b.setLayoutParams(new LinearLayout.LayoutParams(-2, dp(38))); return b; }
-    private TextView label(String text, int size, boolean bold, int color) { TextView v = new TextView(this); v.setText(text); v.setTextSize(size); v.setTextColor(color); if (bold) v.setTypeface(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD); v.setGravity(Gravity.CENTER_VERTICAL); return v; }
-    private android.graphics.drawable.GradientDrawable round(int color, int radius, int stroke) { android.graphics.drawable.GradientDrawable d = new android.graphics.drawable.GradientDrawable(); d.setColor(color); d.setCornerRadius(dp(radius)); d.setStroke(dp(1), stroke); return d; }
-    private Spinner spinner(String[] values) { Spinner s = new Spinner(this); s.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, values)); s.setBackground(round(0xFF0A3442, 8, 0xFF286171)); return s; }
-    private int dp(int n) { return Math.round(n * getResources().getDisplayMetrics().density); }
-    private void toast(String value) { Toast.makeText(this, value, Toast.LENGTH_SHORT).show(); }
-    private android.text.TextWatcher watcher() { return new android.text.TextWatcher() { public void beforeTextChanged(CharSequence s,int start,int count,int after){} public void onTextChanged(CharSequence s,int start,int before,int count){renderRoutes();} public void afterTextChanged(android.text.Editable e){} }; }
-    private android.widget.AdapterView.OnItemSelectedListener filterListener() { return new android.widget.AdapterView.OnItemSelectedListener() { public void onNothingSelected(android.widget.AdapterView<?> p){} public void onItemSelected(android.widget.AdapterView<?> p, View v, int position, long id){renderRoutes();} }; }
-
-    private final class MapCanvas extends View {
-        private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG); private final Path route = new Path();
-        MapCanvas() { super(MapHomeActivity.this); setBackgroundColor(Color.rgb(240, 238, 230)); setOnTouchListener((v, e) -> { if (e.getAction() != MotionEvent.ACTION_UP || mode.isEmpty()) return true; float x=e.getX()/Math.max(1,getWidth()), y=e.getY()/Math.max(1,getHeight()); if (mode.equals("point")) { points.add(new PointF(x,y)); mode=""; persistLocalMap(); modeLabel.setText("Đã thêm điểm trên thiết bị · Chưa đồng bộ"); } else if(mode.equals("adjust")){int index=Math.max(1,Math.min(routePoints.size()-1,routePoints.size()/2));routePoints.add(index,new PointF(x,y));mode="";persistLocalMap();modeLabel.setText("Tuyến đã đổi trên thiết bị · Chưa đồng bộ server");} else { drawnLine.add(new PointF(x,y)); modeLabel.setText("Đang vẽ · " + drawnLine.size() + " điểm. Chạm tiếp hoặc nhấn ✓ để lưu."); } invalidate(); return true; }); }
-        @Override protected void onDraw(Canvas c) { super.onDraw(c); float w=getWidth(),h=getHeight(); boolean satellite=basemap.startsWith("Vệ tinh"); boolean streets=!basemap.equals("Vệ tinh"); p.setStyle(Paint.Style.FILL); p.setColor(satellite?Color.rgb(53,76,65):basemap.equals("Địa hình")?Color.rgb(232,237,216):Color.rgb(240,238,230)); c.drawRect(0,0,w,h,p);
-            if(satellite){p.setColor(Color.rgb(71,94,68));c.drawOval(w*.05f,h*.08f,w*.42f,h*.35f,p);c.drawOval(w*.61f,h*.55f,w*1.07f,h*.93f,p);p.setColor(Color.rgb(83,101,76));c.drawRect(w*.48f,h*.06f,w*.7f,h*.31f,p);} 
-            p.setStrokeCap(Paint.Cap.ROUND); p.setStrokeJoin(Paint.Join.ROUND); p.setStyle(Paint.Style.STROKE);
-            if(streets){p.setStrokeWidth(dp(23)); p.setColor(satellite?0xFF6E746C:Color.rgb(215,229,211)); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p);
-            p.setStrokeWidth(dp(10)); p.setColor(satellite?0xFFD5D0BB:Color.WHITE); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p); c.drawLine(w*.05f,h*.35f,w*1.1f,h*.62f,p);
-            p.setStrokeWidth(dp(2)); p.setColor(satellite?0xFFB58C5F:Color.rgb(224,174,100)); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p);}
-            else {p.setStrokeWidth(dp(1));p.setColor(0x8886A779);for(int i=0;i<5;i++)c.drawOval(w*(.07f+i*.16f),h*(.12f+i*.08f),w*(.48f+i*.12f),h*(.38f+i*.08f),p);}
-            p.setStrokeWidth(dp(2)); p.setColor(Color.rgb(25,174,195)); route.reset(); route.moveTo(routePoints.get(0).x*w,routePoints.get(0).y*h); for(int i=1;i<routePoints.size();i++)route.lineTo(routePoints.get(i).x*w,routePoints.get(i).y*h); c.drawPath(route,p);
-            marker(c,w*.16f,h*.72f,"MX",Color.rgb(4,54,68)); marker(c,w*.46f,h*.56f,"DP",Color.rgb(4,54,68)); marker(c,w*.78f,h*.38f,"MX",Color.rgb(4,54,68));
-            if(folderVisibility.isEmpty()||folderVisibility.get(0)){for(PointF point:points){p.setStyle(Paint.Style.FILL);p.setColor(Color.rgb(110,185,0));c.drawCircle(point.x*w,point.y*h,dp(6),p);p.setColor(Color.WHITE);p.setTextSize(dp(11));c.drawText("MX",point.x*w+dp(7),point.y*h,p);}
-            for(List<PointF> line:localLines)drawLocalLine(c,w,h,line,Color.rgb(239,106,138));}
-            if(!drawnLine.isEmpty())drawLocalLine(c,w,h,drawnLine,Color.rgb(236,169,28));
-            p.setStyle(Paint.Style.FILL);p.setColor(0xAAFFFFFF);p.setTextSize(dp(12));c.drawText("Buôn Ma Thuột",w*.32f,h*.38f,p);p.setTextSize(dp(10));p.setColor(0xFF65716D);c.drawText("Nền bản đồ minh họa · "+basemap,dp(12),h-dp(12),p);
+    private void locate(String id) {
+        if (gpsRequest != null) { result(id, json("ok", false, "error", "Đang lấy vị trí.")); return; }
+        gpsRequest = id;
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, GPS);
+        } else beginLocation();
+    }
+    @SuppressLint("MissingPermission")
+    private void beginLocation() {
+        final LocationManager manager = (LocationManager)getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override public void onLocationChanged(Location location) {
+                String id = gpsRequest; stopLocation();
+                if (id != null) result(id, json("lat", location.getLatitude(), "lon", location.getLongitude(), "accuracy", location.getAccuracy()));
+            }
+            @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
+            @Override public void onProviderEnabled(String provider) { }
+            @Override public void onProviderDisabled(String provider) { }
+        };
+        boolean started = false;
+        for (String provider : new String[]{LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER}) {
+            try { if (manager.isProviderEnabled(provider)) { manager.requestLocationUpdates(provider, 1000, 0, locationListener); started = true; } }
+            catch (Exception ignored) { }
         }
-        private void drawLocalLine(Canvas c,float w,float h,List<PointF> line,int color){if(line.size()<2)return;p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(dp(3));p.setColor(color);Path user=new Path();user.moveTo(line.get(0).x*w,line.get(0).y*h);for(int i=1;i<line.size();i++)user.lineTo(line.get(i).x*w,line.get(i).y*h);c.drawPath(user,p);}
-        private void marker(Canvas c,float x,float y,String text,int color){p.setStyle(Paint.Style.FILL);p.setColor(Color.WHITE);c.drawCircle(x,y,dp(12),p);p.setColor(color);c.drawRoundRect(x-dp(17),y-dp(31),x+dp(17),y-dp(5),dp(4),dp(4),p);p.setColor(Color.WHITE);p.setTextAlign(Paint.Align.CENTER);p.setTextSize(dp(11));c.drawText(text,x,y-dp(13),p);p.setTextAlign(Paint.Align.LEFT);}
+        if (!started) { String id = gpsRequest; stopLocation(); result(id, json("ok", false, "error", "Hãy bật Vị trí trên điện thoại.")); return; }
+        locationTimeout = () -> {
+            String id = gpsRequest; stopLocation();
+            if (id != null) result(id, json("ok", false, "error", "Chưa lấy được GPS. Hãy ra nơi thoáng rồi thử lại."));
+        };
+        ui.postDelayed(locationTimeout, 20000);
     }
-
-    private static final class Route { final String name,type,capacity; boolean checked=true; Route(String n,String t,String c){name=n;type=t;capacity=c;} }
+    private void stopLocation() {
+        if (locationListener != null) {
+            try { ((LocationManager)getSystemService(LOCATION_SERVICE)).removeUpdates(locationListener); } catch (Exception ignored) { }
+        }
+        if (locationTimeout != null) ui.removeCallbacks(locationTimeout);
+        locationListener = null; locationTimeout = null; gpsRequest = null;
+    }
+    @Override public void onRequestPermissionsResult(int code, String[] permissions, int[] results) {
+        super.onRequestPermissionsResult(code, permissions, results);
+        if (code != GPS || gpsRequest == null) return;
+        if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) beginLocation();
+        else { String id = gpsRequest; gpsRequest = null; result(id, json("ok", false, "error", "Chưa được cấp quyền vị trí.")); }
+    }
+    @SuppressLint("SetJavaScriptEnabled")
+    private void serverLogin(String id) {
+        if (authDialog != null) return;
+        authWeb = new WebView(this); configure(authWeb);
+        final boolean[] importing = {false};
+        authWeb.setWebViewClient(new WebViewClient() {
+            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return !BridgePolicy.trustedUrl(request.getUrl().toString());
+            }
+            @Override public void onPageFinished(WebView view, String url) {
+                if (!BridgePolicy.trustedUrl(url) || BridgePolicy.isLoginUrl(url) || importing[0]) return;
+                view.evaluateJavascript("sessionStorage.getItem('hp-server-session')", encoded -> {
+                    try {
+                        Object decoded = new JSONTokener(encoded).nextValue();
+                        if (!(decoded instanceof String)) return;
+                        JSONObject session = new JSONObject((String)decoded);
+                        String token = session.optString("token");
+                        if (token.isEmpty()) return;
+                        importing[0] = true;
+                        view.setVisibility(android.view.View.INVISIBLE);
+                        worker.execute(() -> {
+                            try { result(id, api.importSession(token, session.optLong("expires_at", 0))); }
+                            catch (Exception failure) { fail(id, failure); }
+                            finally { ui.post(() -> closeAuth()); }
+                        });
+                    } catch (Exception ignored) { }
+                });
+            }
+            @Override public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) { handler.cancel(); }
+        });
+        authDialog = new AlertDialog.Builder(this).setTitle("Đăng nhập HP Telecom Server").setView(authWeb)
+            .setNegativeButton("Quay lại HP Map", (dialog, which) -> {}).create();
+        authDialog.setOnDismissListener(dialog -> {
+            if (!importing[0]) result(id, json("ok", false, "cancelled", true, "error", "Đã quay lại HP Map."));
+            if (authWeb != null) { authWeb.stopLoading(); authWeb.destroy(); authWeb = null; }
+            authDialog = null;
+        });
+        authDialog.show();
+        authDialog.getWindow().setLayout(-1, (int)(getResources().getDisplayMetrics().heightPixels * 0.88));
+        authWeb.loadUrl(BridgePolicy.LOGIN_URL);
+    }
+    private void closeAuth() { if (authDialog != null) authDialog.dismiss(); }
+    @Override public void onBackPressed() {
+        web.evaluateJavascript("window.HPMapApp&&window.HPMapApp.back?window.HPMapApp.back():false", value -> {
+            if (!"true".equals(value)) new AlertDialog.Builder(this).setMessage("Thoát HP Map?")
+                .setNegativeButton("Ở lại", null).setPositiveButton("Thoát", (dialog, which) -> finish()).show();
+        });
+    }
+    @Override protected void onDestroy() {
+        destroyed = true; stopLocation(); closeAuth(); worker.shutdownNow();
+        if (web != null) { web.removeJavascriptInterface("HPMap"); web.stopLoading(); web.destroy(); }
+        super.onDestroy();
+    }
 }
-

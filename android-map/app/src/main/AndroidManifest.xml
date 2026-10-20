@@ -23,4 +23,3 @@
             android:exported="false" android:grantUriPermissions="true" />
     </application>
 </manifest>
-
