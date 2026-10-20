@@ -94,8 +94,18 @@ public final class MapSmokeRunner extends Instrumentation {
     }
     private void checkSharedTransfers(String fixture) throws Exception {
         js("window.__qaFixture=" + fixture.replace("role:'staff'", "role:'admin'") + ";HPMapApp.receiveSession(window.__qaFixture);document.getElementById('nav-routes').click();document.getElementById('shared-tab').click();true");
-        check("(function(){var select=document.querySelector('.select-shared-features');if(!select)return false;select.click();var checks=Array.from(document.querySelectorAll('.feature-choice input[data-source=shared]'));checks.forEach(function(c){c.click();});return checks.length===2&&document.getElementById('selection-count').textContent.startsWith('2 ');})()",
-                "Shared point and line selection controls missing");
+        check("document.querySelectorAll('.select-shared-features').length===2", "Shared folder selection buttons missing");
+        js("document.querySelector('.select-shared-features').click();true");
+        if (!"true".equals(js("!document.getElementById('selection-bar').hidden&&document.querySelectorAll('.feature-choice input[data-source=shared]').length===2"))) {
+            throw new AssertionError("Shared selection mode/choices missing: " + js("JSON.stringify({selectionHidden:document.getElementById('selection-bar').hidden,count:document.getElementById('selection-count').textContent,choices:Array.from(document.querySelectorAll('.feature-choice input')).map(function(c){return [c.dataset.source,c.dataset.featureId,c.checked];}),toast:document.getElementById('toast').textContent})"));
+        }
+        // Each click re-renders the list. Re-query the next live input instead of
+        // clicking a detached node, which does not dispatch change in WebView.
+        for (String id : new String[]{"qa-point", "qa-line"}) {
+            check("(function(){var c=document.querySelector('.feature-choice input[data-source=shared][data-feature-id=\"" + id + "\"]');if(!c||c.disabled)return false;c.click();var current=document.querySelector('.feature-choice input[data-source=shared][data-feature-id=\"" + id + "\"]');return !!current&&current.checked;})()",
+                    "Cannot select shared feature " + id);
+        }
+        check("document.getElementById('selection-count').textContent.startsWith('2 ')", "Shared selection did not retain point and line");
         check("(function(){document.getElementById('selection-copy').click();document.getElementById('transfer-target').value='qa-dest';var original=window.HPMap,spy={request:function(id,action,args){if(action!=='transferSharedFeatures')return original.request(id,action,args);window.__qaTransfer=JSON.parse(args);var updated=JSON.parse(JSON.stringify(window.__qaFixture)),source=updated.sharedLayers[0],dest=updated.sharedLayers[1];updated.sharedLayers.forEach(function(l){l.revision=4;});dest.markers=[Object.assign({},source.markers[0],{feature_id:'qa-copy-point'})];dest.lines=JSON.parse(JSON.stringify(source.lines));dest.lineFeatures=[Object.assign({},source.lineFeatures[0],{feature_id:'qa-copy-line'})];updated.transfer={saved:true,mode:'copy',count:2};window.HPMapResult(id,updated);}};try{window.HPMap=spy;if(window.HPMap!==spy)return false;document.getElementById('transfer-confirm').click();var t=window.__qaTransfer;return t&&t.team==='QA'&&t.revision===3&&t.mode==='copy'&&t.targetFolderId==='qa-dest'&&t.featureIds.length===2&&t.featureIds.includes('qa-point')&&t.featureIds.includes('qa-line');}finally{window.HPMap=original;}})()",
                 "Shared transfer did not use raw feature/folder IDs, selected scope and revision");
         check("(function(){var rows=Array.from(document.querySelectorAll('.shared-row'));return document.getElementById('selection-bar').hidden&&document.getElementById('modal-backdrop').hidden&&rows.some(function(r){return r.textContent.includes('Đích quản trị kiểm thử')&&r.textContent.includes('1 điểm hiển thị')&&r.textContent.includes('1 đường');})()",

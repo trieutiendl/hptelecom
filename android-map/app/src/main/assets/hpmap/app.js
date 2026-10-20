@@ -411,6 +411,7 @@
     $("shared-select-all").indeterminate = sharedSelected.size > 0 && !$("shared-select-all").checked; $("shared-select-all").disabled = !sharedLayers.length;
   }
   function modal(title, html, setup, onClose) {
+    clearTimeout(toastTimer); $("toast").hidden = true;
     lastFocus = document.activeElement; $("modal-title").textContent = title; $("modal-body").innerHTML = html; $("modal-backdrop").hidden = false; modalCloseAction = onClose || null;
     if (setup) setup(); $("close-modal").focus();
   }
@@ -474,7 +475,7 @@
     }
     if (initialId) featureSelection.ids.add(String(initialId));
     openSheet(source === "local" ? "folders" : "shared"); renderMap(); renderShared();
-    toast("Đánh dấu điểm hoặc đường trong danh sách; có thể chạm đối tượng trên bản đồ để chọn.", 5000);
+    toast("Chọn điểm/đường trên bản đồ hoặc danh sách.", 2200);
   }
   function cancelFeatureSelection() {
     if (transferBusy) return;
