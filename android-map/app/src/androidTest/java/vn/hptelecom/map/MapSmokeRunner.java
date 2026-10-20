@@ -66,6 +66,8 @@ public final class MapSmokeRunner extends Instrumentation {
             check("document.getElementById('route-list').textContent.includes('TUYẾN KIỂM THỬ')","Server route missing");
             check("document.getElementById('creation-tools').hidden&&document.getElementById('nav-import').hidden&&document.getElementById('edit').hidden","Staff can edit");
             check("HPMapApp.makeKml(true).includes('TUYẾN KIỂM THỬ')","Read-only KMZ export missing route");
+            SystemClock.sleep(800);
+            check("(function(){var s=document.querySelector('.leaflet-overlay-pane>svg'),p=s&&s.querySelector('path');if(!s||!p)return false;var r=s.getBoundingClientRect();return r.width>100&&r.height>100&&p.getTotalLength()>10;})()","Cable line is clipped or missing");
             screenshot("02-map-staff-test-data");
             js("document.getElementById('shared-tab').click();true");
             screenshot("03-shared-folders-test-data");
