@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteBase /nhom/
+RewriteRule ^([A-Za-z0-9_-]+)/?$ index.html [L]
