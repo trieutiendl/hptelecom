@@ -39,6 +39,7 @@ public final class MapHomeActivity extends Activity {
     private static final int BG = Color.rgb(8, 43, 57), PANEL = Color.rgb(12, 58, 72), ACCENT = Color.rgb(25, 200, 218), INK = Color.rgb(236, 248, 250), MUTED = Color.rgb(160, 194, 202);
     private final List<Route> routes = new ArrayList<>();
     private final List<String> folders = new ArrayList<>();
+    private final List<Boolean> folderVisibility = new ArrayList<>();
     private final List<PointF> points = new ArrayList<>(), drawnLine = new ArrayList<>();
     private final List<List<PointF>> localLines = new ArrayList<>();
     private final List<PointF> routePoints = new ArrayList<>();
@@ -55,7 +56,7 @@ public final class MapHomeActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         getWindow().setStatusBarColor(BG); getWindow().setNavigationBarColor(BG);
-        folders.add("Mặc định");
+        folders.add("Default folder"); folderVisibility.add(true);
         seedRoutes(); imports = new ImportedMapStore(new java.io.File(getFilesDir(), "imported-maps")); loadLocalMap();
         buildScreen(); renderRoutes();
     }
@@ -170,13 +171,14 @@ public final class MapHomeActivity extends Activity {
         EditText input = new EditText(this); input.setHint("Tên thư mục"); input.setSingleLine(true);
         new AlertDialog.Builder(this).setTitle("Tạo thư mục").setView(input).setNegativeButton("Hủy", null).setPositiveButton("Tạo", (d, w) -> {
             String value = input.getText().toString().trim(); if (value.isEmpty()) { toast("Nhập tên thư mục."); return; }
-            if (!folders.contains(value)) folders.add(value); persistLocalMap(); toast("Đã tạo thư mục " + value + " trên thiết bị.");
+            if (!folders.contains(value)) { folders.add(value); folderVisibility.add(true); } persistLocalMap(); toast("Đã tạo thư mục " + value + " trên thiết bị.");
         }).show();
     }
 
     private void showFolders() {
-        String[] items = folders.toArray(new String[0]);
-        new AlertDialog.Builder(this).setTitle("Thư mục bản đồ").setItems(items, (dialog, which) -> toast(folders.get(which)))
+        String[] items = new String[folders.size()]; boolean[] checked = new boolean[folders.size()];
+        for(int i=0;i<folders.size();i++){int visibleCount=i==0?points.size()+localLines.size():0;items[i]=folders.get(i)+" · "+visibleCount+" mục";checked[i]=i<folderVisibility.size()&&folderVisibility.get(i);}
+        new AlertDialog.Builder(this).setTitle("Thư mục bản đồ").setMultiChoiceItems(items, checked, (dialog, which, isChecked) -> { while(folderVisibility.size()<=which)folderVisibility.add(true);folderVisibility.set(which,isChecked);persistLocalMap();map.invalidate(); })
             .setPositiveButton("＋ Tạo thư mục", (dialog, which) -> createFolder()).setNegativeButton("Đóng", null).show();
     }
 
@@ -216,7 +218,8 @@ public final class MapHomeActivity extends Activity {
         android.content.SharedPreferences prefs = getSharedPreferences("hp-map-local", MODE_PRIVATE);
         try {
             org.json.JSONArray names = new org.json.JSONArray(prefs.getString("folders", "[]"));
-            for (int i=0;i<names.length() && folders.size()<50;i++) { String name=names.optString(i, ""); if(!name.isEmpty()&&!folders.contains(name))folders.add(name); }
+            org.json.JSONArray vis = new org.json.JSONArray(prefs.getString("folderVisibility", "[]"));
+            for (int i=0;i<names.length() && folders.size()<50;i++) { String name=names.optString(i, ""); if(!name.isEmpty()&&!folders.contains(name)){folders.add(name);folderVisibility.add(vis.optBoolean(i,true));} }
             readPoints(new org.json.JSONArray(prefs.getString("points", "[]")), points);
             readPoints(new org.json.JSONArray(prefs.getString("route", "[]")), routePoints);
             org.json.JSONArray lines = new org.json.JSONArray(prefs.getString("lines", "[]"));
@@ -229,7 +232,7 @@ public final class MapHomeActivity extends Activity {
     }
     private org.json.JSONArray pointsJson(List<PointF> list) { org.json.JSONArray out=new org.json.JSONArray();for(PointF point:list){try{org.json.JSONArray pair=new org.json.JSONArray();pair.put(point.x);pair.put(point.y);out.put(pair);}catch(org.json.JSONException ignored){}}return out; }
     private void persistLocalMap() {
-        try { org.json.JSONArray names=new org.json.JSONArray();for(String name:folders)names.put(name);org.json.JSONArray lines=new org.json.JSONArray();for(List<PointF> line:localLines)lines.put(pointsJson(line));getSharedPreferences("hp-map-local",MODE_PRIVATE).edit().putString("folders",names.toString()).putString("points",pointsJson(points).toString()).putString("route",pointsJson(routePoints).toString()).putString("lines",lines.toString()).apply(); } catch (Exception ignored) { }
+        try { org.json.JSONArray names=new org.json.JSONArray(), visibility=new org.json.JSONArray();for(int i=0;i<folders.size();i++){names.put(folders.get(i));visibility.put(i>=folderVisibility.size()||folderVisibility.get(i));}org.json.JSONArray lines=new org.json.JSONArray();for(List<PointF> line:localLines)lines.put(pointsJson(line));getSharedPreferences("hp-map-local",MODE_PRIVATE).edit().putString("folders",names.toString()).putString("folderVisibility",visibility.toString()).putString("points",pointsJson(points).toString()).putString("route",pointsJson(routePoints).toString()).putString("lines",lines.toString()).apply(); } catch (Exception ignored) { }
     }
 
     private void locate() {
@@ -258,15 +261,17 @@ public final class MapHomeActivity extends Activity {
     private final class MapCanvas extends View {
         private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG); private final Path route = new Path();
         MapCanvas() { super(MapHomeActivity.this); setBackgroundColor(Color.rgb(240, 238, 230)); setOnTouchListener((v, e) -> { if (e.getAction() != MotionEvent.ACTION_UP || mode.isEmpty()) return true; float x=e.getX()/Math.max(1,getWidth()), y=e.getY()/Math.max(1,getHeight()); if (mode.equals("point")) { points.add(new PointF(x,y)); mode=""; persistLocalMap(); modeLabel.setText("Đã thêm điểm trên thiết bị · Chưa đồng bộ"); } else if(mode.equals("adjust")){int index=Math.max(1,Math.min(routePoints.size()-1,routePoints.size()/2));routePoints.add(index,new PointF(x,y));mode="";persistLocalMap();modeLabel.setText("Tuyến đã đổi trên thiết bị · Chưa đồng bộ server");} else { drawnLine.add(new PointF(x,y)); modeLabel.setText("Đang vẽ · " + drawnLine.size() + " điểm. Chạm tiếp hoặc nhấn ✓ để lưu."); } invalidate(); return true; }); }
-        @Override protected void onDraw(Canvas c) { super.onDraw(c); float w=getWidth(),h=getHeight(); p.setStyle(Paint.Style.FILL); p.setColor(Color.rgb(240,238,230)); c.drawRect(0,0,w,h,p);
+        @Override protected void onDraw(Canvas c) { super.onDraw(c); float w=getWidth(),h=getHeight(); boolean satellite=basemap.startsWith("Vệ tinh"); boolean streets=!basemap.equals("Vệ tinh"); p.setStyle(Paint.Style.FILL); p.setColor(satellite?Color.rgb(53,76,65):basemap.equals("Địa hình")?Color.rgb(232,237,216):Color.rgb(240,238,230)); c.drawRect(0,0,w,h,p);
+            if(satellite){p.setColor(Color.rgb(71,94,68));c.drawOval(w*.05f,h*.08f,w*.42f,h*.35f,p);c.drawOval(w*.61f,h*.55f,w*1.07f,h*.93f,p);p.setColor(Color.rgb(83,101,76));c.drawRect(w*.48f,h*.06f,w*.7f,h*.31f,p);} 
             p.setStrokeCap(Paint.Cap.ROUND); p.setStrokeJoin(Paint.Join.ROUND); p.setStyle(Paint.Style.STROKE);
-            p.setStrokeWidth(dp(23)); p.setColor(Color.rgb(215,229,211)); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p);
-            p.setStrokeWidth(dp(10)); p.setColor(Color.WHITE); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p); c.drawLine(w*.05f,h*.35f,w*1.1f,h*.62f,p);
-            p.setStrokeWidth(dp(2)); p.setColor(Color.rgb(224,174,100)); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p);
+            if(streets){p.setStrokeWidth(dp(23)); p.setColor(satellite?0xFF6E746C:Color.rgb(215,229,211)); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p);
+            p.setStrokeWidth(dp(10)); p.setColor(satellite?0xFFD5D0BB:Color.WHITE); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p); c.drawLine(w*.05f,h*.35f,w*1.1f,h*.62f,p);
+            p.setStrokeWidth(dp(2)); p.setColor(satellite?0xFFB58C5F:Color.rgb(224,174,100)); c.drawLine(-20,h*.88f,w*.9f,h*.05f,p); c.drawLine(w*.25f,h*.2f,w*.62f,h*1.2f,p);}
+            else {p.setStrokeWidth(dp(1));p.setColor(0x8886A779);for(int i=0;i<5;i++)c.drawOval(w*(.07f+i*.16f),h*(.12f+i*.08f),w*(.48f+i*.12f),h*(.38f+i*.08f),p);}
             p.setStrokeWidth(dp(2)); p.setColor(Color.rgb(25,174,195)); route.reset(); route.moveTo(routePoints.get(0).x*w,routePoints.get(0).y*h); for(int i=1;i<routePoints.size();i++)route.lineTo(routePoints.get(i).x*w,routePoints.get(i).y*h); c.drawPath(route,p);
             marker(c,w*.16f,h*.72f,"MX",Color.rgb(4,54,68)); marker(c,w*.46f,h*.56f,"DP",Color.rgb(4,54,68)); marker(c,w*.78f,h*.38f,"MX",Color.rgb(4,54,68));
-            for(PointF point:points){p.setStyle(Paint.Style.FILL);p.setColor(Color.rgb(110,185,0));c.drawCircle(point.x*w,point.y*h,dp(6),p);p.setColor(Color.WHITE);p.setTextSize(dp(11));c.drawText("MX",point.x*w+dp(7),point.y*h,p);}
-            for(List<PointF> line:localLines)drawLocalLine(c,w,h,line,Color.rgb(239,106,138));
+            if(folderVisibility.isEmpty()||folderVisibility.get(0)){for(PointF point:points){p.setStyle(Paint.Style.FILL);p.setColor(Color.rgb(110,185,0));c.drawCircle(point.x*w,point.y*h,dp(6),p);p.setColor(Color.WHITE);p.setTextSize(dp(11));c.drawText("MX",point.x*w+dp(7),point.y*h,p);}
+            for(List<PointF> line:localLines)drawLocalLine(c,w,h,line,Color.rgb(239,106,138));}
             if(!drawnLine.isEmpty())drawLocalLine(c,w,h,drawnLine,Color.rgb(236,169,28));
             p.setStyle(Paint.Style.FILL);p.setColor(0xAAFFFFFF);p.setTextSize(dp(12));c.drawText("Buôn Ma Thuột",w*.32f,h*.38f,p);p.setTextSize(dp(10));p.setColor(0xFF65716D);c.drawText("Nền bản đồ minh họa · "+basemap,dp(12),h-dp(12),p);
         }
