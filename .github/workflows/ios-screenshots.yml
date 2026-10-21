@@ -1,0 +1,53 @@
+name: HP Telecom iOS review screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [screenshot-ios-418-47]
+    paths:
+      - ios-screenshots/**
+      - .github/workflows/ios-screenshots.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hp-ios-review-screenshots-47
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    # Use only a standard free runner in the already authorized public repo.
+    if: github.repository == 'trieutiendl/hptelecom' && github.event.repository.private == false && github.actor == 'trieutiendl' && github.ref == 'refs/heads/screenshot-ios-418-47'
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - name: Read screenshot build helpers
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: ios-screenshots
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.23.1'
+      - name: Build unsigned iPhone simulator app and capture screenshots
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HP_IOS_SCREENSHOT_KEY_47 }}
+        run: bash ios-screenshots/build.sh
+      - name: Preserve encrypted screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: hp-ios-review-screenshots-${{ github.run_id }}
+          path: ${{ runner.temp }}/hp-ios-screenshot-artifacts/screenshot-results.zip.enc
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 0
+      - name: Remove simulator and plaintext build files
+        if: always()
+        run: bash ios-screenshots/cleanup.sh
