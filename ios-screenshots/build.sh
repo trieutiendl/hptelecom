@@ -17,6 +17,9 @@ finish() {
   local encrypted=0
   set +e
   trap - EXIT
+  if [ "$result" -ne 0 ] && [ -n "${BUILD_APP:-}" ] && [ -d "$BUILD_APP" ]; then
+    ditto -c -k --keepParent "$BUILD_APP" "$BUILD_WORK/results/simulator-app.zip" >> "$BUILD_WORK/build.log" 2>&1
+  fi
   if [ -f "$BUILD_WORK/build.log" ]; then
     cp "$BUILD_WORK/build.log" "$BUILD_WORK/results/build.log"
   fi
@@ -85,5 +88,5 @@ BUILD_APP="$(find "$BUILD_WORK/DerivedData/Build/Products/Release-iphonesimulato
 test -n "$BUILD_APP"
 export BUILD_APP
 echo 'Launching isolated iPhone simulators and capturing the application screens.'
-python3 "$BUILD_HELPERS/capture.py" >> "$BUILD_WORK/build.log" 2>&1
+python3 -u "$BUILD_HELPERS/capture.py" 2>> "$BUILD_WORK/build.log"
 echo 'Screenshots captured. Packaging the encrypted result and removing temporary files.'

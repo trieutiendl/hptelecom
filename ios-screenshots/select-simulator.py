@@ -7,7 +7,7 @@ from pathlib import Path
 work = Path(os.environ['BUILD_WORK'])
 
 def listing(kind):
-    return json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', kind, '--json']))
+    return json.loads(subprocess.check_output(['xcrun', 'simctl', 'list', kind, '--json'], timeout=30))
 
 runtimes = [r for r in listing('runtimes')['runtimes']
             if r.get('isAvailable') and r['identifier'].startswith('com.apple.CoreSimulator.SimRuntime.iOS-')]
@@ -21,15 +21,26 @@ groups = [
     ('iphone-large', [('iPhone 16 Pro Max', [1320, 2868])], False),
 ]
 selected = []
+attempts = []
 for group, models, required in groups:
     chosen = None
     for runtime in runtimes:
         for name, dimensions in models:
             if name not in types:
                 continue
-            result = subprocess.run([
-                'xcrun', 'simctl', 'create', f'HP Telecom Review 47 {group}', types[name], runtime['identifier']
-            ], text=True, capture_output=True)
+            try:
+                result = subprocess.run([
+                    'xcrun', 'simctl', 'create', f'HP Telecom Review 47 {group}', types[name], runtime['identifier']
+                ], text=True, capture_output=True, timeout=45)
+                attempt = {'name': name, 'runtime': runtime['version'],
+                           'returncode': result.returncode, 'stderr': result.stderr}
+            except subprocess.TimeoutExpired:
+                result = None
+                attempt = {'name': name, 'runtime': runtime['version'], 'timedOut': True}
+            attempts.append(attempt)
+            (work / 'results' / 'simulator-selection.json').write_text(json.dumps(attempts, indent=2))
+            if result is None:
+                continue
             if result.returncode == 0:
                 chosen = {'group': group, 'name': name, 'dimensions': dimensions,
                           'runtime': runtime['version'], 'deviceType': types[name],
