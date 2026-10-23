@@ -19,6 +19,16 @@ diagnostics.mkdir(parents=True, exist_ok=True)
 release = json.loads((helpers / 'release.json').read_text())
 capture = json.loads((work / 'app' / 'capture.json').read_text())
 devices = json.loads((results / 'simulators.json').read_text())['devices']
+requested_groups = capture.get('groups')
+if requested_groups is not None:
+    if (not isinstance(requested_groups, list) or not requested_groups or
+            any(not isinstance(group, str) or group not in {'iphone-medium', 'iphone-large'}
+                for group in requested_groups) or len(set(requested_groups)) != len(requested_groups)):
+        raise ValueError('Invalid requested screenshot device groups')
+    available_groups = [device['group'] for device in devices]
+    if any(available_groups.count(group) != 1 for group in requested_groups):
+        raise ValueError('Requested screenshot device group is missing or duplicated')
+    devices = [device for device in devices if device['group'] in requested_groups]
 screens = capture['screens']
 if not 3 <= len(screens) <= 10:
     raise ValueError('Expected 3 to 10 screenshots')
@@ -141,27 +151,6 @@ for device in devices:
                 '--batteryLevel', '100', timeout=30)
         container = Path(command('get_app_container', udid, release['bundleIdentifier'], 'data', timeout=30))
         ready_file = container / 'Documents' / 'capture-ready.json'
-        stage = 'launch'
-        for attempt in (1, 2):
-            progress(f'{group}: launching app (attempt {attempt})')
-            try:
-                # File output preserves fatal JavaScript/native startup errors;
-                # --console would block simctl for the lifetime of the app.
-                command('launch', f'--stdout={device_diagnostics / ("app-stdout-" + str(attempt) + ".log")}',
-                        f'--stderr={device_diagnostics / ("app-stderr-" + str(attempt) + ".log")}',
-                        udid, release['bundleIdentifier'], timeout=45)
-                settle(capture.get('initialSettleSeconds', 12))
-                wait_ready(ready_file)
-                break
-            except Exception:
-                collect_failure(udid, device_diagnostics / f'launch-attempt-{attempt}', ready_file)
-                if attempt == 2:
-                    raise
-                progress(f'{group}: retrying app launch once')
-                command('terminate', udid, release['bundleIdentifier'], timeout=20, check=False)
-                if ready_file.exists():
-                    ready_file.unlink()
-                time.sleep(3)
         for screen in screens:
             screen_id = screen['id']
             stage = f'screen-{screen_id}'
@@ -169,16 +158,43 @@ for device in devices:
             destination = output / screen['file']
             if destination.exists():
                 raise ValueError('Screenshot destination already exists')
-            previous_revision = read_ready(ready_file).get('revision')
+            # A fresh app process avoids native view/StatusBar recycling between
+            # fixture scenes. The same installed app and private local DB remain.
+            command('terminate', udid, release['bundleIdentifier'], timeout=20, check=False)
+            if ready_file.exists():
+                ready_file.unlink()
             # Only the simulator-only fixture reads this local control file.
             # Atomic replacement avoids partial JSON and system URL prompts.
             nonce = uuid.uuid4().hex
             control_file = ready_file.parent / 'capture-command.json'
+            control_file.parent.mkdir(parents=True, exist_ok=True)
             temporary_control = ready_file.parent / f'capture-command-{nonce}.tmp'
             temporary_control.write_text(json.dumps({'screen': screen_id, 'nonce': nonce}))
             temporary_control.replace(control_file)
-            wait_ready(ready_file, screen_id, previous_revision, nonce=nonce)
+            for attempt in (1, 2):
+                progress(f'{group}: launching {screen_id} (attempt {attempt})')
+                try:
+                    command('launch', f'--stdout={device_diagnostics / (screen_id + "-stdout-" + str(attempt) + ".log")}',
+                            f'--stderr={device_diagnostics / (screen_id + "-stderr-" + str(attempt) + ".log")}',
+                            udid, release['bundleIdentifier'], timeout=45)
+                    settle(capture.get('initialSettleSeconds', 12))
+                    wait_ready(ready_file, screen_id, nonce=nonce)
+                    break
+                except Exception:
+                    collect_failure(udid, device_diagnostics / f'{screen_id}-launch-attempt-{attempt}', ready_file)
+                    if attempt == 2:
+                        raise
+                    progress(f'{group}: retrying scene launch once')
+                    command('terminate', udid, release['bundleIdentifier'], timeout=20, check=False)
+                    if ready_file.exists():
+                        ready_file.unlink()
+                    time.sleep(3)
             settle(screen.get('settleSeconds', 8))
+            # Reapply the real simulator status override after each cold launch.
+            command('status_bar', udid, 'override', '--time', '9:41', '--dataNetwork', 'wifi',
+                    '--wifiMode', 'active', '--wifiBars', '3', '--batteryState', 'charged',
+                    '--batteryLevel', '100', timeout=30)
+            time.sleep(1)
             command('io', udid, 'screenshot', '--type=png', str(destination), timeout=30)
             raw = destination.read_bytes()
             if len(raw) < 24 or raw[:8] != b'\x89PNG\r\n\x1a\n':

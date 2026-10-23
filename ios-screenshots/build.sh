@@ -68,7 +68,8 @@ if [ "$HP_IOS_FULL_REBUILD" = false ]; then
   node - <<'NODE' >> "$BUILD_WORK/build.log" 2>&1
 const fs=require('node:fs'), path=require('node:path'), crypto=require('node:crypto');
 const mutable=new Set(['capture.json','CaptureApp.tsx','CaptureFixtures.ts','CaptureProductionApp.tsx',
-  'src/captureState.ts','src/CaptureIncidentEditor.tsx','src/CaptureDossierEditor.tsx']);
+  'src/captureState.ts','src/CaptureIncidentEditor.tsx','src/CaptureDossierEditor.tsx',
+  'src/CaptureServerGate.tsx','src/CaptureLoginStorage.ts']);
 const files=[];
 function walk(dir='') {
   for (const name of fs.readdirSync(dir || '.')) {

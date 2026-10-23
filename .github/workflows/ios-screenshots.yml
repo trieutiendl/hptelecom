@@ -48,12 +48,25 @@ jobs:
           HP_IOS_FULL_REBUILD: ${{ inputs.full_rebuild && 'true' || 'false' }}
         run: bash ios-screenshots/build.sh
       - name: Preserve encrypted screenshots and diagnostics
+        id: encrypted_upload
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: hp-ios-review-screenshots-${{ github.run_id }}
           path: ${{ runner.temp }}/hp-ios-screenshot-artifacts/screenshot-results.zip.enc
           if-no-files-found: warn
+          retention-days: 1
+          compression-level: 0
+      - name: Retry preserving encrypted screenshots and diagnostics
+        if: always() && steps.encrypted_upload.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          # A distinct name also handles a lost response after artifact creation.
+          # Never overwrite or delete any result from the first attempt.
+          name: hp-ios-review-screenshots-${{ github.run_id }}-retry
+          path: ${{ runner.temp }}/hp-ios-screenshot-artifacts/screenshot-results.zip.enc
+          if-no-files-found: error
           retention-days: 1
           compression-level: 0
       - name: Remove simulator and plaintext build files
