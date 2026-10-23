@@ -2,6 +2,11 @@ name: HP Telecom iOS review screenshots
 
 on:
   workflow_dispatch:
+    inputs:
+      full_rebuild:
+        description: Recompile native code instead of reusing the pinned simulator app
+        type: boolean
+        default: false
   push:
     branches: [screenshot-ios-418-47]
     paths:
@@ -10,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: hp-ios-review-screenshots-47
@@ -38,6 +44,8 @@ jobs:
       - name: Build unsigned iPhone simulator app and capture screenshots
         env:
           HP_IOS_BUILD_KEY: ${{ secrets.HP_IOS_SCREENSHOT_KEY_47 }}
+          GITHUB_TOKEN: ${{ github.token }}
+          HP_IOS_FULL_REBUILD: ${{ inputs.full_rebuild && 'true' || 'false' }}
         run: bash ios-screenshots/build.sh
       - name: Preserve encrypted screenshots and diagnostics
         if: always()
