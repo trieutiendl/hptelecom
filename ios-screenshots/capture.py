@@ -8,6 +8,7 @@ import struct
 import subprocess
 import time
 import traceback
+import uuid
 from pathlib import Path
 
 work = Path(os.environ['BUILD_WORK'])
@@ -18,9 +19,6 @@ diagnostics.mkdir(parents=True, exist_ok=True)
 release = json.loads((helpers / 'release.json').read_text())
 capture = json.loads((work / 'app' / 'capture.json').read_text())
 devices = json.loads((results / 'simulators.json').read_text())['devices']
-scheme = capture['scheme']
-if not re.fullmatch(r'[a-z][a-z0-9+-]*', scheme):
-    raise ValueError('Invalid capture URL scheme')
 screens = capture['screens']
 if not 3 <= len(screens) <= 10:
     raise ValueError('Expected 3 to 10 screenshots')
@@ -74,13 +72,14 @@ def read_ready(path):
         return {}
 
 
-def wait_ready(path, screen_id=None, previous_revision=None, timeout=45):
+def wait_ready(path, screen_id=None, previous_revision=None, timeout=45, nonce=None):
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         ready = read_ready(path)
         if (ready.get('version') == release['version'] and
                 str(ready.get('build')) == str(release['build']) and
                 ready.get('screen') in {s['id'] for s in screens} and
+                (nonce is None or ready.get('nonce') == nonce) and
                 (screen_id is None or (ready.get('screen') == screen_id and
                                       ready.get('revision') != previous_revision))):
             return ready
@@ -171,8 +170,14 @@ for device in devices:
             if destination.exists():
                 raise ValueError('Screenshot destination already exists')
             previous_revision = read_ready(ready_file).get('revision')
-            command('openurl', udid, f'{scheme}://screen/{screen_id}', timeout=30)
-            wait_ready(ready_file, screen_id, previous_revision)
+            # Only the simulator-only fixture reads this local control file.
+            # Atomic replacement avoids partial JSON and system URL prompts.
+            nonce = uuid.uuid4().hex
+            control_file = ready_file.parent / 'capture-command.json'
+            temporary_control = ready_file.parent / f'capture-command-{nonce}.tmp'
+            temporary_control.write_text(json.dumps({'screen': screen_id, 'nonce': nonce}))
+            temporary_control.replace(control_file)
+            wait_ready(ready_file, screen_id, previous_revision, nonce=nonce)
             settle(screen.get('settleSeconds', 8))
             command('io', udid, 'screenshot', '--type=png', str(destination), timeout=30)
             raw = destination.read_bytes()
