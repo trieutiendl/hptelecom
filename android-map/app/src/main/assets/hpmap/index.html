@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#092e3a">
+  <title>HP Map</title>
+  <link rel="stylesheet" href="../vendor/leaflet.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <img src="logo.svg" alt="HP Hà Phong Telecom" class="logo">
+      <div class="brand"><strong>HP Map</strong><small id="connection">Bản đồ tuyến cáp</small></div>
+      <button id="refresh" class="icon-button" title="Cập nhật dữ liệu" aria-label="Cập nhật dữ liệu"></button>
+      <button id="account" class="icon-button" title="Tài khoản" aria-label="Tài khoản"></button>
+    </header>
+    <main class="workspace">
+      <div id="map" aria-label="Bản đồ tương tác"></div>
+      <div id="caption" class="map-caption"><span class="dot"></span><strong>HP Map</strong><small>Chọn tuyến hoặc tạo bản đồ</small></div>
+      <div class="map-tools">
+        <button id="fit" title="Xem toàn bộ tuyến đã chọn" aria-label="Xem toàn bộ tuyến đã chọn"></button>
+        <button id="locate" title="Vị trí của tôi" aria-label="Vị trí của tôi"></button>
+        <button id="edit" title="Chỉnh tuyến" aria-label="Chỉnh tuyến"></button>
+        <button id="layers" title="Lớp bản đồ" aria-label="Lớp bản đồ"></button>
+      </div>
+      <div id="creation-tools" class="creation-tools" aria-label="Công cụ bản đồ" hidden>
+        <button id="add-point" title="Thêm điểm" aria-label="Thêm điểm"></button>
+        <button id="add-line" title="Vẽ đường" aria-label="Vẽ đường"></button>
+        <button id="open-folders" title="Thư mục" aria-label="Thư mục"></button>
+      </div>
+      <div id="drawing-bar" class="drawing-bar" hidden>
+        <span id="drawing-help">Chạm bản đồ để thêm điểm</span>
+        <button id="undo-drawing" class="icon-button" aria-label="Bỏ điểm cuối"></button>
+        <button id="cancel-drawing" class="icon-button" aria-label="Hủy"></button>
+        <button id="finish-drawing" class="primary" hidden>Lưu</button>
+      </div>
+      <div id="selection-bar" class="selection-bar" hidden aria-label="Đối tượng đã chọn">
+        <div class="selection-summary"><button id="selection-list" class="text-button"><strong id="selection-count">0 đã chọn</strong></button><button id="selection-cancel" class="text-button">Hủy chọn</button></div>
+        <div class="selection-actions"><button id="selection-copy" class="secondary">Sao chép</button><button id="selection-move" class="primary">Di chuyển</button><button id="selection-delete" class="secondary danger">Xóa</button></div>
+      </div>
+      <section id="sheet" class="sheet" aria-label="Danh sách tuyến">
+        <button id="sheet-handle" class="handle" aria-label="Thu gọn danh sách"><span></span></button>
+        <div class="sheet-heading"><h1 id="sheet-title">Tuyến cáp</h1><span id="route-count" class="muted"></span><button id="close-sheet" class="icon-button" aria-label="Thu gọn danh sách"></button></div>
+        <div class="tabs"><button id="routes-tab" aria-selected="true">Tuyến server</button><button id="shared-tab" aria-selected="false">Quản trị</button><button id="folders-tab" aria-selected="false">Trên máy</button></div>
+        <div id="routes-panel">
+          <p id="server-warning" class="sync-warning" hidden></p>
+          <label class="search"><span id="search-icon"></span><input id="search" type="search" placeholder="Tìm tên tuyến…" aria-label="Tìm tên tuyến"></label>
+          <div class="filters">
+            <label>Loại kết nối<select id="type-filter"><option value="">Tất cả</option></select></label>
+            <label>Dung lượng cáp<select id="capacity-filter"><option value="">Tất cả</option></select></label>
+          </div>
+          <div class="select-row"><label><input id="select-all" type="checkbox">Chọn tất cả</label><span id="selected-count"></span></div>
+          <div id="route-list"></div>
+          <div id="route-empty" class="empty"></div>
+        </div>
+        <div id="folders-panel" hidden>
+          <div class="folder-toolbar"><span class="muted">Lưu trên thiết bị này</span><button id="new-folder" class="small-button">＋ Tạo thư mục</button></div>
+          <button id="select-local-features" class="secondary wide-button" hidden>Chọn điểm / đường</button>
+          <div id="folder-list"></div>
+        </div>
+        <div id="shared-panel" hidden>
+          <div class="select-row"><label><input id="shared-select-all" type="checkbox">Chọn tất cả</label><span id="shared-selected-count"></span></div>
+          <div id="shared-list"></div>
+          <div id="shared-empty" class="empty">Chưa có bản đồ quản trị được chia sẻ.</div>
+        </div>
+      </section>
+      <div id="toast" role="status" aria-live="polite" hidden></div>
+    </main>
+    <nav class="nav" aria-label="Điều hướng bản đồ">
+      <button id="nav-map"><span></span>Bản đồ</button>
+      <button id="nav-routes" aria-current="page"><span></span>Tuyến</button>
+      <button id="nav-import"><span></span>Nhập KMZ</button>
+      <button id="nav-export"><span></span>Xuất KMZ</button>
+    </nav>
+  </div>
+  <div id="modal-backdrop" class="modal-backdrop" hidden>
+    <section id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="sheet-heading"><h2 id="modal-title"></h2><button id="close-modal" class="icon-button" aria-label="Đóng"></button></div>
+      <div id="modal-body"></div>
+    </section>
+  </div>
+  <section id="login" class="login-screen" hidden aria-label="Đăng nhập HP Telecom">
+    <div class="login-top"><button id="close-login" class="icon-button" aria-label="Quay lại bản đồ"></button><strong>HP Map</strong></div>
+    <div class="login-brand"><img src="logo.svg" alt="HP Hà Phong Telecom"><strong>HP Telecom</strong><span>Bản đồ tuyến cáp</span></div>
+    <form id="login-form">
+      <label>Tài khoản<input id="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Nhập tên đăng nhập" required></label>
+      <label>Mật khẩu<div class="password-wrap"><input id="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required><button id="show-password" type="button">Hiện</button></div></label>
+      <p id="login-error" class="form-error" role="alert" hidden></p>
+      <button id="login-submit" type="submit" class="primary">Đăng nhập</button>
+      <button id="server-login" type="button" class="secondary">Đăng nhập qua HP Telecom Server ↗</button>
+      <button id="continue-local" type="button" class="text-button" hidden>Quay lại bản đồ</button>
+      <small>Tài khoản HP Telecom của bạn. Đăng nhập để xem tuyến được cấp quyền.</small>
+    </form>
+  </section>
+  <script src="../vendor/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
