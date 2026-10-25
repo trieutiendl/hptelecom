@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f3f7f8" />
+    <title>Thư viện ảnh | HP Telecom</title>
+    <meta name="description" content="Lưu trữ, tìm kiếm và xem lại ảnh chụp hiện trường HP Telecom." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root { color-scheme: light; --ink:#102a3e; --muted:#536b77; --teal:#006d77; --line:#dce6ea; --canvas:#f1f5f6; --surface:#fff; --focus:rgba(0,109,119,.3); }
+      * { box-sizing:border-box; }
+      body { min-width:320px; min-height:100vh; margin:0; background:var(--canvas); color:var(--ink); font-family:"Manrope","Segoe UI",sans-serif; }
+      a { color:inherit; text-decoration:none; }
+      button,input,select { font:inherit; }
+      button,select { cursor:pointer; }
+      .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+      .skip-link { position:absolute; top:8px; left:8px; z-index:20; padding:10px 14px; transform:translateY(-150%); background:var(--teal); color:#fff; font-weight:700; }
+      .skip-link:focus { transform:none; }
+      .sidebar { position:fixed; inset:0 auto 0 0; z-index:5; display:flex; width:238px; flex-direction:column; padding:22px 14px; border-right:1px solid #1c4052; background:var(--ink); }
+      .brand-header { display:flex; align-items:flex-start; justify-content:space-between; gap:6px; }
+      .brand { display:block; padding:2px 8px 26px; line-height:0; }
+      .brand-logo { display:block; width:194px; max-width:100%; height:auto; }
+      .sidebar-toggle { display:grid; width:30px; height:30px; flex:0 0 30px; place-items:center; margin-top:1px; border:1px solid #365666; border-radius:7px; background:#183b51; color:#d2dfe5; font-size:19px; line-height:1; }
+      .sidebar-toggle:hover { border-color:#6e929e; background:#20495c; color:#fff; }
+      .sidebar-toggle-icon { transform:translateX(-1px); transition:transform .16s ease; }
+      .sidebar-toggle[aria-pressed="true"] .sidebar-toggle-icon { transform:rotate(180deg) translateX(-1px); }
+      .nav-label { margin:0 10px 8px; color:#9bb0bd; font-size:10px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+      .nav { display:grid; gap:12px; }
+      .nav-group { position:relative; display:grid; gap:3px; }
+      .nav-group-trigger,.nav-link,.nav-child-link,.nav-child-disabled { display:flex; min-height:42px; align-items:center; gap:10px; padding:0 9px; border:1px solid transparent; border-radius:8px; color:#d2dfe5; font-size:11px; font-weight:700; transition:background-color .16s ease,border-color .16s ease,color .16s ease; }
+      .nav-group-trigger { width:100%; justify-content:flex-start; background:transparent; text-align:left; }
+      .nav-group-trigger:hover,.nav-group-trigger[aria-expanded="true"],.nav-link:hover,.nav-child-link:hover { border-color:#335766; background:#183b51; color:#fff; }
+      .nav-link[aria-current="page"],.nav-child-link[aria-current="page"] { border-color:#23616a; background:#164653; color:#8ce4e4; }
+      .nav-group-trigger .nav-icon { background:transparent; }
+      .nav-group-chevron { display:grid; width:16px; height:16px; flex:0 0 16px; place-items:center; margin-left:auto; color:#9bb0bd; }
+      .nav-group-chevron::before { width:5px; height:5px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; content:""; transform:translateY(-1px) rotate(45deg); transition:transform .16s ease; }
+      .nav-group-trigger[aria-expanded="true"] .nav-group-chevron::before { transform:translateY(1px) rotate(225deg); }
+      .nav-icon { display:grid; width:27px; height:27px; flex:0 0 27px; place-items:center; border:1px solid #365666; border-radius:7px; background:#183b51; color:#bed1d7; }
+      .nav-icon svg { display:block; width:15px; height:15px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.7; }
+      .nav-link[aria-current="page"] .nav-icon,.nav-child-link[aria-current="page"] .nav-icon { border-color:#28747e; background:#0d5660; color:#a3ebed; }
+      .nav-children { display:grid; gap:3px; margin-left:12px; padding-left:9px; border-left:1px solid #315260; }
+      .nav-children[hidden] { display:none; }
+      .nav-standalone { display:grid; gap:3px; margin-top:5px; padding-top:9px; border-top:1px solid #244559; }
+      .nav-child-link { min-height:36px; color:#bacbd2; font-size:10px; }
+      .nav-child-disabled { min-height:36px; justify-content:space-between; color:#8299a3; font-size:10px; cursor:not-allowed; }
+      .nav-coming-soon { padding:3px 5px; border:1px solid #395663; border-radius:4px; color:#a9bdc4; font-size:8px; font-weight:700; white-space:nowrap; }
+      .sidebar-bottom { margin-top:auto; padding:14px 10px 4px; border-top:1px solid #244559; }
+      .connection-state { display:flex; align-items:center; gap:8px; color:#c6d4dc; font-size:10px; }
+      .connection-state::before { width:7px; height:7px; border-radius:50%; background:#d49a31; content:""; }
+      .version { margin:8px 0 0; color:#9bb0bd; font-size:10px; }
+      .main-column { min-height:100vh; margin-left:238px; }
+      .sidebar.is-collapsed { width:76px; align-items:center; padding:18px 8px; }
+      .sidebar.is-collapsed + .main-column { margin-left:76px; }
+      .sidebar.is-collapsed .brand-header { width:100%; flex-direction:column; align-items:center; }
+      .sidebar.is-collapsed .brand { width:52px; height:56px; overflow:hidden; padding:0; }
+      .sidebar.is-collapsed .brand-logo { width:303px; max-width:none; height:64px; }
+      .sidebar.is-collapsed .sidebar-toggle { transform:rotate(180deg); }
+      .sidebar.is-collapsed .nav-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; }
+      .sidebar.is-collapsed .nav { width:100%; gap:9px; }
+      .sidebar.is-collapsed .nav-group { gap:4px; }
+      .sidebar.is-collapsed .nav-group-trigger,.sidebar.is-collapsed .nav-link,.sidebar.is-collapsed .nav-child-link,.sidebar.is-collapsed .nav-child-disabled { min-height:43px; justify-content:center; gap:0; padding:0; font-size:0; }
+      .sidebar.is-collapsed .nav-group-trigger > span:not(.nav-icon),.sidebar.is-collapsed .nav-group-chevron { display:none; }
+      .sidebar.is-collapsed .nav-group-trigger .nav-icon { background:#183b51; }
+      .sidebar.is-collapsed .nav-icon { width:29px; height:29px; flex-basis:29px; }
+      .sidebar.is-collapsed .nav-group.is-open .nav-children { position:absolute; top:0; left:calc(100% + 8px); z-index:8; width:204px; margin:0; padding:10px; border:1px solid #365666; border-radius:9px; background:var(--ink); box-shadow:0 10px 25px rgba(0,0,0,.2); }
+      .sidebar.is-collapsed .nav-children::before { padding:3px 8px 8px; color:#9bb0bd; content:attr(data-label); font-size:9px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+      .sidebar.is-collapsed .nav-group.is-open .nav-child-link,.sidebar.is-collapsed .nav-group.is-open .nav-child-disabled { min-height:38px; justify-content:flex-start; gap:9px; padding:0 8px; font-size:10px; }
+      .sidebar.is-collapsed .nav-group.is-open .nav-icon { width:25px; height:25px; flex-basis:25px; }
+      .sidebar.is-collapsed .nav-group.is-open .nav-coming-soon { display:inline-flex; }
+      .sidebar.is-collapsed .nav-coming-soon { display:none; }
+      .sidebar.is-collapsed .nav-standalone { margin-top:5px; padding-top:8px; }
+      .sidebar.is-collapsed .sidebar-bottom { width:100%; padding:12px 0 3px; }
+      .sidebar.is-collapsed .connection-state { justify-content:center; font-size:0; }
+      .sidebar.is-collapsed .version { display:none; }
+      .topbar { position:sticky; top:0; z-index:4; display:flex; min-height:64px; align-items:center; justify-content:space-between; gap:20px; padding:0 clamp(22px,3vw,44px); border-bottom:1px solid var(--line); background:#fff; box-shadow:0 3px 14px rgba(0,0,0,.055); }
+      .topbar-title { color:#58687d; font-size:12px; }
+      .admin { display:flex; align-items:center; gap:9px; padding-left:16px; border-left:1px solid var(--line); }
+      .avatar { display:grid; width:34px; height:34px; place-items:center; border-radius:50%; background:#e3f4f4; color:var(--teal); font-size:10px; font-weight:800; }
+      .admin-name,.admin-role { display:block; }
+      .admin-name { font-size:11px; font-weight:800; }
+      .admin-role { margin-top:2px; color:var(--muted); font-size:10px; }
+      .page-shell { width:min(1540px,100%); margin:0 auto; padding:40px clamp(24px,3.4vw,52px) 58px; }
+      .page-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; margin-bottom:22px; }
+      .breadcrumb { margin:0 0 9px; color:var(--muted); font-size:11px; }
+      h1 { margin:0; font-size:clamp(28px,2.4vw,36px); letter-spacing:-.05em; }
+      .subtitle { max-width:62ch; margin:7px 0 0; color:var(--muted); font-size:13px; line-height:1.65; }
+      .heading-actions { display:flex; align-items:center; gap:9px; }
+      .demo-badge { display:inline-flex; min-height:28px; align-items:center; gap:7px; padding:0 10px; border:1px solid #ecd9ad; border-radius:999px; background:#fffaf0; color:#795619; font-size:10px; font-weight:700; white-space:nowrap; }
+      .demo-badge::before { width:6px; height:6px; border-radius:50%; background:#d49a31; content:""; }
+      .upload-button { display:inline-flex; min-height:40px; align-items:center; justify-content:center; gap:8px; padding:0 14px; border:1px solid var(--teal); border-radius:7px; background:var(--teal); color:#fff; font-size:11px; font-weight:800; transition:background-color .16s ease,transform .16s ease; }
+      .upload-button:hover { transform:translateY(-1px); background:#005861; }
+      .sr-only:focus-visible + .upload-button { outline:3px solid var(--focus); outline-offset:2px; }
+      .upload-button span { font-size:16px; line-height:1; }
+      .notice { display:flex; align-items:flex-start; gap:10px; margin-bottom:20px; padding:11px 14px; border:1px solid #cbe2e1; border-radius:9px; background:#eaf5f4; color:#244e56; font-size:10px; line-height:1.6; }
+      .notice-symbol { display:grid; width:19px; height:19px; flex:0 0 auto; place-items:center; border:1px solid #9bc7c5; border-radius:50%; color:var(--teal); font-size:11px; font-weight:800; }
+      .library-layout { display:grid; grid-template-columns:218px minmax(0,1fr); align-items:start; gap:18px; }
+      .album-panel,.gallery-panel { border:1px solid var(--line); border-radius:11px; background:var(--surface); box-shadow:0 8px 24px rgba(0,0,0,.035); }
+      .album-panel { padding:15px 10px 12px; }
+      .panel-heading { margin:0 9px 10px; color:#455d6c; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+      .album-list { display:grid; gap:3px; }
+      .album-button { display:flex; min-height:39px; align-items:center; justify-content:space-between; gap:8px; padding:0 10px; border:1px solid transparent; border-radius:7px; background:transparent; color:#455d6c; text-align:left; font-size:11px; font-weight:700; }
+      .album-button:hover { background:#f4f8f9; }
+      .album-button[aria-pressed="true"] { border-color:#cbe2e1; background:#eaf5f4; color:#005861; }
+      .album-count { color:#72838e; font-size:10px; font-weight:700; }
+      .album-button[aria-pressed="true"] .album-count { color:var(--teal); }
+      .album-divider { height:1px; margin:12px 9px; background:var(--line); }
+      .storage-note { margin:14px 9px 2px; color:#6d7f89; font-size:10px; line-height:1.6; }
+      .gallery-panel { min-width:0; overflow:hidden; }
+      .gallery-toolbar { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:16px 18px; }
+      .gallery-title { min-width:0; }
+      .gallery-title h2 { margin:0; font-size:14px; font-weight:800; letter-spacing:-.02em; }
+      .gallery-title p { margin:4px 0 0; color:var(--muted); font-size:10px; }
+      .toolbar-controls { display:flex; align-items:center; gap:8px; }
+      .search-wrap { position:relative; }
+      .search-icon { position:absolute; top:50%; left:11px; color:#536b77; font-size:14px; transform:translateY(-50%); pointer-events:none; }
+      .search,.sort-select { height:38px; border:1px solid #cbd9de; border-radius:7px; background:#fff; color:var(--ink); font-size:10px; }
+      .search { width:min(240px,22vw); padding:0 11px 0 32px; }
+      .search::placeholder { color:#667985; opacity:1; }
+      .sort-select { min-width:126px; padding:0 24px 0 9px; }
+      .album-tabs { display:flex; gap:3px; padding:0 18px; border-bottom:1px solid var(--line); overflow-x:auto; }
+      .album-tab { min-height:42px; flex:0 0 auto; padding:0 11px; border:0; border-bottom:3px solid transparent; background:transparent; color:var(--muted); font-size:10px; font-weight:800; }
+      .album-tab:hover { color:var(--teal); }
+      .album-tab[aria-pressed="true"] { border-bottom-color:var(--teal); color:var(--teal); }
+      .album-tab-count { margin-left:3px; color:#71818d; font-size:9px; }
+      .photo-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; padding:16px; }
+      .photo-card { min-width:0; overflow:hidden; border:1px solid #e1e8eb; border-radius:8px; background:#fff; transition:border-color .16s ease,transform .16s ease; }
+      .photo-card:hover { transform:translateY(-2px); border-color:#9bc7ca; }
+      .photo-open { display:block; width:100%; padding:0; border:0; background:#dce8e9; text-align:left; }
+      .photo-image { display:block; width:100%; aspect-ratio:1.42; object-fit:cover; background:#dce8e9; }
+      .photo-card-info { padding:10px 11px 11px; }
+      .photo-caption { display:block; overflow:hidden; color:var(--ink); font-size:10px; font-weight:800; text-overflow:ellipsis; white-space:nowrap; }
+      .photo-meta { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:5px; color:var(--muted); font-size:9px; }
+      .photo-album { display:inline-flex; align-items:center; gap:5px; color:#42616b; }
+      .photo-album::before { width:6px; height:6px; border-radius:50%; background:#13836f; content:""; }
+      .photo-date { flex:0 0 auto; font-variant-numeric:tabular-nums; }
+      .empty-state { padding:46px 18px; color:var(--muted); text-align:center; }
+      .empty-state strong { display:block; color:var(--ink); font-size:12px; }
+      .empty-state span { display:block; margin-top:5px; font-size:10px; }
+      .empty-state[hidden] { display:none; }
+      .gallery-footer { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; padding:0 16px; border-top:1px solid var(--line); color:var(--muted); font-size:9px; }
+      dialog { width:min(900px,calc(100% - 30px)); max-height:min(88vh,820px); padding:0; overflow:auto; border:1px solid var(--line); border-radius:12px; background:#fff; color:var(--ink); box-shadow:0 18px 52px rgba(0,0,0,.22); }
+      dialog::backdrop { background:rgba(14,26,43,.72); }
+      .dialog-header { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; padding:16px 20px; border-bottom:1px solid var(--line); }
+      .dialog-header h2 { margin:0; font-size:14px; letter-spacing:-.02em; }
+      .dialog-header p { margin:4px 0 0; color:var(--muted); font-size:10px; }
+      .dialog-close { display:grid; width:32px; height:32px; flex:0 0 auto; place-items:center; border:1px solid var(--line); border-radius:6px; background:#fff; color:#536b77; font-size:17px; }
+      .preview-layout { display:grid; grid-template-columns:minmax(0,1fr) 220px; gap:0; }
+      .preview-stage { display:grid; min-height:360px; place-items:center; padding:18px; background:#132b38; }
+      .preview-image { display:block; max-width:100%; max-height:64vh; object-fit:contain; }
+      .preview-details { padding:19px 17px; }
+      .preview-details h3 { margin:0; font-size:13px; line-height:1.5; }
+      .preview-description { margin:6px 0 16px; color:var(--muted); font-size:10px; line-height:1.6; }
+      .detail-list { display:grid; gap:11px; margin:0; }
+      .detail-list div { display:grid; gap:3px; }
+      .detail-list dt { color:var(--muted); font-size:9px; }
+      .detail-list dd { margin:0; color:var(--ink); font-size:10px; font-weight:700; }
+      .download-button { display:flex; min-height:36px; align-items:center; justify-content:center; margin-top:18px; padding:0 11px; border:1px solid #d5e2e6; border-radius:6px; background:#fff; color:#315c63; font-size:10px; font-weight:800; }
+      .download-button:hover { border-color:#9bc7ca; background:#eef8f8; }
+      .toast { position:fixed; right:22px; bottom:22px; z-index:10; max-width:calc(100% - 44px); padding:11px 15px; border-radius:7px; background:#183752; color:#fff; font-size:11px; box-shadow:0 8px 22px rgba(0,0,0,.18); }
+      .toast[hidden] { display:none; }
+      :focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+      @media (max-width:1120px) {
+        .library-layout { grid-template-columns:190px minmax(0,1fr); gap:14px; }
+        .gallery-toolbar { align-items:flex-start; flex-direction:column; }
+        .toolbar-controls { width:100%; }
+        .search-wrap { flex:1; }
+        .search { width:100%; }
+      }
+      @media (max-width:850px) {
+        .sidebar { position:relative; width:auto; padding:10px 14px 12px; border-right:0; border-bottom:1px solid #244559; }
+        .brand-header { align-items:center; }
+        .brand { padding:0 4px 10px; }
+        .brand-logo { width:166px; }
+        .sidebar-toggle { display:none; }
+        .sidebar.is-collapsed { width:auto; align-items:stretch; padding:10px 14px 12px; }
+        .sidebar.is-collapsed .brand-header { width:auto; flex-direction:row; align-items:center; }
+        .sidebar.is-collapsed .brand { width:auto; height:auto; overflow:visible; padding:0 4px 10px; }
+        .sidebar.is-collapsed .brand-logo { width:166px; max-width:100%; height:auto; }
+        .sidebar.is-collapsed .nav-label,.sidebar.is-collapsed .nav-group-title { position:static; width:auto; height:auto; overflow:visible; clip:auto; white-space:normal; }
+        .sidebar.is-collapsed .nav { width:auto; gap:5px 8px; }
+        .sidebar.is-collapsed .nav-group-trigger,.sidebar.is-collapsed .nav-link,.sidebar.is-collapsed .nav-child-link,.sidebar.is-collapsed .nav-child-disabled { min-height:42px; justify-content:flex-start; gap:10px; padding:0 8px; font-size:10px; }
+        .sidebar.is-collapsed .nav-group-trigger > span:not(.nav-icon),.sidebar.is-collapsed .nav-group-chevron { display:grid; }
+        .sidebar.is-collapsed .nav-group.is-open .nav-child-link,.sidebar.is-collapsed .nav-group.is-open .nav-child-disabled { min-height:40px; justify-content:flex-start; gap:8px; padding:0 8px; font-size:10px; }
+        .sidebar.is-collapsed .nav-icon { width:25px; height:25px; flex-basis:25px; }
+        .sidebar.is-collapsed .nav-coming-soon { display:inline-flex; }
+        .sidebar.is-collapsed .sidebar-bottom { display:none; }
+        .sidebar.is-collapsed + .main-column { margin-left:0; }
+        .sidebar-menu { display:block; margin:0; padding:0; }
+        .nav-label { margin:0 3px 6px; }
+        .nav { grid-template-columns:repeat(2,minmax(0,1fr)); gap:5px 8px; }
+        .nav-group { display:grid; grid-column:1/-1; gap:3px; }
+        .nav-group-trigger { min-height:40px; padding:0 8px; font-size:11px; }
+        .nav-children { grid-template-columns:repeat(2,minmax(0,1fr)); margin-left:0; padding:2px 0 0; border:0; }
+        .nav-link,.nav-child-link,.nav-child-disabled { min-height:42px; padding:0 8px; font-size:10px; }
+        .nav-icon { width:25px; height:25px; flex-basis:25px; }
+        .nav-icon svg { width:14px; height:14px; }
+        .nav-child-link::before,.nav-child-disabled::before { display:none; }
+        .nav-coming-soon { margin-left:auto; }
+        .nav-standalone { display:contents; }
+        .nav-standalone::before { grid-column:1/-1; margin:9px 3px 2px; color:#9bb0bd; content:"QUẢN TRỊ"; font-size:9px; font-weight:800; letter-spacing:.1em; }
+        .sidebar-bottom { display:none; }
+        .main-column { margin-left:0; }
+        .topbar { min-height:52px; padding:0 16px; }
+        .admin { padding-left:0; border-left:0; }
+        .admin>span:last-child { display:none; }
+        .page-shell { padding:27px 18px 42px; }
+        .library-layout { grid-template-columns:1fr; }
+        .album-panel { padding:12px; }
+        .panel-heading { margin-bottom:8px; }
+        .album-list { display:flex; gap:5px; overflow-x:auto; }
+        .album-button { min-height:34px; flex:0 0 auto; gap:7px; border-color:#e3eaed; padding:0 9px; font-size:10px; }
+        .album-divider,.storage-note { display:none; }
+      }
+      @media (max-width:620px) {
+        .page-shell { padding:23px 12px 34px; }
+        .page-heading { align-items:flex-start; flex-direction:column; gap:12px; margin-bottom:17px; }
+        h1 { font-size:27px; }
+        .subtitle { font-size:12px; }
+        .heading-actions { width:100%; justify-content:space-between; }
+        .notice { font-size:10px; }
+        .gallery-toolbar { padding:13px; }
+        .toolbar-controls { align-items:stretch; flex-direction:column; }
+        .search,.sort-select { width:100%; }
+        .album-tabs { padding-inline:9px; }
+        .album-tab { padding-inline:9px; }
+        .photo-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; padding:10px; }
+        .photo-card-info { padding:8px; }
+        .photo-caption { font-size:9px; }
+        .photo-meta { align-items:flex-start; flex-direction:column; gap:3px; font-size:8px; }
+        .preview-layout { grid-template-columns:1fr; }
+        .preview-stage { min-height:220px; padding:10px; }
+        .preview-image { max-height:52vh; }
+        .preview-details { padding:15px; }
+        .detail-list { grid-template-columns:1fr 1fr; }
+        .download-button { width:100%; }
+      }
+      @media (max-width:370px) { .photo-grid { grid-template-columns:1fr; } .photo-image { aspect-ratio:1.6; } }
+      @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition-duration:.01ms!important; } }
+    </style>
+    <link rel="stylesheet" href="../server-theme.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
+    <aside class="sidebar">
+      <div class="brand-header">
+        <a class="brand" href="../tonghop/" aria-label="HP Telecom, trang tổng quan" title="HP Telecom, trang tổng quan">
+          <svg class="brand-logo" viewBox="0 0 303 64" role="img" aria-label="HP Telecom — Điều hành hiện trường">
+            <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
+              <path d="M30 7a23 23 0 0 0-22 16" /><path d="M7 32a23 23 0 0 0 17 22" /><path d="M34 55a23 23 0 0 0 18-19" /><path d="M54 27A23 23 0 0 0 38 9" />
+            </g>
+            <circle cx="21" cy="7" r="3.2" fill="#00bfd0" /><circle cx="53" cy="47" r="3.2" fill="#00bfd0" />
+            <text x="10" y="39" fill="#fff" font-family="Arial, sans-serif" font-size="25" font-weight="800" letter-spacing="-2">HP</text>
+            <text x="76" y="29" fill="#fff" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="-.7">HP Telecom</text>
+            <text x="76" y="50" fill="#a3ebed" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="2.1">ĐIỀU HÀNH HIỆN TRƯỜNG</text>
+          </svg>
+        </a>
+        <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Thu gọn menu" aria-pressed="false" title="Thu gọn menu">
+          <span class="sidebar-toggle-icon" aria-hidden="true">‹</span>
+        </button>
+      </div>
+      <div class="sidebar-menu" id="sidebar-menu">
+        <p class="nav-label">Không gian quản trị</p>
+        <nav class="nav" aria-label="Điều hướng quản trị">
+          <div class="nav-group">
+            <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="summary-menu" aria-label="Mở thư mục Tổng hợp" title="Tổng hợp" data-nav-toggle>
+              <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span>
+              <span>Tổng hợp</span><span class="nav-group-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="nav-children" id="summary-menu" data-label="Tổng hợp" hidden>
+                <a class="nav-child-link" href="../tonghop/" aria-label="Tổng quan" title="Tổng quan">
+                  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan
+                </a>
+                <a class="nav-child-link" href="../tonghop/suco/" aria-label="Tổng hợp Sự cố" title="Tổng hợp Sự cố">
+                  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố
+                </a>
+                <a class="nav-child-link" href="../tonghop/didoi/" aria-label="Tổng hợp Di dời" title="Tổng hợp Di dời">
+                  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời
+                </a>
+              </div>
+            </div>
+            <div class="nav-group">
+                <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="reports-menu" aria-label="Mở thư mục Báo cáo" title="Báo cáo" data-nav-toggle>
+                  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3.5h9l5 5v12H5z"/><path d="M14 3.5v5h5m-10 4h6m-6 4h6"/></svg></span>
+                  <span>Báo cáo</span><span class="nav-group-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="nav-children" id="reports-menu" data-label="Báo cáo" hidden>
+                <a class="nav-child-link" href="../baocao/suco/" aria-label="Báo cáo Sự cố" title="Báo cáo Sự cố">
+                  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố
+                </a>
+                <a class="nav-child-link" href="../baocao/didoi/" aria-label="Báo cáo Di dời" title="Báo cáo Di dời">
+                  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời
+                </a>
+                <a class="nav-child-link" href="../baocao/tuantuyen/" aria-label="Báo cáo Tuần Tuyến" title="Báo cáo Tuần Tuyến">
+                  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến
+                </a>
+              </div>
+            </div>
+            <div class="nav-standalone">
+              <a class="nav-link" href="./" aria-current="page" aria-label="Thư viện ảnh" title="Thư viện ảnh">
+                <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh
+              </a>
+              <a class="nav-link" href="../nguoidung/" aria-label="Người dùng" title="Người dùng">
+                <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng
+              </a>
+            </div>
+        </nav>
+        <div class="sidebar-bottom"><div class="connection-state">Bản xem trước độc lập</div><p class="version">HP Telecom · Giao diện demo</p></div>
+      </div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <span class="topbar-title">Không gian quản trị · Thư viện ảnh</span>
+        <div class="admin"><span class="avatar" aria-hidden="true">QT</span><span><span class="admin-name">Quản trị viên</span><span class="admin-role">Tài khoản demo</span></span></div>
+      </header>
+      <main class="page-shell" id="main-content">
+        <section class="page-heading" aria-labelledby="page-title">
+          <div>
+            <p class="breadcrumb">Không gian quản trị <span aria-hidden="true">/</span> Thư viện ảnh</p>
+            <h1 id="page-title">Thư viện ảnh</h1>
+            <p class="subtitle">Lưu trữ và tìm lại ảnh chụp hiện trường, thiết bị, công trình theo từng bộ sưu tập.</p>
+          </div>
+          <div class="heading-actions">
+            <span class="demo-badge">Ảnh minh họa</span>
+            <label class="upload-button" for="photo-upload"><span aria-hidden="true">＋</span>Thêm ảnh</label>
+            <input class="sr-only" id="photo-upload" type="file" accept="image/*" multiple />
+          </div>
+        </section>
+
+        <div class="notice" role="note">
+          <span class="notice-symbol" aria-hidden="true">i</span>
+          <span>Ảnh mẫu chỉ để xem giao diện. Ảnh bạn chọn từ máy sẽ xuất hiện tạm trong phiên này, chưa được tải lên hoặc lưu trên máy chủ HP Telecom.</span>
+        </div>
+
+        <div class="library-layout">
+          <aside class="album-panel" aria-label="Bộ sưu tập ảnh">
+            <h2 class="panel-heading">Bộ sưu tập</h2>
+            <div class="album-list" id="album-list">
+              <button class="album-button" type="button" data-album="Tất cả ảnh" aria-pressed="true"><span>Tất cả ảnh</span><span class="album-count" data-album-count="Tất cả ảnh">0</span></button>
+              <button class="album-button" type="button" data-album="Hiện trường" aria-pressed="false"><span>Hiện trường</span><span class="album-count" data-album-count="Hiện trường">0</span></button>
+              <button class="album-button" type="button" data-album="Thiết bị" aria-pressed="false"><span>Thiết bị</span><span class="album-count" data-album-count="Thiết bị">0</span></button>
+              <button class="album-button" type="button" data-album="Công trình" aria-pressed="false"><span>Công trình</span><span class="album-count" data-album-count="Công trình">0</span></button>
+              <button class="album-button" type="button" data-album="Biên bản" aria-pressed="false"><span>Biên bản</span><span class="album-count" data-album-count="Biên bản">0</span></button>
+            </div>
+            <div class="album-divider"></div>
+            <p class="panel-heading">Lưu ý</p>
+            <p class="storage-note">Ảnh hiện trường dễ tìm hơn khi được gom theo loại công việc hoặc địa điểm.</p>
+          </aside>
+
+          <section class="gallery-panel" aria-labelledby="gallery-heading">
+            <div class="gallery-toolbar">
+              <div class="gallery-title">
+                <h2 id="gallery-heading">Tất cả ảnh</h2>
+                <p id="result-count" aria-live="polite">Đang hiển thị ảnh</p>
+              </div>
+              <div class="toolbar-controls">
+                <label class="search-wrap">
+                  <span class="search-icon" aria-hidden="true">⌕</span>
+                  <span class="sr-only">Tìm ảnh</span>
+                  <input class="search" id="search" type="search" placeholder="Tìm ảnh, địa điểm..." autocomplete="off" />
+                </label>
+                <label>
+                  <span class="sr-only">Sắp xếp ảnh</span>
+                  <select class="sort-select" id="sort">
+                    <option value="recent">Mới nhất</option>
+                    <option value="oldest">Cũ nhất</option>
+                    <option value="name">Tên A–Z</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="album-tabs" id="album-tabs" role="group" aria-label="Lọc bộ sưu tập ảnh">
+              <button class="album-tab" type="button" data-album-tab="Tất cả ảnh" aria-pressed="true">Tất cả ảnh <span class="album-tab-count" data-tab-count="Tất cả ảnh">0</span></button>
+              <button class="album-tab" type="button" data-album-tab="Hiện trường" aria-pressed="false">Hiện trường <span class="album-tab-count" data-tab-count="Hiện trường">0</span></button>
+              <button class="album-tab" type="button" data-album-tab="Thiết bị" aria-pressed="false">Thiết bị <span class="album-tab-count" data-tab-count="Thiết bị">0</span></button>
+              <button class="album-tab" type="button" data-album-tab="Công trình" aria-pressed="false">Công trình <span class="album-tab-count" data-tab-count="Công trình">0</span></button>
+              <button class="album-tab" type="button" data-album-tab="Biên bản" aria-pressed="false">Biên bản <span class="album-tab-count" data-tab-count="Biên bản">0</span></button>
+            </div>
+            <div class="photo-grid" id="photo-grid" aria-live="polite"></div>
+            <div class="empty-state" id="empty-state" hidden>
+              <strong>Chưa có ảnh phù hợp</strong>
+              <span>Thử từ khóa khác hoặc chọn bộ sưu tập khác.</span>
+            </div>
+            <footer class="gallery-footer"><span id="footer-count">0 ảnh</span><span>Ảnh mới nhất hiển thị trước</span></footer>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <dialog id="photo-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-header">
+        <div><h2 id="dialog-title">Ảnh hiện trường</h2><p id="dialog-caption"></p></div>
+        <button class="dialog-close" id="close-dialog" type="button" aria-label="Đóng">×</button>
+      </div>
+      <div class="preview-layout">
+        <div class="preview-stage"><img class="preview-image" id="preview-image" src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&amp;fit=crop&amp;w=1400&amp;q=86" alt="Ảnh khảo sát công trình hiện trường" /></div>
+        <aside class="preview-details">
+          <h3 id="preview-title"></h3>
+          <p class="preview-description">Ảnh lưu trong thư viện hiện trường HP Telecom.</p>
+          <dl class="detail-list">
+            <div><dt>Bộ sưu tập</dt><dd id="preview-album"></dd></div>
+            <div><dt>Ngày chụp</dt><dd id="preview-date"></dd></div>
+            <div><dt>Người thêm</dt><dd id="preview-owner"></dd></div>
+            <div><dt>Tên tệp</dt><dd id="preview-filename"></dd></div>
+          </dl>
+          <a class="download-button" id="download-link" href="#" download>Tải ảnh</a>
+        </aside>
+      </div>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script>
+      (() => {
+        const photos = [
+          { id:1, caption:"Khảo sát tuyến cáp khu vực trung tâm", album:"Hiện trường", place:"Quận 1, TP. Hồ Chí Minh", owner:"Nguyễn Minh Anh", date:"2026-10-08", src:"https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=900&q=82", filename:"khao-sat-tuyen-cap-q1.jpg" },
+          { id:2, caption:"Kiểm tra thiết bị tại trạm BTS", album:"Thiết bị", place:"Thủ Đức, TP. Hồ Chí Minh", owner:"Trần Quốc Bảo", date:"2026-10-07", src:"https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=82", filename:"kiem-tra-thiet-bi-bts.jpg" },
+          { id:3, caption:"Thi công hạ tầng cáp quang", album:"Công trình", place:"Dĩ An, Bình Dương", owner:"Lê Hoàng Nam", date:"2026-10-06", src:"https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=900&q=82", filename:"thi-cong-ha-tang-cap-quang.jpg" },
+          { id:4, caption:"Ghi nhận hiện trạng tủ phối quang", album:"Hiện trường", place:"Biên Hòa, Đồng Nai", owner:"Đỗ Thu Hà", date:"2026-10-05", src:"https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=900&q=82", filename:"hien-trang-tu-phoi-quang.jpg" },
+          { id:5, caption:"Đội kỹ thuật bàn giao công việc", album:"Biên bản", place:"Tân Bình, TP. Hồ Chí Minh", owner:"Phạm Gia Huy", date:"2026-10-04", src:"https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=82", filename:"ban-giao-cong-viec.jpg" },
+          { id:6, caption:"Đối chiếu thiết bị trước triển khai", album:"Thiết bị", place:"Thuận An, Bình Dương", owner:"Nguyễn Minh Anh", date:"2026-10-03", src:"https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=900&q=82", filename:"doi-chieu-thiet-bi.jpg" },
+          { id:7, caption:"Hoàn thiện tuyến cáp trên cao", album:"Công trình", place:"Gò Vấp, TP. Hồ Chí Minh", owner:"Trần Quốc Bảo", date:"2026-10-02", src:"https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=900&q=82", filename:"hoan-thien-tuyen-cap.jpg" },
+          { id:8, caption:"Ảnh nghiệm thu vị trí lắp đặt", album:"Biên bản", place:"Long Khánh, Đồng Nai", owner:"Lê Hoàng Nam", date:"2026-10-01", src:"https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=900&q=82", filename:"nghiem-thu-vi-tri-lap-dat.jpg" },
+          { id:9, caption:"Khảo sát tủ mạng tại tòa nhà", album:"Hiện trường", place:"Quận 3, TP. Hồ Chí Minh", owner:"Đỗ Thu Hà", date:"2026-09-29", src:"https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=900&q=82", filename:"khao-sat-tu-mang.jpg" }
+        ];
+        const grid = document.getElementById("photo-grid");
+        const search = document.getElementById("search");
+        const sort = document.getElementById("sort");
+        const emptyState = document.getElementById("empty-state");
+        const dialog = document.getElementById("photo-dialog");
+        const uploadInput = document.getElementById("photo-upload");
+        const toast = document.getElementById("toast");
+        const sidebar = document.querySelector(".sidebar");
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        const compactNavigation = window.matchMedia("(max-width: 850px)");
+        let selectedAlbum = "Tất cả ảnh";
+        let nextId = 10;
+        let toastTimer;
+
+        function formatDate(value) {
+          return new Intl.DateTimeFormat("vi-VN", { day:"2-digit", month:"2-digit", year:"numeric" }).format(new Date(`${value}T00:00:00`));
+        }
+
+        function updateCounts() {
+          document.querySelectorAll("[data-album-count],[data-tab-count]").forEach((element) => {
+            const album = element.dataset.albumCount || element.dataset.tabCount;
+            element.textContent = album === "Tất cả ảnh" ? photos.length : photos.filter((photo) => photo.album === album).length;
+          });
+        }
+
+        function getVisiblePhotos() {
+          const query = search.value.trim().toLocaleLowerCase("vi");
+          return photos.filter((photo) => {
+            const matchesAlbum = selectedAlbum === "Tất cả ảnh" || photo.album === selectedAlbum;
+            const matchesQuery = !query || `${photo.caption} ${photo.place} ${photo.album} ${photo.owner} ${photo.filename}`.toLocaleLowerCase("vi").includes(query);
+            return matchesAlbum && matchesQuery;
+          }).sort((a,b) => {
+            if (sort.value === "name") return a.caption.localeCompare(b.caption,"vi");
+            return sort.value === "oldest" ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date);
+          });
+        }
+
+        function render() {
+          const visible = getVisiblePhotos();
+          grid.replaceChildren();
+          visible.forEach((photo) => {
+            const card = document.createElement("article");
+            card.className = "photo-card";
+            const openButton = document.createElement("button");
+            openButton.className = "photo-open";
+            openButton.type = "button";
+            openButton.dataset.photoId = String(photo.id);
+            openButton.setAttribute("aria-label", `Xem ảnh: ${photo.caption}`);
+            const image = document.createElement("img");
+            image.className = "photo-image";
+            image.src = photo.src;
+            image.alt = photo.caption;
+            image.loading = "lazy";
+            openButton.append(image);
+            const info = document.createElement("div");
+            info.className = "photo-card-info";
+            const caption = document.createElement("span");
+            caption.className = "photo-caption";
+            caption.textContent = photo.caption;
+            const meta = document.createElement("div");
+            meta.className = "photo-meta";
+            const album = document.createElement("span");
+            album.className = "photo-album";
+            album.textContent = photo.album;
+            const date = document.createElement("time");
+            date.className = "photo-date";
+            date.dateTime = photo.date;
+            date.textContent = formatDate(photo.date);
+            meta.append(album,date);
+            info.append(caption,meta);
+            card.append(openButton,info);
+            grid.append(card);
+          });
+          const countText = `${visible.length} ảnh`;
+          document.getElementById("gallery-heading").textContent = selectedAlbum;
+          document.getElementById("result-count").textContent = `Đang hiển thị ${countText}`;
+          document.getElementById("footer-count").textContent = countText;
+          emptyState.hidden = visible.length > 0;
+          grid.hidden = visible.length === 0;
+        }
+
+        function showToast(message) {
+          toast.textContent = message;
+          toast.hidden = false;
+          window.clearTimeout(toastTimer);
+          toastTimer = window.setTimeout(() => { toast.hidden = true; }, 3200);
+        }
+
+        function openPhoto(photo) {
+          const preview = document.getElementById("preview-image");
+          preview.src = photo.src;
+          preview.alt = photo.caption;
+          document.getElementById("dialog-title").textContent = photo.album;
+          document.getElementById("dialog-caption").textContent = photo.place;
+          document.getElementById("preview-title").textContent = photo.caption;
+          document.getElementById("preview-album").textContent = photo.album;
+          document.getElementById("preview-date").textContent = formatDate(photo.date);
+          document.getElementById("preview-owner").textContent = photo.owner;
+          document.getElementById("preview-filename").textContent = photo.filename;
+          const download = document.getElementById("download-link");
+          if (photo.local) {
+            download.href = photo.src;
+            download.download = photo.filename;
+            download.hidden = false;
+          } else {
+            download.href = "#";
+            download.removeAttribute("download");
+            download.hidden = true;
+          }
+          dialog.showModal();
+        }
+
+        function addLocalPhotos(fileList) {
+          const selected = Array.from(fileList);
+          const images = selected.filter((file) => file.type.startsWith("image/"));
+          if (images.length !== selected.length) showToast("Một số tệp không phải ảnh nên đã được bỏ qua.");
+          if (images.length === 0) return;
+          images.forEach((file) => {
+            photos.unshift({
+              id:nextId++,
+              caption:file.name.replace(/\.[^.]+$/,""),
+              album:"Hiện trường",
+              place:"Ảnh từ thiết bị của bạn",
+              owner:"Bạn",
+              date:new Date().toISOString().slice(0,10),
+              src:URL.createObjectURL(file),
+              filename:file.name,
+              local:true
+            });
+          });
+          updateCounts();
+          render();
+          showToast(`${images.length} ảnh đã thêm vào bản xem trước của phiên này.`);
+        }
+
+        function setSidebarCollapsed(collapsed) {
+          sidebar.classList.toggle("is-collapsed",collapsed);
+          sidebarToggle.setAttribute("aria-pressed",String(collapsed));
+          sidebarToggle.setAttribute("aria-label",collapsed ? "Mở rộng menu" : "Thu gọn menu");
+          sidebarToggle.title = collapsed ? "Mở rộng menu" : "Thu gọn menu";
+          try {
+            window.localStorage.setItem("hp-sidebar-collapsed",String(collapsed));
+          } catch (error) {
+            showToast("Không lưu được tùy chọn thu gọn menu trên thiết bị này.");
+          }
+        }
+        try {
+          setSidebarCollapsed(!compactNavigation.matches && window.localStorage.getItem("hp-sidebar-collapsed") === "true");
+        } catch (error) {
+          setSidebarCollapsed(false);
+        }
+        sidebarToggle.addEventListener("click",() => {
+          setSidebarCollapsed(!sidebar.classList.contains("is-collapsed"));
+        });
+        compactNavigation.addEventListener("change",(event) => {
+          if (event.matches && sidebar.classList.contains("is-collapsed")) sidebar.classList.remove("is-collapsed");
+        });
+        document.querySelectorAll("[data-nav-toggle]").forEach((button) => {
+          const group = button.closest(".nav-group");
+          const submenu = document.getElementById(button.getAttribute("aria-controls"));
+          function setGroupOpen(open) {
+            button.setAttribute("aria-expanded",String(open));
+            button.setAttribute("aria-label",`${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
+            submenu.hidden = !open;
+            group.classList.toggle("is-open",open);
+          }
+          button.addEventListener("pointerenter",(event) => {
+            if (event.pointerType === "mouse" && !group.dataset.pinned) setGroupOpen(true);
+          });
+          group.addEventListener("pointerleave",(event) => {
+            if (event.pointerType === "mouse" && !group.dataset.pinned && !group.contains(document.activeElement)) setGroupOpen(false);
+          });
+          group.addEventListener("focusin",() => setGroupOpen(true));
+          group.addEventListener("focusout",(event) => {
+            if (!group.contains(event.relatedTarget) && !group.dataset.pinned) setGroupOpen(false);
+          });
+          button.addEventListener("click",() => {
+            const pinned = group.dataset.pinned === "true";
+            if (pinned) {
+              delete group.dataset.pinned;
+              setGroupOpen(false);
+            } else {
+              group.dataset.pinned = "true";
+              setGroupOpen(true);
+            }
+          });
+          group.addEventListener("keydown",(event) => {
+            if (event.key === "Escape" && group.classList.contains("is-open")) {
+              delete group.dataset.pinned;
+              setGroupOpen(false);
+              button.focus();
+            }
+          });
+        });
+
+        document.getElementById("album-list").addEventListener("click", (event) => {
+          const button = event.target.closest("[data-album]");
+          if (!button) return;
+          selectedAlbum = button.dataset.album;
+          document.querySelectorAll("[data-album]").forEach((item) => item.setAttribute("aria-pressed",String(item === button)));
+          document.querySelectorAll("[data-album-tab]").forEach((item) => item.setAttribute("aria-pressed",String(item.dataset.albumTab === selectedAlbum)));
+          render();
+        });
+        document.getElementById("album-tabs").addEventListener("click", (event) => {
+          const button = event.target.closest("[data-album-tab]");
+          if (!button) return;
+          selectedAlbum = button.dataset.albumTab;
+          document.querySelectorAll("[data-album]").forEach((item) => item.setAttribute("aria-pressed",String(item.dataset.album === selectedAlbum)));
+          document.querySelectorAll("[data-album-tab]").forEach((item) => item.setAttribute("aria-pressed",String(item === button)));
+          render();
+        });
+        grid.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-photo-id]");
+          if (!button) return;
+          const photo = photos.find((item) => item.id === Number(button.dataset.photoId));
+          if (photo) openPhoto(photo);
+        });
+        search.addEventListener("input",render);
+        sort.addEventListener("change",render);
+        uploadInput.addEventListener("change",() => {
+          addLocalPhotos(uploadInput.files);
+          uploadInput.value = "";
+        });
+        document.getElementById("close-dialog").addEventListener("click",() => dialog.close());
+        dialog.addEventListener("click",(event) => { if (event.target === dialog) dialog.close(); });
+
+        updateCounts();
+        render();
+      })();
+    </script>
+  </body>
+</html>
