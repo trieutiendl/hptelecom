@@ -3,6 +3,6 @@
   "build": "50",
   "bundleIdentifier": "vn.hptelecom.fieldwork.server",
   "teamId": "DX247Z5GQ8",
-  "sourceSha256": "879e886362a5ebcbec01970630fdc66c887af371c1404b0ceeb63a2747235acc",
-  "testsPassed": 158
+  "sourceSha256": "2aeba8363bf763e3f938ce35430d4f6cb9f9e4413400b3162d93a743fd4e9399",
+  "testsPassed": 167
 }
