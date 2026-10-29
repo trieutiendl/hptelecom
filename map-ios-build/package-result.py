@@ -7,7 +7,9 @@ with zipfile.ZipFile(work/'hp-map-ios-result.zip','w',zipfile.ZIP_DEFLATED) as a
     for relative in paths:
         path=work/relative
         if path.is_file(): archive.write(path,relative)
-    for folder in ['screenshots','Tests.xcresult']:
+    # Exported xcresult attachments retain screenshots, recordings and AX diagnostics
+    # without duplicating the full simulator result bundle in the download.
+    for folder in ['screenshots']:
         base=work/folder
         if base.is_dir():
             for path in base.rglob('*'):

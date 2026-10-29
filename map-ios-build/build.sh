@@ -94,6 +94,7 @@ xcodebuild -project HPMap.xcodeproj -scheme HPMap -configuration Debug \
   -resultBundlePath "$BUILD_WORK/Tests.xcresult" \
   -parallel-testing-enabled NO ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO SWIFT_ACTIVE_COMPILATION_CONDITIONS='DEBUG HPMAP_UI_TESTS' test
 printf 'passed\n' >"$BUILD_WORK/simulator-tests-passed.txt"
+echo 'iPhone interface tests passed; creating the signed HP Map installation package.' >&3
 xcrun simctl status_bar "$SIMULATOR_ID" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100 || true
 xcrun simctl launch "$SIMULATOR_ID" vn.hptelecom.map
 sleep 3
