@@ -18,6 +18,14 @@ finish() {
   local status=$?
   trap - EXIT
   set +e
+  if [ "$status" -ne 0 ] && [ -n "${SIMULATOR_ID:-}" ]; then
+    mkdir -p "$BUILD_WORK/screenshots"
+    xcrun simctl io "$SIMULATOR_ID" screenshot "$BUILD_WORK/screenshots/failure.png"
+  fi
+  if [ -d "$BUILD_WORK/Tests.xcresult" ]; then
+    mkdir -p "$BUILD_WORK/screenshots/test-attachments"
+    xcrun xcresulttool export attachments --path "$BUILD_WORK/Tests.xcresult" --output-path "$BUILD_WORK/screenshots/test-attachments"
+  fi
   export HP_MAP_BUILD_EXIT="$status"
   python3 "$BUILD_HELPERS/package-result.py"
   local package_status=$?
@@ -49,9 +57,17 @@ if ! xcodebuild -version; then
   xcodebuild -version
 fi
 xcrun --sdk iphoneos --show-sdk-version
+python3 - <<'PY'
+import subprocess
+xcode=subprocess.check_output(['xcodebuild','-version'],text=True).splitlines()[0]
+sdk=subprocess.check_output(['xcrun','--sdk','iphoneos','--show-sdk-version'],text=True).strip()
+assert int(xcode.split()[1].split('.')[0]) >= 26, 'Xcode 26 or later is required'
+assert int(sdk.split('.')[0]) >= 26, 'iOS 26 SDK or later is required'
+PY
 node scripts/prepare-api.cjs --check
 node --test tests/*.test.cjs >"$BUILD_WORK/javascript-tests.log" 2>&1
 echo 'JavaScript tests passed.'
+echo 'HP Map data tests passed; checking native iPhone components.' >&3
 
 mkdir -p "$BUILD_WORK/native-tests"
 cp "$BUILD_HELPERS/native-tests.swift" "$BUILD_WORK/native-tests/main.swift"
@@ -71,11 +87,12 @@ SIMULATOR_ID="$(python3 "$BUILD_HELPERS/select-simulator.py")"
 export SIMULATOR_ID
 xcrun simctl boot "$SIMULATOR_ID" || true
 xcrun simctl bootstatus "$SIMULATOR_ID" -b
+echo 'Building and testing the iPhone interface.' >&3
 xcodebuild -project HPMap.xcodeproj -scheme HPMap -configuration Debug \
   -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
   -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
   -resultBundlePath "$BUILD_WORK/Tests.xcresult" \
-  -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test
+  -parallel-testing-enabled NO ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO SWIFT_ACTIVE_COMPILATION_CONDITIONS='DEBUG HPMAP_UI_TESTS' test
 printf 'passed\n' >"$BUILD_WORK/simulator-tests-passed.txt"
 xcrun simctl status_bar "$SIMULATOR_ID" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100 || true
 xcrun simctl launch "$SIMULATOR_ID" vn.hptelecom.map

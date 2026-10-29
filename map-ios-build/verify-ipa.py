@@ -13,6 +13,8 @@ with zipfile.ZipFile(ipas[0]) as archive:
     assert info['CFBundleIdentifier']==release['bundleIdentifier']
     assert info['CFBundleShortVersionString']==release['version'] and info['CFBundleVersion']==release['build']
     assert info.get('CFBundleDisplayName')=='HP Map' and info.get('NSLocationWhenInUseUsageDescription')
+    sdk=info.get('DTSDKName','')
+    assert sdk.startswith('iphoneos') and int(sdk[8:].split('.')[0]) >= 26, 'App Store requires iOS 26 SDK or later'
     assert any(n.endswith('/_CodeSignature/CodeResources') for n in archive.namelist())
     assert any(n.endswith('/embedded.mobileprovision') for n in archive.namelist())
     assert any(n.endswith('/Web/hpmap/app.js') for n in archive.namelist())
@@ -30,6 +32,7 @@ assert not profile.get('ProvisionedDevices') and not profile.get('ProvisionsAllD
 assert profile['ExpirationDate']>datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 receipt={**release,'ipaSha256':hashlib.sha256(ipas[0].read_bytes()).hexdigest(),'ipaBytes':ipas[0].stat().st_size,
          'codesign':'verified','githubRunId':os.environ.get('GITHUB_RUN_ID'),'simulatorTests':'passed',
-         'appleUpload':'not submitted','deviceTesting':'not run','minimumIOSVersion':info.get('MinimumOSVersion')}
+         'appleUpload':'not submitted','deviceTesting':'not run','minimumIOSVersion':info.get('MinimumOSVersion'),
+         'sdkName':sdk,'xcodeBuild':info.get('DTXcodeBuild'),'xcodeVersion':info.get('DTXcode')}
 (work/'verification.json').write_text(json.dumps(receipt,indent=2)+'\n')
 print('HP Map identity, version, simulator tests and App Store code signature verified.')
