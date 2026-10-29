@@ -7,6 +7,24 @@ func check(_ condition: @autoclosure () -> Bool, _ name: String) {
 }
 func url(_ value: String) -> URL { URL(string: value)! }
 let api = "https://hptelecom.id.vn"
+var connectivity = MapConnectionState()
+check(!connectivity.known && !connectivity.available, "startup does not invent connectivity")
+check(connectivity.update(available: false), "first real offline observation is published")
+check(!connectivity.update(available: false), "unchanged offline path does not emit duplicate event")
+check(connectivity.update(available: true), "network recovery emits a change")
+check(!connectivity.update(available: true), "unchanged online path does not emit duplicate event")
+let onlineState = connectivity.payload(sequence: 9)
+check(onlineState["networkAvailable"] as? Bool == true && onlineState["offline"] as? Bool == false, "online payload follows OS path")
+check(onlineState["cacheOnly"] as? Bool == false && onlineState["sequence"] as? Int == 9, "online does not claim cache isolation")
+check(connectivity.update(available: false), "network loss emits a change")
+let offlineState = connectivity.payload(sequence: 10)
+check(offlineState["networkAvailable"] as? Bool == false && offlineState["offline"] as? Bool == true && offlineState["cacheOnly"] as? Bool == false, "offline path does not promise cached remote imagery")
+for (code, expected) in [(NSURLErrorTimedOut,"ETIMEDOUT"),(NSURLErrorDNSLookupFailed,"ENOTFOUND"),(NSURLErrorNetworkConnectionLost,"NETWORK_ERROR"),(NSURLErrorServerCertificateUntrusted,"CERT_ERROR"),(NSURLErrorSecureConnectionFailed,"CERT_ERROR")] {
+    let failure = MapSecurity.nativeErrorResult(NSError(domain: NSURLErrorDomain, code: code, userInfo: [NSLocalizedDescriptionKey:"Bearer private-token https://private.invalid/?key=secret"]))
+    check(failure["code"] as? String == expected, "native connection error category \(expected)")
+    check(!(failure["error"] as? String ?? "").contains("private"), "native failure omits raw secret description")
+}
+check(MapSecurity.nativeErrorResult(MapFailure.message("Phản hồi vượt giới hạn tải."))["code"] as? String == "NATIVE_ERROR", "native response validation is not a connection failure")
 check(MapSecurity.trusted(MapSecurity.startURL), "local app origin")
 check(!MapSecurity.trusted(url(api + "/hpmap/index.html")), "remote frame rejected")
 check(!MapSecurity.trusted(url("hpmap://app/hpmap/index.html?frame=other")), "unexpected query rejected")

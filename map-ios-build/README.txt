@@ -1,4 +1,4 @@
-HP Map iOS 1.0.0 (1) - separate app vn.hptelecom.map
+HP Map iOS 1.0.0 (2) - separate app vn.hptelecom.map
 
 Local staging only. These files do not publish code or configure secrets.
 
@@ -9,8 +9,8 @@ Local staging only. These files do not publish code or configure secrets.
    tests at its root. Exclude .git, private material, checks and CI artifacts.
 3. Set release.json sourceSha256 to the exact plaintext ZIP SHA-256, encrypt the
    ZIP with crypt.cjs (HP_IOS_BUILD_KEY env, 64 hex characters) as source.enc.
-4. Configure temporary Actions secrets HP_MAP_IOS_SOURCE_100_1 (same encryption
-   key) and HP_MAP_IOS_SIGNING_100_1 (JSON: teamId, bundleIdentifier, p12 base64,
+4. Configure temporary Actions secrets HP_MAP_IOS_SOURCE_100_2 (same encryption
+   key) and HP_MAP_IOS_SIGNING_100_2 (JSON: teamId, bundleIdentifier, p12 base64,
    password and profile base64). Use an App Store profile specifically for
    vn.hptelecom.map and team DX247Z5GQ8. The reporting-app profile is rejected.
 5. After dispatch, download hp-map-ios-RUN_ID, decrypt hp-map-ios-result.zip.enc
