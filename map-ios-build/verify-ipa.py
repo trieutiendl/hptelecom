@@ -24,6 +24,12 @@ verify=work/'verify-export'
 subprocess.run(['ditto','-xk',str(ipas[0]),str(verify)],check=True)
 apps=list((verify/'Payload').glob('*.app')); assert len(apps)==1
 subprocess.run(['codesign','--verify','--deep','--strict',str(apps[0])],check=True)
+entitlements=plistlib.loads(subprocess.check_output(['codesign','-d','--entitlements',':-',str(apps[0])],stderr=subprocess.DEVNULL))
+assert entitlements.get('application-identifier')==release['teamId']+'.'+release['bundleIdentifier']
+assert entitlements.get('com.apple.developer.team-identifier')==release['teamId']
+assert entitlements.get('get-task-allow',False) is False
+executable=(apps[0]/info['CFBundleExecutable']).read_bytes()
+assert b'--hpmap-ui-test' not in executable and b'ui_test_not_a_live_key' not in executable, 'Test fixture leaked into Release'
 profile=plistlib.loads(subprocess.check_output(['security','cms','-D','-i',str(apps[0]/'embedded.mobileprovision')]))
 assert profile['TeamIdentifier']==[release['teamId']]
 assert profile['Entitlements']['application-identifier']==release['teamId']+'.'+release['bundleIdentifier']
@@ -32,7 +38,7 @@ assert not profile.get('ProvisionedDevices') and not profile.get('ProvisionsAllD
 assert profile['ExpirationDate']>datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 receipt={**release,'ipaSha256':hashlib.sha256(ipas[0].read_bytes()).hexdigest(),'ipaBytes':ipas[0].stat().st_size,
          'codesign':'verified','githubRunId':os.environ.get('GITHUB_RUN_ID'),'simulatorTests':'passed',
-         'appleUpload':'not submitted','deviceTesting':'not run','minimumIOSVersion':info.get('MinimumOSVersion'),
+         'appleUpload':'not submitted','deviceTesting':'not run','testFixtureInRelease':False,'signedEntitlements':'verified','minimumIOSVersion':info.get('MinimumOSVersion'),
          'sdkName':sdk,'xcodeBuild':info.get('DTXcodeBuild'),'xcodeVersion':info.get('DTXcode')}
 (work/'verification.json').write_text(json.dumps(receipt,indent=2)+'\n')
 print('HP Map identity, version, simulator tests and App Store code signature verified.')
