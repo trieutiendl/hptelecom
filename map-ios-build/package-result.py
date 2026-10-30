@@ -18,5 +18,5 @@ with zipfile.ZipFile(work/'hp-map-ios-result.zip','w',zipfile.ZIP_DEFLATED) as a
     if status==0 and (work/'verification.json').is_file():
         ipas=list((work/'export').glob('*.ipa'))
         if len(ipas)!=1: raise ValueError('Expected one verified HP Map IPA')
-        archive.write(ipas[0],'HP-Map-iOS-1.0.0-2.ipa')
+        archive.write(ipas[0],'HP-Map-iOS-1.0.0-3.ipa')
 print('Encrypted-result package prepared.')

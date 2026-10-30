@@ -53,7 +53,7 @@ class PipelineTests(unittest.TestCase):
             (root/'verification.json').write_text('{}'); (root/'signing-identity.txt').write_text('private')
             subprocess.run([sys.executable,str(HERE/'package-result.py')],check=True,env={**os.environ,'BUILD_WORK':str(root),'HP_MAP_BUILD_EXIT':'0'},stdout=subprocess.DEVNULL)
             with zipfile.ZipFile(root/'hp-map-ios-result.zip') as archive:
-                self.assertIn('HP-Map-iOS-1.0.0-2.ipa',archive.namelist())
+                self.assertIn('HP-Map-iOS-1.0.0-3.ipa',archive.namelist())
                 self.assertNotIn('signing-identity.txt',archive.namelist())
 
 if __name__=='__main__': unittest.main()
