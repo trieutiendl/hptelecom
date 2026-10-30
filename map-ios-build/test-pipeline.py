@@ -15,7 +15,7 @@ class PipelineTests(unittest.TestCase):
         target=root/'source.zip'
         with zipfile.ZipFile(target,'w') as out:
             out.writestr('HPMap.xcodeproj/project.pbxproj','fixture')
-            out.writestr('HPMap/Info.plist',plistlib.dumps({'CFBundleShortVersionString':'1.0.0','CFBundleVersion':'2','CFBundleDisplayName':'HP Map'}))
+            out.writestr('HPMap/Info.plist',plistlib.dumps({'CFBundleShortVersionString':'1.0.0','CFBundleVersion':'3','CFBundleDisplayName':'HP Map'}))
             if extra:
                 entry=zipfile.ZipInfo('entry'); entry.filename=extra[0]
                 out.writestr(entry,extra[1])

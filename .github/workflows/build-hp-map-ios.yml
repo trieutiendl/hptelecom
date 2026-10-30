@@ -1,4 +1,4 @@
-name: HP Map iOS 1.0.0 (2)
+name: HP Map iOS 1.0.0 (3)
 
 on:
   workflow_dispatch:
@@ -30,8 +30,8 @@ jobs:
           node-version: '22.23.1'
       - name: Test, build and sign separate HP Map app
         env:
-          HP_MAP_IOS_SOURCE_100_2: ${{ secrets.HP_MAP_IOS_SOURCE_100_2 }}
-          HP_MAP_IOS_SIGNING_100_2: ${{ secrets.HP_MAP_IOS_SIGNING_100_2 }}
+          HP_MAP_IOS_SOURCE_100_3: ${{ secrets.HP_MAP_IOS_SOURCE_100_3 }}
+          HP_MAP_IOS_SIGNING_100_3: ${{ secrets.HP_MAP_IOS_SIGNING_100_3 }}
         run: bash map-ios-build/build.sh
       - name: Preserve encrypted result and diagnostics
         if: always()

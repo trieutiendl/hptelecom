@@ -1,6 +1,6 @@
 import hashlib, json, os, pathlib, plistlib, stat, zipfile
 
-EXPECTED = {'version':'1.0.0','build':'2','bundleIdentifier':'vn.hptelecom.map','teamId':'DX247Z5GQ8'}
+EXPECTED = {'version':'1.0.0','build':'3','bundleIdentifier':'vn.hptelecom.map','teamId':'DX247Z5GQ8'}
 
 def extract_checked(source, destination, release):
     for key,value in EXPECTED.items():
