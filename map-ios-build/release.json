@@ -1,7 +1,7 @@
 {
-  "version": "1.0.0",
-  "build": "3",
+  "version": "1.0.2",
+  "build": "5",
   "bundleIdentifier": "vn.hptelecom.map",
   "teamId": "DX247Z5GQ8",
-  "sourceSha256": "fecf2819946c39b6fda4adc8ef83563a9169b3fe76146799be7d2faf0bb66fba"
+  "sourceSha256": "0f744a26e2c33a26ae338b5fc4d5fd8bcae97d281573dc5c0e30d6e4b3b42093"
 }

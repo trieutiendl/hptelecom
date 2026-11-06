@@ -34,6 +34,15 @@ check(!MapSecurity.allowedAPI(url(api + "/api/login"), method:"GET"), "login GET
 check(MapSecurity.allowedAPI(url(api + "/api/map-session"), method:"POST"), "HP Map persistent session exchange")
 check(!MapSecurity.allowedAPI(url(api + "/api/map-session"), method:"GET"), "session exchange GET rejected")
 check(!MapSecurity.allowedAPI(url(api + "/api/map-session?token=secret"), method:"POST"), "session credentials in query rejected")
+check(MapSecurity.allowedAPI(url(api + "/api/map-routes/transfer-folders"), method:"POST"), "whole folder transfer endpoint")
+check(!MapSecurity.allowedAPI(url(api + "/api/map-routes/transfer-folders"), method:"GET"), "folder transfer GET rejected")
+check(!MapSecurity.allowedAPI(url(api + "/api/map-routes/transfer-folders?task_id=other"), method:"POST"), "folder transfer query rejected")
+check(MapSecurity.allowedAPI(url(api + "/api/map-routes/transfer-points"), method:"POST"), "point transfer endpoint")
+check(MapSecurity.coordinateClipboardText("12.345678, 108.765432") == "12.345678, 108.765432", "coordinate copy preserves coordinate precision")
+check(MapSecurity.coordinateClipboardText("-90, 180") == "-90.0, 180.0", "coordinate copy accepts boundaries")
+for invalid in ["", "12", ",108", "12,", "NaN, 108", "12, inf", "91, 108", "12, -181", "12, 108, 42", "12, 108\nprivate", String(repeating:"0", count:101) + ", 1"] {
+    check(MapSecurity.coordinateClipboardText(invalid) == nil, "coordinate copy rejects malformed or unsafe text")
+}
 check(!MapSecurity.allowedAPI(url("http://hptelecom.id.vn/api/me"), method:"GET"), "TLS required")
 check(!MapSecurity.allowedAPI(url("https://hptelecom.id.vn.evil.invalid/api/me"), method:"GET"), "spoof host rejected")
 check(!MapSecurity.allowedAPI(url("https://user:password@hptelecom.id.vn/api/me"), method:"GET"), "userinfo rejected")
