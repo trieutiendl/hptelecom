@@ -1,0 +1,291 @@
+:root {
+  color-scheme: dark;
+  --ink: #e8f5fa;
+  --text: #e8f5fa;
+  --muted: #a9c6d3;
+  --blue: #24d1df;
+  --teal: #24d1df;
+  --cyan: #24d1df;
+  --line: #387083;
+  --canvas: #071f2b;
+  --surface: #103441;
+  --green: #67d5a0;
+  --amber: #ffd051;
+  --red: #ffb4ad;
+  --focus: #ffd051;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  background: radial-gradient(ellipse at top right, #0e4b60, transparent 65%), var(--canvas);
+  color: var(--ink);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+h1, h2, h3, .metric-value, .stat-value, .team-title, .incident-id,
+.record-code, .list-title, .panel-head h2, .gallery-title h2 {
+  color: var(--ink);
+}
+
+.sidebar {
+  border-color: #285366;
+  background: #071f2b;
+}
+
+.sidebar .nav a[aria-current="page"],
+.sidebar .nav .nav-link[aria-current="page"],
+.sidebar .nav .nav-child-link[aria-current="page"],
+.sidebar .nav .nav-group.has-current > .nav-group-trigger {
+  border-color: #52d6df;
+  background: #103b4b;
+  color: #3ddbe5;
+  box-shadow: inset 2px 0 #3ddbe5;
+}
+
+.sidebar .nav a:hover,
+.sidebar .nav .nav-group-trigger:hover,
+.sidebar .nav .nav-link:hover,
+.sidebar .nav .nav-child-link:hover {
+  border-color: #387083;
+  background: #174757;
+  color: #f5fdff;
+}
+
+.nav-icon,
+.sidebar .nav .nav-icon,
+.team-icon,
+.team-avatar,
+.metric-symbol,
+.quick-icon,
+.avatar {
+  border-color: #387083;
+  background: #174757;
+  color: #3ddbe5;
+}
+
+.main-column { color: var(--ink); }
+
+.topbar {
+  border-color: #285366;
+  background: #071f2b;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, .18);
+}
+
+.topbar-title, .top-link, .support-link, .admin-role,
+.user-role, .user-name, .admin-name {
+  color: var(--muted);
+}
+
+.avatar {
+  border-radius: 50%;
+  background: #103b4b;
+  color: #3ddbe5;
+}
+
+.content, .page, .page-shell { color: var(--ink); }
+
+.panel, .metrics, .stats, .toolbar, .list-toolbar, .filter-panel,
+.report-nav, .table-wrap, .album-panel, .gallery-panel, .quick-link,
+.user-panel, .user-list, .content-card, .summary-card, .metric,
+.stat, .gallery-toolbar {
+  border-color: #387083;
+  background: #103441;
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.panel-head, .dispatch-row, .activity:not(:last-child)::after,
+.metric:not(:last-child)::after, .stat:not(:last-child)::after,
+.details-list dt, .details-list dd {
+  border-color: #285366;
+}
+
+.panel-head h2, .panel-head p, .toolbar-title, .list-title,
+.gallery-title h2, .panel-heading, .team-name, .team-title,
+.activity-text, .activity-text strong, .details-list dd {
+  color: var(--ink);
+}
+
+.panel-head p, .toolbar-count, .metric-head, .metric-foot,
+.stat-label, .stat-note, .team-region, .team-sub, .dispatch-count small,
+.chart-labels, .chart-legend, .activity-time, .activity-text,
+.gallery-title p, .storage-note, .album-count, .notice,
+.page-description, .subtitle, .breadcrumb, .crumb, .list-count,
+.export-status, .record-summary, .record-muted, .empty-state {
+  color: var(--muted);
+}
+
+.report-tab { color: var(--muted); }
+.report-tab:hover { background: #174757; color: #f5fdff; }
+.report-tab[aria-current="page"] {
+  border-color: #ffd051;
+  border-bottom-color: #ffd051;
+  background: #103441;
+  color: #ffd051;
+}
+
+.date-filter, .search, .sort-select, .control, .search,
+.field select, .field input, .field textarea, .edit-field input,
+.edit-field textarea, input, select, textarea {
+  border-color: #4e7785;
+  background: #092733;
+  color: #f5fdff;
+}
+
+input::placeholder, textarea::placeholder, .search::placeholder,
+.field input::placeholder {
+  color: #a9c6d3;
+  opacity: 1;
+}
+
+label, .field label, .edit-field, .panel-heading { color: #c6e2eb; }
+
+button, .primary-button, .upload-button, .action-button,
+.edit-actions button[type="submit"] {
+  border-color: #4c8091;
+  border-radius: 9px;
+  background: #174757;
+  color: #f5fdff;
+}
+
+button:hover, .primary-button:hover, .upload-button:hover,
+.action-button:hover, .edit-actions button:hover {
+  border-color: #52d6df;
+  background: #235f71;
+  color: #fff;
+}
+
+button:disabled { opacity: .5; cursor: wait; }
+
+.primary, .primary-button, .upload-button, .action-button,
+.edit-actions button[type="submit"] {
+  border-color: #4aebf6;
+  background: #24d1df;
+  color: #052c39;
+}
+
+.primary:hover, .primary-button:hover, .upload-button:hover,
+.action-button:hover, .edit-actions button[type="submit"]:hover {
+  background: #65e9f0;
+  color: #052c39;
+}
+
+.export-button, .outline-button, .edit-actions button {
+  border-color: #4c8091;
+  background: #174757;
+  color: #f5fdff;
+}
+
+.demo-badge, .preview-label {
+  border-color: #f5bf51;
+  background: #533f24;
+  color: #ffe08a;
+}
+
+.demo-badge::before { background: #ffd051; }
+
+.notice, .preview-notice {
+  border-color: #8b6b32;
+  background: #533f24;
+  color: #ffe08a;
+}
+
+.notice-symbol {
+  border-color: #f5bf51;
+  color: #ffd051;
+}
+
+.incident-table th, table th, th {
+  background: #092733;
+  color: #c6e2eb;
+}
+
+.incident-table td, table td, td {
+  border-color: #285366;
+  color: #e8f5fa;
+}
+
+tbody tr:hover, .dispatch-row:hover, .quick-link:hover,
+.album-button:hover, .item:hover {
+  border-color: #387083;
+  background: #174757;
+  color: #f5fdff;
+}
+
+.album-button, .item {
+  border-color: transparent;
+  background: transparent;
+  color: #c6e2eb;
+}
+
+.album-button[aria-pressed="true"], .tabs button.active {
+  border-color: #ffd051;
+  background: #ffd051;
+  color: #172b35;
+}
+
+.tab-count, .metric-symbol, .quick-icon, .team-icon, .team-avatar {
+  border-radius: 8px;
+  background: #174757;
+  color: #3ddbe5;
+}
+
+.state, .incident-status, .priority.low {
+  border: 1px solid #387083;
+  background: #174757;
+  color: #bfeaf0;
+}
+
+.incident-status.open, .priority.medium, .priority.high {
+  border-color: #8b6b32;
+  background: #533f24;
+  color: #ffe08a;
+}
+
+.text-link, .incident-id, .record-code { color: #3ddbe5; }
+.text-link:hover, .record-link:hover .record-code { color: #65e9f0; }
+
+.photo-card, .edit-photo-card {
+  border-color: #387083;
+  background: #0b2a37;
+}
+
+.photo-card a, .photo-card img, .edit-photo-card img {
+  background: #061c26;
+}
+
+dialog {
+  border-color: #4b9aae;
+  border-radius: 14px;
+  background: #0a2835;
+  color: #f5fdff;
+}
+
+dialog::backdrop { background: #000b; }
+
+.dialog-heading, .dialog-heading h2 { border-color: #387083; color: #f5fdff; }
+
+.dialog-close, .edit-actions button {
+  border-color: #4e7785;
+  background: #174757;
+  color: #f5fdff;
+}
+
+.connection-state { color: #c6e2eb; }
+.connection-state::before { background: #3ddbe5; }
+
+:focus-visible {
+  outline: 3px solid #ffd051;
+  outline-offset: 3px;
+}
+
+@media (max-width: 850px) {
+  .sidebar, .sidebar.is-collapsed {
+    border-color: #285366;
+    background: #071f2b;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
