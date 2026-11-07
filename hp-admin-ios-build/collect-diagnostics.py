@@ -17,8 +17,8 @@ def collect(work, home):
                         phase=pathlib.Path(result.stdout.strip())/'Library/Caches/hp-admin-capture-stage.json'
                         if phase.is_file() and phase.stat().st_size<=4096:
                             value=json.loads(phase.read_text())
-                            phases={'preflightStarted','inputRejected','responseAccepted','responseRejected','timedOut','accountRejected','accountAccepted','savingSession','sessionSaved','installingScripts','navigating','preflightRejected'}
-                            if set(value)=={'phase','at'} and value['phase'] in phases and isinstance(value['at'],(int,float)):
+                            phases={'preflightStarted','inputRejected','responseAccepted','responseRejected','timedOut','accountRejected','accountAccepted','savingSession','sessionSaved','sessionSaveFailed','installingScripts','navigating','preflightRejected'}
+                            if set(value) in [{'phase','at'},{'phase','at','osStatus'}] and value['phase'] in phases and isinstance(value['at'],(int,float)) and ('osStatus' not in value or type(value['osStatus']) is int):
                                 (output/(parts[0]+'-capture-stage.json')).write_text(json.dumps(value)+'\n')
                 except (OSError,ValueError,subprocess.TimeoutExpired):pass
     copied=[];total=0

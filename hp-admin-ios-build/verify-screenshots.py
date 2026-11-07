@@ -30,6 +30,9 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--family',choices=['iPhone','iPad'],required=True);args=parser.parse_args()
     work=pathlib.Path(os.environ['BUILD_WORK'])
     selected=verify_family(work,args.family)
-    receipt={'passed':True,'family':args.family,'count':len(selected),'mode':'real authenticated app; native simulator screenshots; unedited','files':selected}
+    release=json.loads((pathlib.Path(os.environ['BUILD_HELPERS'])/'release.json').read_text())
+    run_id=os.environ.get('GITHUB_RUN_ID','')
+    if not run_id.isdigit() or not re.fullmatch(r'[a-f0-9]{64}',release.get('sourceSha256','')):raise ValueError('Verified CI/source identity required')
+    receipt={'passed':True,'family':args.family,'count':len(selected),'mode':'real authenticated app; native simulator screenshots; unedited','githubRunId':run_id,'sourceSha256':release['sourceSha256'],'files':selected}
     (work/('screenshots-'+args.family+'.json')).write_text(json.dumps(receipt,indent=2)+'\n')
     print(args.family+': ten authenticated screenshots verified and copied without editing')

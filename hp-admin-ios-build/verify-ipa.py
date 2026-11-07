@@ -5,7 +5,7 @@ assert release['bundleIdentifier']=='vn.hptelecom.admin.ios' and release['teamId
 for family in ['iPhone','iPad']: assert (work/(family+'-tests-passed.txt')).read_text().strip()=='passed'
 capture_requested=os.environ.get('HP_ADMIN_CAPTURE_REQUESTED')=='1'
 screenshots={family:json.loads((work/('screenshots-'+family+'.json')).read_text()) for family in ['iPhone','iPad']} if capture_requested else {}
-if capture_requested: assert all(v['passed'] and v['count']==10 for v in screenshots.values())
+if capture_requested: assert all(v['passed'] and v['count']==10 and v.get('sourceSha256')==release['sourceSha256'] and v.get('githubRunId')==os.environ.get('GITHUB_RUN_ID') for v in screenshots.values())
 ipas=list((work/'export').glob('*.ipa')); assert len(ipas)==1
 with zipfile.ZipFile(ipas[0]) as archive:
     assert archive.testzip() is None
@@ -43,6 +43,8 @@ assert b'--hp-admin-ui-test' not in executable, 'Offline test fixture must not s
 assert b'--hp-admin-authenticated-capture' not in executable and b'HP_ADMIN_CAPTURE_SESSION' not in executable, 'Private capture bootstrap must not ship in Release'
 assert b'HP_ADMIN_CAPTURE_EXPECTED_USERNAME' not in executable and b'DebugCaptureSession' not in executable, 'Capture-only authentication code must not ship in Release'
 assert b'HP_ADMIN_CAPTURE_ORIGIN' not in executable, 'Capture-only origin bootstrap must not ship in Release'
+assert all(value not in executable for value in [b'--hp-admin-keychain-test',b'keychain-self-test',b'hp-admin-keychain-result',b'HP Admin Keychain round trip passed']), 'Keychain self-test must not ship in Release'
+assert b'hp-admin-capture-stage.json' not in executable, 'DEBUG phase diagnostics must not ship in Release'
 profile=plistlib.loads(subprocess.check_output(['security','cms','-D','-i',str(apps[0]/'embedded.mobileprovision')]))
 assert profile['TeamIdentifier']==[release['teamId']]
 assert profile['Entitlements']['application-identifier']==release['teamId']+'.'+release['bundleIdentifier']

@@ -97,6 +97,12 @@ while read -r family simulator; do
   xcrun simctl boot "$simulator" || true
   xcrun simctl bootstatus "$simulator" -b
   xcrun simctl status_bar "$simulator" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100 || true
+  # The real Keychain requires app identity entitlements even on Simulator.
+  # An ad-hoc simulator signature uses no Apple private signing material.
+  xcodebuild -project HPTelecomAdmin.xcodeproj -scheme HPTelecomAdmin -configuration Debug \
+    -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
+    -parallel-testing-enabled NO ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- build-for-testing
+  python3 "$BUILD_HELPERS/verify-simulator.py" --family "$family"
   echo "Testing public/offline admin UI first on $family." >&3
   # Public-login assertions must run before capture persists the real session.
   # This also verifies normal cold launch before the DEBUG-only preflight path.
@@ -104,7 +110,7 @@ while read -r family simulator; do
     -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
     -resultBundlePath "$BUILD_WORK/$family-smoke.xcresult" -parallel-testing-enabled NO \
     -only-testing:AdminUITests/SmokeTests \
-    ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO test
+    ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- test-without-building
   mkdir -p "$BUILD_WORK/smoke-screenshots/$family"
   xcrun xcresulttool export attachments --path "$BUILD_WORK/$family-smoke.xcresult" --output-path "$BUILD_WORK/smoke-screenshots/$family"
   if [ "$HP_ADMIN_CAPTURE_REQUESTED" = 1 ]; then
@@ -115,7 +121,7 @@ while read -r family simulator; do
     -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
     -resultBundlePath "$BUILD_WORK/$family.xcresult" -parallel-testing-enabled NO \
     -only-testing:AdminUITests/AuthenticatedScreenshots \
-    ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO test
+    ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- test-without-building
   mkdir -p "$BUILD_WORK/screenshots/$family"
   xcrun xcresulttool export attachments --path "$BUILD_WORK/$family.xcresult" --output-path "$BUILD_WORK/screenshots/$family"
   python3 "$BUILD_HELPERS/verify-screenshots.py" --family "$family"
