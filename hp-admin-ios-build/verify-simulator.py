@@ -60,7 +60,7 @@ def validate(info, entitlements):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--family',choices=['iPhone','iPad'],required=True);args=parser.parse_args()
     work=pathlib.Path(os.environ['BUILD_WORK'])
-    app=work/'SimulatorDerivedData/Build/Products/Debug-iphonesimulator/HPTelecomAdmin.app'
+    app=work/('SimulatorDerivedData-'+args.family)/'Build/Products/Debug-iphonesimulator/HPTelecomAdmin.app'
     info=plistlib.loads((app/'Info.plist').read_bytes())
     subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
     signature=subprocess.run(['codesign','-d','--verbose=2',str(app)],capture_output=True,text=True,check=True)

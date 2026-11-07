@@ -99,15 +99,16 @@ while read -r family simulator; do
   xcrun simctl status_bar "$simulator" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100 || true
   # The real Keychain requires app identity entitlements even on Simulator.
   # An ad-hoc simulator signature uses no Apple private signing material.
+  # Keep device-thinned resources and their signatures separate for each family.
   xcodebuild -project HPTelecomAdmin.xcodeproj -scheme HPTelecomAdmin -configuration Debug \
-    -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
+    -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData-$family" \
     -parallel-testing-enabled NO ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- build-for-testing
   python3 "$BUILD_HELPERS/verify-simulator.py" --family "$family"
   echo "Testing public/offline admin UI first on $family." >&3
   # Public-login assertions must run before capture persists the real session.
   # This also verifies normal cold launch before the DEBUG-only preflight path.
   xcodebuild -project HPTelecomAdmin.xcodeproj -scheme HPTelecomAdmin -configuration Debug \
-    -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
+    -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData-$family" \
     -resultBundlePath "$BUILD_WORK/$family-smoke.xcresult" -parallel-testing-enabled NO \
     -only-testing:AdminUITests/SmokeTests \
     ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- test-without-building
@@ -118,7 +119,7 @@ while read -r family simulator; do
   # xcodebuild forwards TEST_RUNNER_* variables to XCTest without the prefix.
   TEST_RUNNER_HP_ADMIN_CAPTURE_ENABLED=1 TEST_RUNNER_HP_ADMIN_CAPTURE_SESSION="$HP_ADMIN_CAPTURE_VALUE" TEST_RUNNER_HP_ADMIN_CAPTURE_CONFIG="$HP_ADMIN_CAPTURE_LABELS" \
   xcodebuild -project HPTelecomAdmin.xcodeproj -scheme HPTelecomAdmin -configuration Debug \
-    -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
+    -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData-$family" \
     -resultBundlePath "$BUILD_WORK/$family.xcresult" -parallel-testing-enabled NO \
     -only-testing:AdminUITests/AuthenticatedScreenshots \
     ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- test-without-building
