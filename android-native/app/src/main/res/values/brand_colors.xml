@@ -1,0 +1,5 @@
+<resources>
+    <color name="brand_icon_background">#002B3E</color>
+    <color name="brand_accent">#00D5EB</color>
+    <color name="brand_hint">#B1D6F1</color>
+</resources>

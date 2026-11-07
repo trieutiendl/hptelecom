@@ -1,0 +1,160 @@
+{
+  "notice": "MINH HỌA: tên, ID, tọa độ và ảnh đều giả. Không gửi dữ liệu này lên server thật.",
+  "wirePayloadSubset": {
+    "version": 1,
+    "module": "relocation",
+    "name": "DI-DOI-MINH-HOA-A-B",
+    "completed": false,
+    "photos": [],
+    "report": {
+      "relocation": true,
+      "completed": false,
+      "location": "Địa điểm minh họa",
+      "locationMode": "manual",
+      "reporter": "Người lập minh họa",
+      "date": "12/10/2026",
+      "cause": "Điện lực yêu cầu",
+      "solution": "Chuyển sang vị trí minh họa mới",
+      "cable": "12FO",
+      "cableSpan": "KV100",
+      "commonRelocationCable": "12FO",
+      "splitRelocation": true,
+      "newCableEnabled": true,
+      "start": "3067",
+      "end": "2917",
+      "relocationLength": "",
+      "recovery": {
+        "enabled": true,
+        "length": "50",
+        "cable": "12FO"
+      },
+      "recoveryLength": "50",
+      "recoveryCable": "12FO",
+      "materials": [
+        {
+          "name": "Néo",
+          "type": "",
+          "quantity": "4",
+          "unit": "bộ",
+          "note": "Minh họa"
+        },
+        {
+          "name": "Măng xông",
+          "type": "12FO",
+          "quantity": "2",
+          "unit": "cái",
+          "note": "Minh họa"
+        }
+      ],
+      "groups": [
+        {
+          "name": "Trước di dời",
+          "note": "Mô tả minh họa",
+          "pairNotes": [
+            "Hàng ảnh minh họa"
+          ],
+          "images": [
+            {
+              "file": "demo-image-before",
+              "width": 1200,
+              "height": 900,
+              "caption": "Ảnh giữ chỗ — Minh họa",
+              "originalFile": "demo-image-before-original"
+            }
+          ]
+        },
+        {
+          "name": "Trong thi công",
+          "note": "Mô tả minh họa",
+          "pairNotes": [
+            "Hàng ảnh minh họa"
+          ],
+          "images": []
+        },
+        {
+          "name": "Sau hoàn thành",
+          "note": "Mô tả minh họa",
+          "pairNotes": [
+            "Hàng ảnh minh họa"
+          ],
+          "images": []
+        },
+        {
+          "name": "Vật tư",
+          "note": "Mô tả minh họa",
+          "pairNotes": [
+            "Hàng ảnh minh họa"
+          ],
+          "images": []
+        },
+        {
+          "name": "Măng xông (MX)",
+          "note": "Mô tả minh họa",
+          "pairNotes": [
+            "Hàng ảnh minh họa"
+          ],
+          "images": [
+            {
+              "file": "demo-image-mx",
+              "width": 1200,
+              "height": 900,
+              "caption": "MX minh họa",
+              "lat": 12.0001,
+              "lon": 108.0001,
+              "mxLocalReadState": "READABLE",
+              "mxCoordinateDescriptionApplied": true
+            }
+          ]
+        },
+        {
+          "name": "Đầu số cáp",
+          "note": "Mô tả minh họa",
+          "pairNotes": [
+            "Hàng ảnh minh họa"
+          ],
+          "images": []
+        },
+        {
+          "name": "Kết quả đo kiểm",
+          "note": "Mô tả minh họa",
+          "pairNotes": [
+            "Hàng ảnh minh họa"
+          ],
+          "images": []
+        }
+      ]
+    }
+  },
+  "expected": {
+    "newCableMetres": 150,
+    "recoveryMetres": 50,
+    "solutionPrefix": "Thu hồi kéo lại 50m 12FO",
+    "materialsSummary": "150m cáp 12FO, 4 néo, 2 măng xông 12FO",
+    "uiSteps": 3,
+    "preparedGroupCount": 7,
+    "uiGroupOrder": [
+      "Trước di dời",
+      "Sau hoàn thành",
+      "Vật tư",
+      "Măng xông (MX)",
+      "Đầu số cáp",
+      "Hình ảnh thi công",
+      "Kết quả đo kiểm"
+    ],
+    "lastExcelGroup": "Kết quả đo kiểm",
+    "emptyGroupsMustWarn": true
+  },
+  "states": [
+    "Đang lưu",
+    "Đã lưu bản nháp",
+    "Chờ đồng bộ",
+    "Lỗi gửi",
+    "Bị thu hồi quyền",
+    "Đã hoàn thành"
+  ],
+  "notes": [
+    "Asset ID giả, không có file ảnh. Dùng ô giữ chỗ.",
+    "Payload là tập trường minh họa. Chỉ gửi sau khi tích hợp/kiểm thử hợp đồng staging.",
+    "Không dùng location của báo cáo làm GPS cho ảnh MX."
+  ]
+}
