@@ -9,7 +9,7 @@ with zipfile.ZipFile(work/'hp-admin-ios-result.zip','w',zipfile.ZIP_DEFLATED) as
     for relative in paths:
         path=work/relative
         if path.is_file(): archive.write(path,relative)
-    for folder in ['screenshots','appstore']:
+    for folder in ['screenshots','smoke-screenshots','appstore','crash-diagnostics']:
         for path in (work/folder).rglob('*'):
             if path.is_file() and not path.is_symlink(): archive.write(path,path.relative_to(work).as_posix())
     if status==0 and (work/'verification.json').is_file():

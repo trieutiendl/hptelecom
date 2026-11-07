@@ -35,7 +35,12 @@ finish() {
       mkdir -p "$BUILD_WORK/screenshots/$family"
       xcrun xcresulttool export attachments --path "$BUILD_WORK/$family.xcresult" --output-path "$BUILD_WORK/screenshots/$family"
     fi
+    if [ -d "$BUILD_WORK/$family-smoke.xcresult" ] && [ ! -f "$BUILD_WORK/smoke-screenshots/$family/manifest.json" ]; then
+      mkdir -p "$BUILD_WORK/smoke-screenshots/$family"
+      xcrun xcresulttool export attachments --path "$BUILD_WORK/$family-smoke.xcresult" --output-path "$BUILD_WORK/smoke-screenshots/$family"
+    fi
   done
+  if [ "$status" -ne 0 ]; then python3 "$BUILD_HELPERS/collect-diagnostics.py"; fi
   python3 "$BUILD_HELPERS/package-result.py"
   local packaged=$?
   if [ "$packaged" -eq 0 ]; then
@@ -92,16 +97,29 @@ while read -r family simulator; do
   xcrun simctl boot "$simulator" || true
   xcrun simctl bootstatus "$simulator" -b
   xcrun simctl status_bar "$simulator" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100 || true
-  echo "Testing admin UI on $family; optional reviewer capture follows the requested mode." >&3
+  echo "Testing public/offline admin UI first on $family." >&3
+  # Public-login assertions must run before capture persists the real session.
+  # This also verifies normal cold launch before the DEBUG-only preflight path.
+  xcodebuild -project HPTelecomAdmin.xcodeproj -scheme HPTelecomAdmin -configuration Debug \
+    -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
+    -resultBundlePath "$BUILD_WORK/$family-smoke.xcresult" -parallel-testing-enabled NO \
+    -only-testing:AdminUITests/SmokeTests \
+    ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO test
+  mkdir -p "$BUILD_WORK/smoke-screenshots/$family"
+  xcrun xcresulttool export attachments --path "$BUILD_WORK/$family-smoke.xcresult" --output-path "$BUILD_WORK/smoke-screenshots/$family"
+  if [ "$HP_ADMIN_CAPTURE_REQUESTED" = 1 ]; then
+  echo "Capturing ten real limited-reviewer screenshots on $family." >&3
   # xcodebuild forwards TEST_RUNNER_* variables to XCTest without the prefix.
-  TEST_RUNNER_HP_ADMIN_CAPTURE_ENABLED="$HP_ADMIN_CAPTURE_REQUESTED" TEST_RUNNER_HP_ADMIN_CAPTURE_SESSION="$HP_ADMIN_CAPTURE_VALUE" TEST_RUNNER_HP_ADMIN_CAPTURE_CONFIG="$HP_ADMIN_CAPTURE_LABELS" \
+  TEST_RUNNER_HP_ADMIN_CAPTURE_ENABLED=1 TEST_RUNNER_HP_ADMIN_CAPTURE_SESSION="$HP_ADMIN_CAPTURE_VALUE" TEST_RUNNER_HP_ADMIN_CAPTURE_CONFIG="$HP_ADMIN_CAPTURE_LABELS" \
   xcodebuild -project HPTelecomAdmin.xcodeproj -scheme HPTelecomAdmin -configuration Debug \
     -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
     -resultBundlePath "$BUILD_WORK/$family.xcresult" -parallel-testing-enabled NO \
+    -only-testing:AdminUITests/AuthenticatedScreenshots \
     ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO test
   mkdir -p "$BUILD_WORK/screenshots/$family"
   xcrun xcresulttool export attachments --path "$BUILD_WORK/$family.xcresult" --output-path "$BUILD_WORK/screenshots/$family"
-  if [ "$HP_ADMIN_CAPTURE_REQUESTED" = 1 ]; then python3 "$BUILD_HELPERS/verify-screenshots.py" --family "$family"; fi
+  python3 "$BUILD_HELPERS/verify-screenshots.py" --family "$family"
+  fi
   printf 'passed\n' >"$BUILD_WORK/$family-tests-passed.txt"
   xcrun simctl shutdown "$simulator" || true
 done <"$BUILD_WORK/selected-simulators.txt"
