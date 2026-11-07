@@ -1,0 +1,46 @@
+name: HP Telecom Admin iOS 1.0.0 (1)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: hp-admin-ios-release
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.repository == 'trieutiendl/hptelecom' && github.event.repository.private == false && github.actor == 'trieutiendl' && github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      CI: '1'
+    steps:
+      - name: Read admin build helpers
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: hp-admin-ios-build
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.23.1'
+      - name: Prepare isolated browser test dependencies
+        run: |
+          npm install --prefix "$RUNNER_TEMP/hp-admin-qa-deps" --ignore-scripts --no-audit --no-fund playwright@1.62.1
+          PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/hp-admin-browser" node "$RUNNER_TEMP/hp-admin-qa-deps/node_modules/playwright/cli.js" install chromium
+      - name: Test and sign separate admin app
+        env:
+          HPADMIN_IOS_SOURCE_100_1: ${{ secrets.HPADMIN_IOS_SOURCE_100_1 }}
+          HPADMIN_IOS_SIGNING_100_1: ${{ secrets.HPADMIN_IOS_SIGNING_100_1 }}
+        run: bash hp-admin-ios-build/build.sh
+      - name: Preserve encrypted result and diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: hp-admin-ios-${{ github.run_id }}
+          path: ${{ runner.temp }}/hp-admin-ios-artifacts/*.enc
+          if-no-files-found: warn
+          retention-days: 1
+          compression-level: 0
+      - name: Remove temporary signing material
+        if: always()
+        run: bash hp-admin-ios-build/cleanup.sh
