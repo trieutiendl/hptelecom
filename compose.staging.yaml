@@ -1,0 +1,43 @@
+name: hptelecom-staging
+
+services:
+  hptelecom-staging-api:
+    build:
+      context: ./api-server
+      dockerfile: Dockerfile
+    container_name: hptelecom-staging-api
+    restart: unless-stopped
+    environment:
+      DATA_DIR: /data
+      PORT: "8080"
+      PUBLIC_ORIGIN: ${STAGING_PUBLIC_ORIGIN:-https://staging.hptelecom.id.vn}
+      COOKIE_SECURE: ${STAGING_COOKIE_SECURE:-1}
+      SESSION_HOURS: "8"
+      TRUST_PROXY: "1"
+    volumes:
+      - hptelecom-staging-api-data:/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  hptelecom-staging-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.staging
+    container_name: hptelecom-staging-web
+    restart: unless-stopped
+    depends_on:
+      hptelecom-staging-api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${STAGING_WEB_PORT:-18082}:8080"
+
+volumes:
+  hptelecom-staging-api-data:
