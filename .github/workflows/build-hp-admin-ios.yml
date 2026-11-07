@@ -1,6 +1,12 @@
 name: HP Telecom Admin iOS 1.0.0 (1)
 on:
   workflow_dispatch:
+    inputs:
+      capture:
+        description: Capture ten real screenshots with the approved limited reviewer session
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -29,8 +35,10 @@ jobs:
           PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/hp-admin-browser" node "$RUNNER_TEMP/hp-admin-qa-deps/node_modules/playwright/cli.js" install chromium
       - name: Test and sign separate admin app
         env:
+          HP_ADMIN_RUN_CAPTURE: ${{ inputs.capture && '1' || '0' }}
           HPADMIN_IOS_SOURCE_100_1: ${{ secrets.HPADMIN_IOS_SOURCE_100_1 }}
           HPADMIN_IOS_SIGNING_100_1: ${{ secrets.HPADMIN_IOS_SIGNING_100_1 }}
+          HPADMIN_IOS_CAPTURE_100_1: ${{ secrets.HPADMIN_IOS_CAPTURE_100_1 }}
         run: bash hp-admin-ios-build/build.sh
       - name: Preserve encrypted result and diagnostics
         if: always()
