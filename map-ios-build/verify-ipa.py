@@ -17,9 +17,12 @@ with zipfile.ZipFile(ipas[0]) as archive:
     assert sdk.startswith('iphoneos') and int(sdk[8:].split('.')[0]) >= 26, 'App Store requires iOS 26 SDK or later'
     assert any(n.endswith('/_CodeSignature/CodeResources') for n in archive.namelist())
     assert any(n.endswith('/embedded.mobileprovision') for n in archive.namelist())
-    assert any(n.endswith('/Web/hpmap/app.js') for n in archive.namelist())
-    assert any(n.endswith('/Web/hpmap/ios-native.js') for n in archive.namelist())
-    assert any(n.endswith('/Web/hpmap/ios-api.js') for n in archive.namelist())
+    root = work / 'app/HPMap/Web/hpmap'
+    bundle = infos[0].removesuffix('Info.plist') + 'Web/hpmap/'
+    for name in ('index.html', 'app.js', 'ios-page.js', 'ios-native.js', 'ios-api.js', 'mobile-gestures.js',
+                 'mbf-catalog.js', 'mbf-catalog.css', 'mbf-panel.js', 'mbf-transfer.js', 'mbf-transfer-raw.js',
+                 'mbf-transfer-source.js', 'mbf-report-proposal.js', 'mbf-digest.js', 'mobile-mbf.css'):
+        assert archive.read(bundle + name) == (root / name).read_bytes(), 'Signed app has the wrong asset ' + name
 verify=work/'verify-export'
 subprocess.run(['ditto','-xk',str(ipas[0]),str(verify)],check=True)
 apps=list((verify/'Payload').glob('*.app')); assert len(apps)==1
