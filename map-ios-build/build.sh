@@ -20,17 +20,17 @@ finish() {
   set +e
   if [ "$status" -ne 0 ] && [ -n "${SIMULATOR_ID:-}" ]; then
     mkdir -p "$BUILD_WORK/screenshots"
-    xcrun simctl io "$SIMULATOR_ID" screenshot "$BUILD_WORK/screenshots/failure.png"
+    python3 "$BUILD_HELPERS/run-bounded.py" 30 xcrun simctl io "$SIMULATOR_ID" screenshot "$BUILD_WORK/screenshots/failure.png"
   fi
   if [ -d "$BUILD_WORK/Tests.xcresult" ]; then
     mkdir -p "$BUILD_WORK/screenshots/test-attachments"
-    xcrun xcresulttool export attachments --path "$BUILD_WORK/Tests.xcresult" --output-path "$BUILD_WORK/screenshots/test-attachments"
+    python3 "$BUILD_HELPERS/run-bounded.py" 60 xcrun xcresulttool export attachments --path "$BUILD_WORK/Tests.xcresult" --output-path "$BUILD_WORK/screenshots/test-attachments"
   fi
   export HP_MAP_BUILD_EXIT="$status"
-  python3 "$BUILD_HELPERS/package-result.py"
+  python3 "$BUILD_HELPERS/run-bounded.py" 120 python3 "$BUILD_HELPERS/package-result.py"
   local package_status=$?
   if [ "$package_status" -eq 0 ]; then
-    node "$BUILD_HELPERS/crypt.cjs" encrypt "$BUILD_WORK/hp-map-ios-result.zip" "$BUILD_OUTPUT/hp-map-ios-result.zip.enc"
+    python3 "$BUILD_HELPERS/run-bounded.py" 120 node "$BUILD_HELPERS/crypt.cjs" encrypt "$BUILD_WORK/hp-map-ios-result.zip" "$BUILD_OUTPUT/hp-map-ios-result.zip.enc"
     package_status=$?
   fi
   if [ "$status" -eq 0 ] && [ "$package_status" -eq 0 ]; then
@@ -86,13 +86,15 @@ xcrun simctl list devices available --json >"$BUILD_WORK/simulators.json"
 SIMULATOR_ID="$(python3 "$BUILD_HELPERS/select-simulator.py")"
 export SIMULATOR_ID
 xcrun simctl boot "$SIMULATOR_ID" || true
-xcrun simctl bootstatus "$SIMULATOR_ID" -b
+python3 "$BUILD_HELPERS/run-bounded.py" 240 xcrun simctl bootstatus "$SIMULATOR_ID" -b
 echo 'Building and testing the iPhone interface.' >&3
-xcodebuild -project HPMap.xcodeproj -scheme HPMap -configuration Debug \
+python3 "$BUILD_HELPERS/run-bounded.py" 900 xcodebuild -project HPMap.xcodeproj -scheme HPMap -configuration Debug \
   -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
   -derivedDataPath "$BUILD_WORK/SimulatorDerivedData" \
   -resultBundlePath "$BUILD_WORK/Tests.xcresult" \
-  -parallel-testing-enabled NO ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO SWIFT_ACTIVE_COMPILATION_CONDITIONS='DEBUG HPMAP_UI_TESTS' test
+  -parallel-testing-enabled NO -test-timeouts-enabled YES \
+  -default-test-execution-time-allowance 300 -maximum-test-execution-time-allowance 420 \
+  ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO SWIFT_ACTIVE_COMPILATION_CONDITIONS='DEBUG HPMAP_UI_TESTS' test
 printf 'passed\n' >"$BUILD_WORK/simulator-tests-passed.txt"
 echo 'iPhone interface tests passed; creating the signed HP Map installation package.' >&3
 xcrun simctl status_bar "$SIMULATOR_ID" override --time '9:41' --dataNetwork wifi --wifiMode active --wifiBars 3 --batteryState charged --batteryLevel 100 || true

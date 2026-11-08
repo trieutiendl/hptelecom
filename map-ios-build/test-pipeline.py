@@ -11,6 +11,15 @@ spec=importlib.util.spec_from_file_location('verify_source',HERE/'verify-source.
 source=importlib.util.module_from_spec(spec); spec.loader.exec_module(source)
 
 class PipelineTests(unittest.TestCase):
+    def test_bounded_command_preserves_failure_status(self):
+        result=subprocess.run([sys.executable,str(HERE/'run-bounded.py'),'10',sys.executable,'-c','raise SystemExit(7)'],capture_output=True)
+        self.assertEqual(result.returncode,7)
+
+    def test_bounded_command_terminates_timeout(self):
+        result=subprocess.run([sys.executable,str(HERE/'run-bounded.py'),'0.2',sys.executable,'-c','import time; time.sleep(60)'],capture_output=True,timeout=20)
+        self.assertEqual(result.returncode,124)
+        self.assertIn(b'bounded timeout',result.stderr)
+
     def archive(self,root,extra=None):
         target=root/'source.zip'
         with zipfile.ZipFile(target,'w') as out:
