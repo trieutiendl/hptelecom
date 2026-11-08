@@ -1,4 +1,4 @@
-HP Map iOS 1.0.6 (9) - separate app vn.hptelecom.map
+HP Map iOS 1.0.7 (10) - separate app vn.hptelecom.map
 
 Local staging only. These files do not publish code or configure secrets.
 
