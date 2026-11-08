@@ -24,7 +24,7 @@ class PipelineTests(unittest.TestCase):
         target=root/'source.zip'
         with zipfile.ZipFile(target,'w') as out:
             out.writestr('HPMap.xcodeproj/project.pbxproj','fixture')
-            out.writestr('HPMap/Info.plist',plistlib.dumps({'CFBundleShortVersionString':'1.0.3','CFBundleVersion':'6','CFBundleDisplayName':'HP Map'}))
+            out.writestr('HPMap/Info.plist',plistlib.dumps({'CFBundleShortVersionString':'1.0.4','CFBundleVersion':'7','CFBundleDisplayName':'HP Map'}))
             if extra:
                 entry=zipfile.ZipInfo('entry'); entry.filename=extra[0]
                 out.writestr(entry,extra[1])
@@ -62,7 +62,7 @@ class PipelineTests(unittest.TestCase):
             (root/'verification.json').write_text('{}'); (root/'signing-identity.txt').write_text('private')
             subprocess.run([sys.executable,str(HERE/'package-result.py')],check=True,env={**os.environ,'BUILD_WORK':str(root),'HP_MAP_BUILD_EXIT':'0'},stdout=subprocess.DEVNULL)
             with zipfile.ZipFile(root/'hp-map-ios-result.zip') as archive:
-                self.assertIn('HP-Map-iOS-1.0.3-6.ipa',archive.namelist())
+                self.assertIn('HP-Map-iOS-1.0.4-7.ipa',archive.namelist())
                 self.assertNotIn('signing-identity.txt',archive.namelist())
 
 if __name__=='__main__': unittest.main()
