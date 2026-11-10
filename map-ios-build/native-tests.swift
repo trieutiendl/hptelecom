@@ -84,5 +84,17 @@ check(zip.count > kml.utf8.count, "KMZ ZIP directory present")
 do { _ = try MapKMZ.make("<!DOCTYPE kml [<!ENTITY x SYSTEM 'file:///etc/passwd'>]><kml/>"); fatalError("DTD was accepted") } catch { checks += 1 }
 do { _ = try MapKMZ.make("<kml>" + String(repeating:"x",count:MapSecurity.maxMapFile) + "</kml>"); fatalError("Oversize was accepted") } catch { checks += 1 }
 check(CommandLine.arguments.count == 2, "fixture output supplied")
+let importedStore = try MapKMZ.read(zip)
+check(importedStore == kml, "personal KMZ stored round-trip")
+let rawFile = try MapKMZ.read(Data(kml.utf8))
+check(rawFile == kml, "plain KML import")
+let deflated = Data(base64Encoded: "UEsDBBQAAAAIAGlXal2hItzYDwAAABAAAAAJAAAAZXh0cmEua21ss8nOzbHLL8lILbLRBzEBUEsDBBQAAAAIAGlXal1y4PZpJAAAADAAAAAHAAAAZG9jLmttbLPJzs2xs3HJTy7NTc0rsbPJS8xNtfP2jbLRB7Ns9BFS+iClAFBLAQIUABQAAAAIAGlXal2hItzYDwAAABAAAAAJAAAAAAAAAAAAAACAAQAAAABleHRyYS5rbWxQSwECFAAUAAAACABpV2pdcuD2aSQAAAAwAAAABwAAAAAAAAAAAAAAgAE2AAAAZG9jLmttbFBLBQYAAAAAAgACAGwAAAB/AAAAAAA=")!
+let importedDeflated = try MapKMZ.read(deflated)
+check(importedDeflated == "<kml><Document><name>KMZ</name></Document></kml>", "standard deflated archive uses root doc.kml")
+var corrupt = zip
+corrupt[37] ^= 1
+for malformed in [corrupt, Data(zip.dropLast()), Data(base64Encoded:"UEsDBBQAAAAAAGlXal1y4PZpMAAAADAAAAAKAAAALi4vZG9jLmttbDxrbWw+PERvY3VtZW50PjxuYW1lPktNWjwvbmFtZT48L0RvY3VtZW50Pjwva21sPlBLAQIUABQAAAAAAGlXal1y4PZpMAAAADAAAAAKAAAAAAAAAAAAAACAAQAAAAAuLi9kb2Mua21sUEsFBgAAAAABAAEAOAAAAFgAAAAAAA==")!, Data("<!DOCTYPE kml><kml>bad</kml>".utf8), Data([255])] {
+    do { _ = try MapKMZ.read(malformed); fatalError("Invalid local file was imported") } catch { checks += 1 }
+}
 try zip.write(to:URL(fileURLWithPath:CommandLine.arguments[1]),options:.atomic)
 print("\(checks) native security/KMZ checks passed.")

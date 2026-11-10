@@ -6,13 +6,13 @@ BUILD_WORK="$RUNNER_TEMP/hp-map-ios-build"
 BUILD_OUTPUT="$RUNNER_TEMP/hp-map-ios-artifacts"
 export BUILD_HELPERS BUILD_WORK BUILD_OUTPUT
 mkdir -p "$BUILD_WORK" "$BUILD_OUTPUT"
-if [ -z "${HP_MAP_IOS_SOURCE_108_11:-}" ] || [ -z "${HP_MAP_IOS_SIGNING_108_11:-}" ]; then
+if [ -z "${HP_MAP_IOS_SOURCE_109_12:-}" ] || [ -z "${HP_MAP_IOS_SIGNING_109_12:-}" ]; then
   echo 'HP Map build credentials are missing. No compilation or signing started.'
   exit 1
 fi
-export HP_IOS_BUILD_KEY="$HP_MAP_IOS_SOURCE_108_11"
-export HP_IOS_SIGNING_JSON="$HP_MAP_IOS_SIGNING_108_11"
-unset HP_MAP_IOS_SOURCE_108_11 HP_MAP_IOS_SIGNING_108_11
+export HP_IOS_BUILD_KEY="$HP_MAP_IOS_SOURCE_109_12"
+export HP_IOS_SIGNING_JSON="$HP_MAP_IOS_SIGNING_109_12"
+unset HP_MAP_IOS_SOURCE_109_12 HP_MAP_IOS_SIGNING_109_12
 exec 3>&1 4>&2
 finish() {
   local status=$?
