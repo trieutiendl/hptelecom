@@ -1,11 +1,11 @@
 {
   "name": "HP Telecom Qu\u1ea3n tr\u1ecb",
-  "version": "1.0.0",
-  "build": "1",
+  "version": "1.0.1",
+  "build": "2",
   "bundleIdentifier": "vn.hptelecom.admin.ios",
   "teamId": "DX247Z5GQ8",
   "minimumIOS": "15.0",
   "project": "HPTelecomAdmin",
   "appStoreConnectAppId": "6831996812",
-  "sourceSha256": "0a00b9cb87eb19c683d4eaea9afeb9afee029f2a90f87635fa35603531cc6da8"
+  "sourceSha256": "db374599521c93b3f017b1730129a916585ea1e2d9e7bf5bdbd28060232f766d"
 }

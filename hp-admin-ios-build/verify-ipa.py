@@ -45,6 +45,7 @@ assert b'HP_ADMIN_CAPTURE_EXPECTED_USERNAME' not in executable and b'DebugCaptur
 assert b'HP_ADMIN_CAPTURE_ORIGIN' not in executable, 'Capture-only origin bootstrap must not ship in Release'
 assert all(value not in executable for value in [b'--hp-admin-keychain-test',b'keychain-self-test',b'hp-admin-keychain-result',b'HP Admin Keychain round trip passed']), 'Keychain self-test must not ship in Release'
 assert b'hp-admin-capture-stage.json' not in executable, 'DEBUG phase diagnostics must not ship in Release'
+assert all(marker not in executable for marker in (b'--hp-admin-report-menu-test', b'HP-REPORT-QA', b'simulator-only')), 'Simulator-only report fixtures must not ship in Release'
 profile=plistlib.loads(subprocess.check_output(['security','cms','-D','-i',str(apps[0]/'embedded.mobileprovision')]))
 assert profile['TeamIdentifier']==[release['teamId']]
 assert profile['Entitlements']['application-identifier']==release['teamId']+'.'+release['bundleIdentifier']
@@ -56,6 +57,7 @@ receipt['privacyManifest']=privacy_check
 receipt['simulatorTests']['mode']='offline UI plus real limited-reviewer screenshots' if capture_requested else 'offline UI plus unauthenticated public login; reviewer capture not requested'
 receipt['screenshotsOrigin']='https://hptelecom.id.vn'
 receipt['captureRequested']=capture_requested
+receipt['simulatorTests']['nativeReportMenuToWKWebView']='incident, relocation, patrol, incident; isolated in-memory fixture'
 receipt['screenshots']={'AppStore':'ten verified unedited limited-reviewer screenshots per device family' if capture_requested else 'authenticated capture not requested','iPhone':10 if capture_requested else 0,'iPad':10 if capture_requested else 0,'offlineFixture':'functional test evidence only'}
 (work/'verification.json').write_text(json.dumps(receipt,indent=2)+'\n')
 print('Separate admin identity, device families, version, resources, UI tests and signature verified.')

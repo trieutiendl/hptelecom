@@ -9,21 +9,21 @@ mkdir -p "$BUILD_WORK" "$BUILD_OUTPUT"
 HP_ADMIN_CAPTURE_REQUESTED="${HP_ADMIN_RUN_CAPTURE:-0}"
 export HP_ADMIN_CAPTURE_REQUESTED
 if [ "$HP_ADMIN_CAPTURE_REQUESTED" != 0 ] && [ "$HP_ADMIN_CAPTURE_REQUESTED" != 1 ]; then exit 1; fi
-if [ -z "${HPADMIN_IOS_SOURCE_100_1:-}" ] || [ -z "${HPADMIN_IOS_SIGNING_100_1:-}" ]; then
+if [ -z "${HPADMIN_IOS_SOURCE_101_2:-}" ] || [ -z "${HPADMIN_IOS_SIGNING_101_2:-}" ]; then
   echo 'Admin release credentials are missing. No compilation or signing started.'
   exit 1
 fi
-if [ "$HP_ADMIN_CAPTURE_REQUESTED" = 1 ] && [ -z "${HPADMIN_IOS_CAPTURE_100_1:-}" ]; then
+if [ "$HP_ADMIN_CAPTURE_REQUESTED" = 1 ] && [ -z "${HPADMIN_IOS_CAPTURE_101_2:-}" ]; then
   echo 'Requested authenticated capture requires the approved limited reviewer session.'
   exit 1
 fi
 # Keep private values out of browser, Swift, simulator and Xcode process environments.
-HP_ADMIN_SOURCE_VALUE="$HPADMIN_IOS_SOURCE_100_1"
-HP_ADMIN_SIGNING_VALUE="$HPADMIN_IOS_SIGNING_100_1"
+HP_ADMIN_SOURCE_VALUE="$HPADMIN_IOS_SOURCE_101_2"
+HP_ADMIN_SIGNING_VALUE="$HPADMIN_IOS_SIGNING_101_2"
 HP_ADMIN_CAPTURE_VALUE=''
-if [ "$HP_ADMIN_CAPTURE_REQUESTED" = 1 ]; then HP_ADMIN_CAPTURE_VALUE="$HPADMIN_IOS_CAPTURE_100_1"; fi
+if [ "$HP_ADMIN_CAPTURE_REQUESTED" = 1 ]; then HP_ADMIN_CAPTURE_VALUE="$HPADMIN_IOS_CAPTURE_101_2"; fi
 export -n HP_ADMIN_SOURCE_VALUE HP_ADMIN_SIGNING_VALUE HP_ADMIN_CAPTURE_VALUE
-unset HPADMIN_IOS_SOURCE_100_1 HPADMIN_IOS_SIGNING_100_1 HPADMIN_IOS_CAPTURE_100_1 HP_IOS_BUILD_KEY HP_IOS_SIGNING_JSON HP_ADMIN_CAPTURE_SESSION
+unset HPADMIN_IOS_SOURCE_101_2 HPADMIN_IOS_SIGNING_101_2 HPADMIN_IOS_CAPTURE_101_2 HP_IOS_BUILD_KEY HP_IOS_SIGNING_JSON HP_ADMIN_CAPTURE_SESSION
 exec 3>&1 4>&2
 finish() {
   local status=$?
@@ -85,6 +85,7 @@ python3 -m unittest discover -s tests -p 'test_privacy_manifest.py' >"$BUILD_WOR
 python3 scripts/test-capture-pipeline.py >"$BUILD_WORK/capture-pipeline-tests.log" 2>&1
 node tests/browser-export-bridge.cjs >>"$BUILD_WORK/javascript-tests.log" 2>&1
 node tests/browser-upload-adapter.cjs >>"$BUILD_WORK/javascript-tests.log" 2>&1
+node tests/browser-report-menu.cjs >>"$BUILD_WORK/javascript-tests.log" 2>&1
 cp tests/browser-bridge-result.json "$BUILD_WORK/browser-bridge-production.json"
 cp tests/browser-upload-result.json "$BUILD_WORK/browser-upload-production.json"
 xcrun swiftc Admin/Sources/AdminSecurity.swift tests/AdminSecurityQA.swift -o "$BUILD_WORK/admin-security-qa"

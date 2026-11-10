@@ -48,7 +48,7 @@ def simulated_entitlements(binary):
     return entitlements,sections[b'__ents_der']
 
 def validate(info, entitlements):
-    if info.get('CFBundleIdentifier')!='vn.hptelecom.admin.ios' or info.get('CFBundleShortVersionString')!='1.0.0' or info.get('CFBundleVersion')!='1':
+    if info.get('CFBundleIdentifier')!='vn.hptelecom.admin.ios' or info.get('CFBundleShortVersionString')!='1.0.1' or info.get('CFBundleVersion')!='2':
         raise ValueError('Wrong simulator app identity')
     if not str(info.get('DTSDKName','')).startswith('iphonesimulator'):raise ValueError('Simulator app required')
     if entitlements.get('application-identifier')!=APP_ID or entitlements.get('com.apple.developer.team-identifier')!='DX247Z5GQ8':

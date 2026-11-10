@@ -15,5 +15,5 @@ with zipfile.ZipFile(work/'hp-admin-ios-result.zip','w',zipfile.ZIP_DEFLATED) as
     if status==0 and (work/'verification.json').is_file():
         ipas=list((work/'export').glob('*.ipa'))
         if len(ipas)!=1: raise ValueError('Expected one verified admin IPA')
-        archive.write(ipas[0],'HP-Telecom-Quan-Tri-iOS-1.0.0-1.ipa')
+        archive.write(ipas[0],'HP-Telecom-Quan-Tri-iOS-1.0.1-2.ipa')
 print('Result package prepared for encryption.')
