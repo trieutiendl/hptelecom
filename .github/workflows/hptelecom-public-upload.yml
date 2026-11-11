@@ -1,0 +1,96 @@
+name: Upload public hptelecom for iPhone
+on:
+  workflow_dispatch:
+    inputs:
+      build_run:
+        required: true
+        type: string
+      build_commit:
+        required: true
+        type: string
+      ipa_sha256:
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: hptelecom-public-store-upload
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    if: github.repository == 'trieutiendl/hptelecom' && github.actor == 'trieutiendl' && github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    timeout-minutes: 35
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      BUILD_RUN: ${{ inputs.build_run }}
+      BUILD_COMMIT: ${{ inputs.build_commit }}
+      IPA_SHA256: ${{ inputs.ipa_sha256 }}
+    steps:
+      - name: Fetch the verified public release artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$BUILD_RUN" =~ ^[0-9]+$ && "$BUILD_COMMIT" =~ ^[0-9a-f]{40}$ && "$IPA_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          cd "$RUNNER_TEMP"
+          mkdir hp-store
+          cd hp-store
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN" >run.json
+          jq -e --arg sha "$BUILD_COMMIT" --arg repo "$GITHUB_REPOSITORY" '.repository.full_name == $repo and .head_sha == $sha and .head_branch == "main" and .event == "workflow_dispatch" and .status == "completed" and .path == ".github/workflows/hptelecom-public-ios.yml" and .actor.login == "trieutiendl"' run.json >/dev/null
+          attempt="$(jq -er '.run_attempt' run.json)"
+          [[ "$attempt" =~ ^[1-9][0-9]*$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN/attempts/$attempt/jobs?per_page=100" >jobs.json
+          jq -e --arg sha "$BUILD_COMMIT" --arg run "$BUILD_RUN" '(.total_count == (.jobs | length)) and ([.jobs[] | select(.name == "archive")] | length == 1 and .[0].head_sha == $sha and (.[0].run_id | tostring) == $run and .[0].status == "completed" and .[0].conclusion == "success")' jobs.json >/dev/null
+          gh run download "$BUILD_RUN" -R "$GITHUB_REPOSITORY" -n hptelecom-public-ios-encrypted -D encrypted
+          gh api -H 'Accept: application/vnd.github.raw+json' "repos/$GITHUB_REPOSITORY/contents/hptelecom-public-ios/crypt.cjs?ref=$BUILD_COMMIT" >crypt.cjs
+          echo '98ed8095c3c82feb5d2be747a821ff3c4acb31c2c78f215c4596aa7936f309f9  crypt.cjs' | shasum -a 256 -c -
+      - name: Verify and upload hptelecom 1.0.69 (1) to Apple
+        env:
+          DELIVERY: ${{ secrets.HPTELECOM_PUBLIC_IOS_DELIVERY_1069 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          cd "$RUNNER_TEMP/hp-store"
+          mkdir private_keys
+          trap 'rm -f "$RUNNER_TEMP/hp-store/private_keys/"*.p8 "$RUNNER_TEMP/hp-store/product.ipa"' EXIT
+          python3 - <<'PY'
+          import json, os, pathlib, re
+          data = json.loads(os.environ['DELIVERY'])
+          if not re.fullmatch(r'[A-Z0-9]{10}',data['keyId']) or not re.fullmatch(r'[0-9a-fA-F-]{36}',data['issuer']):
+              raise ValueError('Invalid App Store Connect credentials')
+          if (str(data['run']),data['commit'],data['sha']) != (os.environ['BUILD_RUN'],os.environ['BUILD_COMMIT'],os.environ['IPA_SHA256']):
+              raise ValueError('Upload does not match the authorized artifact')
+          pathlib.Path('private_keys', 'AuthKey_'+data['keyId']+'.p8').write_text(data['p8'])
+          PY
+          node - <<'JS'
+          const fs = require('node:fs');
+          const { decrypt } = require('./crypt.cjs');
+          const key = JSON.parse(process.env.DELIVERY).artifactKey;
+          fs.writeFileSync('product.ipa', decrypt(fs.readFileSync('encrypted/hptelecom-1.0.69-1.ipa.enc'), key), {mode:0o600});
+          JS
+          key_id="$(node -p 'JSON.parse(process.env.DELIVERY).keyId')"
+          issuer="$(node -p 'JSON.parse(process.env.DELIVERY).issuer')"
+          unset DELIVERY
+          echo "$IPA_SHA256  product.ipa" | shasum -a 256 -c -
+          python3 - <<'PY'
+          import plistlib, re, zipfile
+          with zipfile.ZipFile('product.ipa') as ipa:
+              names=[n for n in ipa.namelist() if re.fullmatch(r'Payload/[^/]+\.app/Info\.plist',n)]
+              if len(names)!=1:
+                  raise ValueError('Expected one iPhone application')
+              p=plistlib.loads(ipa.read(names[0]))
+              fields=('CFBundleIdentifier','CFBundleShortVersionString','CFBundleVersion','CFBundleDisplayName','UIDeviceFamily')
+              if tuple(p[k] for k in fields)!=('vn.hptelecom.fieldwork','1.0.69','1','hptelecom',[1]):
+                  raise ValueError('Wrong bundle, build, or device family')
+          PY
+          export API_PRIVATE_KEYS_DIR="$RUNNER_TEMP/hp-store/private_keys"
+          xcrun altool --validate-app -f product.ipa --type ios --apiKey "$key_id" --apiIssuer "$issuer"
+          xcrun altool --upload-app -f product.ipa --type ios --apiKey "$key_id" --apiIssuer "$issuer"
