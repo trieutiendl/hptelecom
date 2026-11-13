@@ -142,6 +142,9 @@ jobs:
             destination="$RUNNER_TEMP/hptelecom-public-screenshots-encrypted"
             mkdir -p "$destination"
             node hptelecom-public-ios/crypt.cjs encrypt "$RUNNER_TEMP/hptelecom-public-screenshots.log" "$destination/hptelecom-public-screenshots.log.enc"
+            if [[ -f "$RUNNER_TEMP/cache-reuse-receipt.json" ]]; then
+              node hptelecom-public-ios/crypt.cjs encrypt "$RUNNER_TEMP/cache-reuse-receipt.json" "$destination/cache-reuse-receipt.json.enc"
+            fi
           fi
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

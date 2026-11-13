@@ -74,7 +74,7 @@ def archive_layout(archive):
     entries = archive.infolist()
     require(0 < len(entries) <= 30000, 'Unexpected cache archive entry count.')
     require(sum(entry.file_size for entry in entries) <= MAX_BYTES, 'Cache expands beyond the size limit.')
-    names, roots, result = set(), set(), []
+    names, roots, validated, result = set(), set(), [], []
     for entry in entries:
         # orig_filename retains unsafe separators/NULs that ZipInfo may
         # normalize for the host platform before exposing filename.
@@ -93,9 +93,28 @@ def archive_layout(archive):
         if path.parts[0] == '__MACOSX':
             # ditto stores Finder/resource metadata here. It is not app content.
             continue
-        root = path.parts[0]
-        require(root.endswith('.app'), 'Only one simulator app may be extracted.')
-        roots.add(root)
+        roots.add(path.parts[0])
+        validated.append((entry, mode))
+    # The pinned capture's ditto archive contains the complete products folder:
+    # find encountered its loose main.jsbundle before the application's copy.
+    # Select only the expected application, never the included old test runner
+    # or dependency products. The signed bundle is still verified after extract.
+    wrapped = roots == {'Release-iphonesimulator'}
+    if wrapped:
+        source_root = 'Release-iphonesimulator/hptelecom.app'
+        root = 'hptelecom.app'
+        strip_prefix = 'Release-iphonesimulator/'
+    else:
+        require(len(roots) == 1 and next(iter(roots)).endswith('.app'),
+                'Expected exactly one simulator app root.')
+        root = source_root = next(iter(roots))
+        strip_prefix = ''
+    for entry, mode in validated:
+        name = entry.orig_filename
+        if name.rstrip('/') != source_root and not name.startswith(source_root + '/'):
+            continue
+        output_name = name[len(strip_prefix):]
+        path = pathlib.PurePosixPath(output_name)
         target = None
         if stat.S_ISLNK(mode):
             require(entry.file_size <= 4096, 'Oversized symbolic link.')
@@ -105,14 +124,12 @@ def archive_layout(archive):
                     'Unsafe cache symbolic link.')
             resolved = posixpath.normpath(posixpath.join(str(path.parent), target))
             require(resolved.startswith(root + '/'), 'Cache symbolic link leaves the app.')
-        result.append((entry, mode, target))
-    require(len(roots) == 1, 'Expected exactly one simulator app root.')
-    root = next(iter(roots))
+        result.append((entry, mode, target, output_name))
     required = {root + '/Info.plist', root + '/main.jsbundle'}
-    require(required.issubset({e.filename for e, _, _ in result}), 'Simulator app metadata or JavaScript is missing.')
-    links = {e.filename.rstrip('/') for e, _, target in result if target is not None}
-    require(all(not any(str(parent) in links for parent in pathlib.PurePosixPath(e.filename).parents)
-                for e, _, _ in result), 'A ZIP member is nested beneath a symbolic link.')
+    require(required.issubset({name for _, _, _, name in result}), 'Simulator app metadata or JavaScript is missing.')
+    links = {name.rstrip('/') for _, _, target, name in result if target is not None}
+    require(all(not any(str(parent) in links for parent in pathlib.PurePosixPath(name).parents)
+                for _, _, _, name in result), 'A ZIP member is nested beneath a symbolic link.')
     return result
 
 
@@ -123,8 +140,8 @@ def extract_cache(cache_zip, destination):
         layout = archive_layout(archive)
         require(archive.testzip() is None, 'Cache ZIP checksum failed.')
         destination.mkdir(parents=True)
-        for entry, mode, target in layout:
-            output = destination.joinpath(*pathlib.PurePosixPath(entry.filename).parts)
+        for entry, mode, target, name in layout:
+            output = destination.joinpath(*pathlib.PurePosixPath(name).parts)
             if target is not None:
                 continue
             if entry.is_dir():
@@ -135,9 +152,9 @@ def extract_cache(cache_zip, destination):
                     for chunk in iter(lambda: source.read(1024 * 1024), b''):
                         out.write(chunk)
                 os.chmod(output, stat.S_IMODE(mode) or 0o644)
-        for entry, _, target in layout:
+        for entry, _, target, name in layout:
             if target is not None:
-                output = destination.joinpath(*pathlib.PurePosixPath(entry.filename).parts)
+                output = destination.joinpath(*pathlib.PurePosixPath(name).parts)
                 output.parent.mkdir(parents=True, exist_ok=True)
                 output.symlink_to(target)
 
