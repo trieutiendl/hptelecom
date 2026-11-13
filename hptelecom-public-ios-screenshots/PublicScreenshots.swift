@@ -72,6 +72,7 @@ final class PublicScreenshots: XCTestCase {
 
     private func fillPassword(_ password: String, in field: XCUIElement) {
         tap(field)
+        print("[focus] secureField=\(field.label) frame=\(field.frame) keyboardCount=\(app.keyboards.count)")
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 10))
         // Keep keyboard focus on the field. Application-directed, paced input
         // avoids reselecting secure text and gives controlled inputs time to commit.
@@ -93,6 +94,7 @@ final class PublicScreenshots: XCTestCase {
         tap(app.buttons["Tạo tài khoản"])
         let password = String(Int64.random(in: 100_000_000_000...999_999_999_999))
         enter("minhan", in: app.textFields["Tên đăng nhập"])
+        print("[focus] afterUsername keyboardCount=\(app.keyboards.count)")
         XCTAssertEqual(app.textFields["Tên đăng nhập"].value as? String, "minhan")
         fillPassword(password, in: app.secureTextFields["Mật khẩu"])
         fillPassword(password, in: app.secureTextFields["Nhập lại mật khẩu"])

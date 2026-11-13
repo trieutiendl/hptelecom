@@ -55,6 +55,27 @@ PY
 defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool NO
 xcrun simctl boot "$simulator"
 xcrun simctl bootstatus "$simulator" -b
+# Recent Xcode also keeps a per-device keyboard preference. Verify both the
+# global and this newly created device setting before launching the test host.
+defaults export com.apple.iphonesimulator "$work/simulator-preferences.plist"
+python3 - "$work/simulator-preferences.plist" "$simulator" <<'PY'
+import plistlib, sys
+p, udid = sys.argv[1:]
+with open(p, 'rb') as f: prefs = plistlib.load(f)
+prefs['ConnectHardwareKeyboard'] = False
+prefs.setdefault('DevicePreferences', {}).setdefault(udid, {})['ConnectHardwareKeyboard'] = False
+with open(p, 'wb') as f: plistlib.dump(prefs, f)
+PY
+defaults import com.apple.iphonesimulator "$work/simulator-preferences.plist"
+defaults export com.apple.iphonesimulator "$work/verified-preferences.plist"
+python3 - "$work/verified-preferences.plist" "$simulator" <<'PY'
+import plistlib, sys
+with open(sys.argv[1], 'rb') as f: prefs = plistlib.load(f)
+assert prefs['ConnectHardwareKeyboard'] is False
+assert prefs['DevicePreferences'][sys.argv[2]]['ConnectHardwareKeyboard'] is False
+print('[capture] Global and per-device software keyboard verified')
+PY
+open -a Simulator --args -CurrentDeviceUDID "$simulator"
 xcrun simctl status_bar "$simulator" override --time '9:41' --dataNetwork wifi --wifiMode active \
   --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
 xcrun simctl install "$simulator" "$app"
