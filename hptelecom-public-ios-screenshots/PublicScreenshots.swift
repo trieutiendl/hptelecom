@@ -78,7 +78,8 @@ final class PublicScreenshots: XCTestCase {
         RunLoop.current.run(until: Date().addingTimeInterval(0.5))
         let observedCount = (field.value as? String)?.count ?? -1
         print("[account-entry] field=\(field.label) typedCount=\(password.count) maskedValueCount=\(observedCount)")
-        field.typeText("\n")
+        // Do not issue a second field-directed type operation to dismiss the
+        // keyboard: XCTest can reselect secure text. Tap the next control.
     }
 
     func testStoreScreenshots() {
