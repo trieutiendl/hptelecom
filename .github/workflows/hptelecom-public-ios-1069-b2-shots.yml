@@ -1,0 +1,145 @@
+name: Verify public hptelecom build 2 with the compiled simulator app
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: hptelecom-public-ios-1069-b2-shots
+  cancel-in-progress: false
+
+jobs:
+  screenshots:
+    if: github.repository == 'trieutiendl/hptelecom' && github.event.repository.private == false && github.actor == 'trieutiendl' && startsWith(github.ref, 'refs/tags/hptelecom-public-ios-1069-b2-shots-')
+    runs-on: macos-26
+    timeout-minutes: 25
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - name: Read the separately reviewed capture harness
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: hptelecom-public-ios-1069-b2-shots
+      - name: Read the unchanged build 2 inputs at their original commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 0439b5437b637a6e243c6102ccee29f295bbc28e
+          persist-credentials: false
+          sparse-checkout: hptelecom-public-ios-1069-b2
+          path: frozen-source
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.23.1
+      - name: Verify the frozen build 2 source
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          export BUILD_HELPERS="$GITHUB_WORKSPACE/frozen-source/hptelecom-public-ios-1069-b2"
+          export BUILD_WORK="$RUNNER_TEMP/hptelecom-public-input"
+          mkdir -p "$BUILD_WORK/app"
+          cd "$BUILD_HELPERS"
+          test "$(git rev-parse HEAD)" = 0439b5437b637a6e243c6102ccee29f295bbc28e
+          node crypt.cjs decrypt source.enc "$BUILD_WORK/source.zip"
+          unset HP_IOS_BUILD_KEY
+          test "$(shasum -a 256 "$BUILD_WORK/source.zip" | cut -d' ' -f1)" = de8f6eaea8ea62b5e6d24e346707605ca887bdbbc55db861d30d983da159fa1b
+          python3 verify-source.py
+      - name: Download and verify only the reviewed build 2 simulator artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          helpers="$GITHUB_WORKSPACE/hptelecom-public-ios-1069-b2-shots"
+          pin="$helpers/pinned-cache.json"
+          cache="$RUNNER_TEMP/hptelecom-b2-cache"
+          mkdir -p "$cache"
+          test -f "$pin"
+          artifact_id="$(python3 - "$pin" <<'PY'
+          import json, sys
+          p = json.load(open(sys.argv[1]))
+          assert type(p.get('artifactId')) is int and p['artifactId'] > 0
+          assert p.get('runId') == 43456092482 and p.get('build') == '2'
+          print(p['artifactId'])
+          PY
+          )"
+          gh api repos/trieutiendl/hptelecom/actions/runs/43456092482 > "$cache/run.json"
+          gh api "repos/trieutiendl/hptelecom/actions/artifacts/$artifact_id" > "$cache/artifact.json"
+          gh api "repos/trieutiendl/hptelecom/actions/artifacts/$artifact_id/zip" > "$cache/artifact.zip"
+          python3 "$helpers/cached-retry/prepare-pin.py" --run "$cache/run.json" \
+            --artifact "$cache/artifact.json" --archive "$cache/artifact.zip" \
+            --output "$cache/observed-pin.json"
+          python3 - "$pin" "$cache/observed-pin.json" "$cache" <<'PY'
+          import json, pathlib, sys, zipfile
+          assert json.load(open(sys.argv[1])) == json.load(open(sys.argv[2])), 'Reviewed build 2 artifact pin differs'
+          cache = pathlib.Path(sys.argv[3])
+          with zipfile.ZipFile(cache/'artifact.zip') as z:
+              assert z.namelist() == ['simulator-app.zip.enc'] and z.testzip() is None
+              (cache/'simulator-app.zip.enc').write_bytes(z.read('simulator-app.zip.enc'))
+          PY
+          node "$GITHUB_WORKSPACE/frozen-source/hptelecom-public-ios-1069-b2/crypt.cjs" decrypt \
+            "$cache/simulator-app.zip.enc" "$cache/simulator-app.zip"
+      - name: Prepare the small XCTest harness dependency
+        run: |
+          set -euo pipefail
+          if ! ruby -e 'require "xcodeproj"; abort unless Xcodeproj::VERSION == "1.27.0"'; then
+            gem install --user-install xcodeproj --version 1.27.0 --no-document
+          fi
+          ruby -e 'gem "xcodeproj", "1.27.0"; require "xcodeproj"'
+      - name: Capture the unchanged simulator app with a bounded AutoFill check
+        id: capture
+        env:
+          PUBLIC_APP_SOURCE: ${{ runner.temp }}/hptelecom-public-input/app
+          PUBLIC_SOURCE_ZIP: ${{ runner.temp }}/hptelecom-public-input/source.zip
+          PUBLIC_SIMULATOR_APP_ZIP: ${{ runner.temp }}/hptelecom-b2-cache/simulator-app.zip
+          PUBLIC_SIMULATOR_RUN_JSON: ${{ runner.temp }}/hptelecom-b2-cache/run.json
+          PUBLIC_SIMULATOR_ARTIFACT_JSON: ${{ runner.temp }}/hptelecom-b2-cache/artifact.json
+          PUBLIC_SIMULATOR_ARTIFACT_ZIP: ${{ runner.temp }}/hptelecom-b2-cache/artifact.zip
+          PUBLIC_CACHE_PIN: ${{ github.workspace }}/hptelecom-public-ios-1069-b2-shots/pinned-cache.json
+          PUBLIC_RELEASE_JSON: ${{ github.workspace }}/frozen-source/hptelecom-public-ios-1069-b2/release.json
+          PUBLIC_SCREENSHOT_OUTPUT: ${{ runner.temp }}/hptelecom-public-screenshots
+          PUBLIC_CACHE_REUSE_RECEIPT: ${{ runner.temp }}/cache-reuse-receipt.json
+        run: |
+          set -euo pipefail
+          umask 077
+          bash "$GITHUB_WORKSPACE/hptelecom-public-ios-1069-b2-shots/cached-retry/capture-cached.sh" \
+            > "$RUNNER_TEMP/hptelecom-public-screenshots.log" 2>&1
+      - name: Verify and encrypt the allowed captures and receipts
+        if: always()
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SOURCE }}
+          CAPTURE_OUTCOME: ${{ steps.capture.outcome }}
+        run: |
+          set -euo pipefail
+          umask 077
+          helpers="$GITHUB_WORKSPACE/hptelecom-public-ios-1069-b2-shots"
+          frozen="$GITHUB_WORKSPACE/frozen-source/hptelecom-public-ios-1069-b2"
+          images="$RUNNER_TEMP/hptelecom-public-screenshots"
+          destination="$RUNNER_TEMP/hptelecom-public-screenshots-encrypted"
+          mkdir -p "$destination"
+          if compgen -G "$images/*.png" >/dev/null; then
+            partial=()
+            if [[ "$CAPTURE_OUTCOME" != success ]]; then partial=(--partial); fi
+            python3 "$helpers/verify-screenshots.py" "$images" "$frozen/release.json" "${partial[@]}" > "$RUNNER_TEMP/screenshot-receipt.json"
+            for file in "$images"/*.png; do
+              node "$frozen/crypt.cjs" encrypt "$file" "$destination/$(basename "$file").enc"
+            done
+          fi
+          for name in screenshot-receipt.json cache-reuse-receipt.json hptelecom-public-screenshots.log; do
+            file="$RUNNER_TEMP/$name"
+            if [[ -f "$file" ]]; then
+              node "$frozen/crypt.cjs" encrypt "$file" "$destination/$name.enc"
+            fi
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: hptelecom-public-ios-1069-b2-shots-encrypted
+          path: ${{ runner.temp }}/hptelecom-public-screenshots-encrypted/*.enc
+          retention-days: 1
+          if-no-files-found: warn

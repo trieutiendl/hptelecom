@@ -1,0 +1,14 @@
+{
+  "artifactDigest": "sha256:f7bf7312ad396cb89d7d246ea9515c2e540fd0d9063ed8871d60b894cdf26642",
+  "artifactId": 14056945762,
+  "artifactName": "hptelecom-public-ios-1069-b2-simulator-encrypted",
+  "build": "2",
+  "bundleIdentifier": "vn.hptelecom.fieldwork",
+  "commit": "0439b5437b637a6e243c6102ccee29f295bbc28e",
+  "repository": "trieutiendl/hptelecom",
+  "runId": 43456092482,
+  "schemaVersion": 1,
+  "sourceSha256": "de8f6eaea8ea62b5e6d24e346707605ca887bdbbc55db861d30d983da159fa1b",
+  "version": "1.0.69",
+  "workflow": ".github/workflows/hptelecom-public-ios-1069-b2.yml"
+}
