@@ -142,25 +142,17 @@ final class PublicScreenshots: XCTestCase {
     private func fillPassword(_ password: String, in field: XCUIElement, alreadyFocused: Bool = false) {
         if !alreadyFocused { tap(field) }
         print("[focus] secureField=\(field.label) frame=\(field.frame) keyboardCount=\(app.keyboards.count)")
-        // A hardware-backed simulator may expose no software Keyboard element.
-        // typeText itself requires real keyboard focus; successful registration
-        // and sign-in below remain the end-to-end checks of the entered password.
-        // Keep keyboard focus on the field. Application-directed, paced input
-        // avoids reselecting secure text and gives controlled inputs time to commit.
-        for (index, character) in password.enumerated() {
-            app.typeText(String(character))
-            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
-            if index == 0 {
-                XCTAssertEqual(app.textFields["Tên đăng nhập"].value as? String, "minhan",
-                               "Secure input must not change the account name")
-                print("[focus] firstSecureCharacter maskedValueCount=\((field.value as? String)?.count ?? -1)")
-            }
-        }
+        // A single operation targets the intended secure field. Compare this
+        // with the previous per-character app.typeText calls on the same frozen
+        // binary; registration and sign-in remain mandatory end-to-end checks.
+        // Never expose text values, screenshots, or the whole accessibility tree.
+        field.typeText(password)
+        XCTAssertEqual(app.textFields["Tên đăng nhập"].value as? String, "minhan",
+                       "Secure input must not change the account name")
         RunLoop.current.run(until: Date().addingTimeInterval(0.5))
         let observedCount = (field.value as? String)?.count ?? -1
         print("[account-entry] field=\(field.label) typedCount=\(password.count) maskedValueCount=\(observedCount)")
-        // Do not issue a second field-directed type operation to dismiss the
-        // keyboard: XCTest can reselect secure text. Tap the next control.
+        // Tap the next control rather than typing again to dismiss the keyboard.
     }
 
     func testStoreScreenshots() throws {
