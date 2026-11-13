@@ -141,6 +141,15 @@ final class PublicScreenshots: XCTestCase {
     
     private func fillPassword(_ password: String, in field: XCUIElement, alreadyFocused: Bool = false) {
         if !alreadyFocused { tap(field) }
+        // The observed first tap can dismiss the username keyboard while the
+        // form moves. Do not send secure input until a keyboard is available.
+        // One ordinary re-tap is allowed; no text is read or injected elsewhere.
+        let keyboard = app.keyboards.firstMatch
+        if !keyboard.waitForExistence(timeout: 3) {
+            tap(field)
+        }
+        XCTAssertTrue(keyboard.waitForExistence(timeout: 5),
+                      "Secure field did not open the software keyboard")
         print("[focus] secureField=\(field.label) frame=\(field.frame) keyboardCount=\(app.keyboards.count)")
         // A single operation targets the intended secure field. Compare this
         // with the previous per-character app.typeText calls on the same frozen
