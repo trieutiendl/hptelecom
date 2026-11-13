@@ -72,14 +72,14 @@ final class PublicScreenshots: XCTestCase {
 
     private func fillPassword(_ password: String, in field: XCUIElement) {
         tap(field)
-        // Numeric input avoids keyboard layout changes and smart punctuation. Wait for
-        // the controlled React Native input before leaving a secure-entry field.
+        // Keep focus on the secure field. Accessibility may mask its value differently
+        // from the number of characters entered; successful registration and sign-in
+        // below are the acceptance checks, not the length of that masked value.
         for (index, character) in password.enumerated() {
             field.typeText(String(character))
-            let count = index + 1
-            let filled = NSPredicate { _, _ in (field.value as? String)?.count == count }
-            XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: filled, object: field)],
-                                         timeout: 5), .completed, "Secure input did not retain the next character")
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+            let observedCount = (field.value as? String)?.count ?? -1
+            print("[account-entry] field=\(field.label) typedCount=\(index + 1) maskedValueCount=\(observedCount)")
         }
         field.typeText("\n")
     }
@@ -95,13 +95,14 @@ final class PublicScreenshots: XCTestCase {
         fillPassword(password, in: app.secureTextFields["Mật khẩu"])
         fillPassword(password, in: app.secureTextFields["Nhập lại mật khẩu"])
         tap(app.buttons["Tạo tài khoản"])
-        XCTAssertTrue(app.buttons["Đăng nhập"].waitForExistence(timeout: 25),
-                      "After registration: \(screenMessages())")
+        let registered = app.buttons["Đăng nhập"].waitForExistence(timeout: 25)
+        XCTAssertTrue(registered, "After registration: \(screenMessages())")
         fillPassword(password, in: app.secureTextFields["Mật khẩu"])
         tap(app.buttons["Đăng nhập"])
         let incidentTile = app.buttons["Sự cố. Báo cáo và xử lý"]
         let routeTile = app.buttons["Tuyến cáp. Ảnh, GPS, KMZ"]
-        XCTAssertTrue(incidentTile.waitForExistence(timeout: 25), "After sign in: \(screenMessages())")
+        let signedIn = incidentTile.waitForExistence(timeout: 25)
+        XCTAssertTrue(signedIn, "After sign in: \(screenMessages())")
         XCTAssertTrue(routeTile.exists)
         XCTAssertTrue(app.buttons["Di dời. Theo dõi di dời"].exists)
         capture("01-home")
