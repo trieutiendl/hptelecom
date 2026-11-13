@@ -1,0 +1,160 @@
+name: Build public hptelecom for iPhone
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hptelecom-public-ios-1069-b2
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    if: github.repository == 'trieutiendl/hptelecom' && github.event.repository.private == false && github.actor == 'trieutiendl' && github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - &checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+          sparse-checkout: hptelecom-public-ios-1069-b2
+      - &node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.23.1
+      - &source
+        name: Verify the frozen public app source
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          export BUILD_HELPERS="$GITHUB_WORKSPACE/hptelecom-public-ios-1069-b2"
+          export BUILD_WORK="$RUNNER_TEMP/hptelecom-public-input"
+          mkdir -p "$BUILD_WORK/app"
+          cd "$BUILD_HELPERS"
+          node crypt.cjs decrypt source.enc "$BUILD_WORK/source.zip"
+          unset HP_IOS_BUILD_KEY
+          test "$(shasum -a 256 "$BUILD_WORK/source.zip" | cut -d' ' -f1)" = "$(node -p "require('./release.json').sourceSha256")"
+          python3 verify-source.py
+      - name: Build and validate the signed iPhone app
+        env:
+          HP_IOS_SIGNING_JSON: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SIGNING }}
+        run: |
+          set -euo pipefail
+          umask 077
+          cd hptelecom-public-ios-1069-b2
+          export PUBLIC_APP_SOURCE="$RUNNER_TEMP/hptelecom-public-input/app"
+          export PUBLIC_APP_ARTIFACTS="$RUNNER_TEMP/hptelecom-public-output"
+          export HP_PUBLIC_BUNDLE_ID="$(node -p "require('./release.json').bundleIdentifier")"
+          export HP_PUBLIC_VERSION="$(node -p "require('./release.json').version")"
+          export HP_PUBLIC_BUILD="$(node -p "require('./release.json').build")"
+          bash build-macos.sh > "$RUNNER_TEMP/hptelecom-public-build.log" 2>&1
+      - name: Package encrypted output
+        if: always()
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          cd hptelecom-public-ios-1069-b2
+          destination="$RUNNER_TEMP/hptelecom-public-encrypted"
+          mkdir -p "$destination"
+          for file in "$RUNNER_TEMP/hptelecom-public-build.log" "$RUNNER_TEMP/hptelecom-public-output/"*.ipa "$RUNNER_TEMP/hptelecom-public-output/verification.json"; do
+            if [[ -f "$file" ]]; then
+              node crypt.cjs encrypt "$file" "$destination/$(basename "$file").enc"
+            fi
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: hptelecom-public-ios-1069-b2-encrypted
+          path: ${{ runner.temp }}/hptelecom-public-encrypted/*.enc
+          retention-days: 1
+          if-no-files-found: warn
+
+  screenshots:
+    if: github.repository == 'trieutiendl/hptelecom' && github.event.repository.private == false && github.actor == 'trieutiendl' && github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - *checkout
+      - *node
+      - *source
+      - name: Capture the running public iPhone app
+        id: capture
+        env:
+          PUBLIC_APP_SOURCE: ${{ runner.temp }}/hptelecom-public-input/app
+          PUBLIC_SCREENSHOT_OUTPUT: ${{ runner.temp }}/hptelecom-public-screenshots
+          PUBLIC_SIMULATOR_CACHE: ${{ runner.temp }}/hptelecom-public-simulator-cache
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$PUBLIC_SCREENSHOT_OUTPUT"
+          bash "$GITHUB_WORKSPACE/hptelecom-public-ios-1069-b2/screenshots/capture-macos.sh" >"$RUNNER_TEMP/hptelecom-public-screenshots.log" 2>&1
+      - name: Encrypt the verified build 2 simulator product
+        if: always()
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          product="$RUNNER_TEMP/hptelecom-public-simulator-cache/simulator-app.zip"
+          if [[ -f "$product" ]]; then
+            mkdir -p "$RUNNER_TEMP/hptelecom-public-simulator-encrypted"
+            node hptelecom-public-ios-1069-b2/crypt.cjs encrypt "$product" "$RUNNER_TEMP/hptelecom-public-simulator-encrypted/simulator-app.zip.enc"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: hptelecom-public-ios-1069-b2-simulator-encrypted
+          path: ${{ runner.temp }}/hptelecom-public-simulator-encrypted/*.enc
+          retention-days: 1
+          if-no-files-found: warn
+      - name: Verify and encrypt App Store screenshots
+        if: always()
+        env:
+          PUBLIC_SCREENSHOT_OUTPUT: ${{ runner.temp }}/hptelecom-public-screenshots
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SOURCE }}
+          CAPTURE_OUTCOME: ${{ steps.capture.outcome }}
+        run: |
+          set -euo pipefail
+          umask 077
+          cd hptelecom-public-ios-1069-b2
+          if ! compgen -G "$PUBLIC_SCREENSHOT_OUTPUT/*.png" >/dev/null; then
+            exit 0
+          fi
+          partial=()
+          if [[ "$CAPTURE_OUTCOME" != success ]]; then partial=(--partial); fi
+          python3 verify-screenshots.py "$PUBLIC_SCREENSHOT_OUTPUT" release.json "${partial[@]}" >"$RUNNER_TEMP/screenshot-receipt.json"
+          destination="$RUNNER_TEMP/hptelecom-public-screenshots-encrypted"
+          mkdir -p "$destination"
+          for file in "$PUBLIC_SCREENSHOT_OUTPUT"/*.png; do
+            node crypt.cjs encrypt "$file" "$destination/$(basename "$file").enc"
+          done
+          node crypt.cjs encrypt "$RUNNER_TEMP/screenshot-receipt.json" "$destination/screenshot-receipt.json.enc"
+      - name: Encrypt capture diagnostics
+        if: always()
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_1069_B2_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          if [[ -f "$RUNNER_TEMP/hptelecom-public-screenshots.log" ]]; then
+            destination="$RUNNER_TEMP/hptelecom-public-screenshots-encrypted"
+            mkdir -p "$destination"
+            node hptelecom-public-ios-1069-b2/crypt.cjs encrypt "$RUNNER_TEMP/hptelecom-public-screenshots.log" "$destination/hptelecom-public-screenshots.log.enc"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: hptelecom-public-ios-1069-b2-screenshots-encrypted
+          path: ${{ runner.temp }}/hptelecom-public-screenshots-encrypted/*.enc
+          retention-days: 1
+          if-no-files-found: warn
