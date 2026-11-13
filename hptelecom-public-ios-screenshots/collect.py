@@ -8,10 +8,10 @@ import struct
 import sys
 
 
-NAMES = ("01-home", "02-incident", "03-cable-materials", "04-route-list")
+NAMES = ("01-home", "02-incident", "03-cable-materials", "04-route-list", "05-account-access")
 
 
-def collect(source, destination):
+def collect(source, destination, partial=False):
     manifest = json.loads((source / "manifest.json").read_text(encoding="utf-8"))
     selected = {}
     digests = set()
@@ -40,14 +40,14 @@ def collect(source, destination):
                 raise ValueError("Two screenshots show identical pixels.")
             digests.add(digest)
             selected[name] = path
-    if set(selected) != set(NAMES):
+    if not partial and set(selected) != set(NAMES):
         raise ValueError(f"Missing expected screenshots: {sorted(set(NAMES) - selected.keys())}")
     destination.mkdir(parents=True, exist_ok=True)
     if any(destination.iterdir()):
         raise ValueError("Output directory must be empty.")
-    for name in NAMES:
-        shutil.copyfile(selected[name], destination / (name + ".png"))
+    for name, path in selected.items():
+        shutil.copyfile(path, destination / (name + ".png"))
 
 
 if __name__ == "__main__":
-    collect(Path(sys.argv[1]), Path(sys.argv[2]))
+    collect(Path(sys.argv[1]), Path(sys.argv[2]), partial=sys.argv[3:] == ["--partial"])

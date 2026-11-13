@@ -11,6 +11,15 @@ app = apps.first
 release = app.build_configurations.find { |config| config.name == 'Release' }
 raise 'Unexpected generated app bundle' unless release.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] == 'vn.hptelecom.fieldwork'
 
+# Ad-hoc simulator builds do not receive an embedded distribution profile. Give
+# SecureStore the same private-by-app keychain namespace the signed app receives.
+simulator_entitlements = 'PublicCapture-Simulator.entitlements'
+Xcodeproj::Plist.write_to_path({
+  'application-identifier' => 'FAKETEAMID.vn.hptelecom.fieldwork',
+  'keychain-access-groups' => ['FAKETEAMID.vn.hptelecom.fieldwork']
+}, File.join(ios, simulator_entitlements))
+release.build_settings['CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]'] = simulator_entitlements
+
 name = 'PublicScreenshots'
 FileUtils.mkdir_p(File.join(ios, name))
 FileUtils.cp(source, File.join(ios, name, 'PublicScreenshots.swift'))

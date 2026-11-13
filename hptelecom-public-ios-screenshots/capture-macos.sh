@@ -65,7 +65,7 @@ build_args=(-workspace "$workspace" -scheme PublicScreenshots -configuration Rel
   CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=-)
 xcodebuild "${build_args[@]}" build-for-testing
 python3 - "$work/DerivedData/Build/Products/Release-iphonesimulator" <<'PY'
-import pathlib, plistlib, sys
+import pathlib, plistlib, subprocess, sys
 matches = []
 for app in pathlib.Path(sys.argv[1]).glob('*.app'):
     with (app/'Info.plist').open('rb') as stream:
@@ -76,10 +76,29 @@ for app in pathlib.Path(sys.argv[1]).glob('*.app'):
             sys.exit('The installed candidate has an unexpected version or build.')
         if not (app/'main.jsbundle').is_file():
             sys.exit('The Release simulator app is missing its embedded JavaScript.')
+        signed = subprocess.run(['codesign', '-d', '--entitlements', ':-', str(app)],
+                                capture_output=True, check=True)
+        entitlements = plistlib.loads(signed.stdout)
+        namespace = 'FAKETEAMID.vn.hptelecom.fieldwork'
+        if (entitlements.get('application-identifier') != namespace or
+                entitlements.get('keychain-access-groups') != [namespace]):
+            sys.exit('The simulator app is missing its private SecureStore access group.')
+        print('Verified simulator private Keychain namespace and embedded release bundle.')
 if len(matches) != 1:
     sys.exit('Expected exactly one public app in simulator products.')
 PY
+if [[ -n "${PUBLIC_SIMULATOR_CACHE:-}" ]]; then
+  mkdir -p "$PUBLIC_SIMULATOR_CACHE"
+  product="$(find "$work/DerivedData/Build/Products/Release-iphonesimulator" -maxdepth 2 -name main.jsbundle -print -quit)"
+  test -n "$product"
+  ditto -c -k --keepParent "$(dirname "$product")" "$PUBLIC_SIMULATOR_CACHE/simulator-app.zip"
+fi
+result=0
 xcodebuild "${build_args[@]}" -resultBundlePath "$work/public.xcresult" \
-  -only-testing:PublicScreenshots/PublicScreenshots/testStoreScreenshots test-without-building
+  -only-testing:PublicScreenshots/PublicScreenshots/testStoreScreenshots test-without-building || result=$?
 xcrun xcresulttool export attachments --path "$work/public.xcresult" --output-path "$work/attachments"
+if [[ "$result" != 0 ]]; then
+  python3 "$helpers/collect.py" "$work/attachments" "$destination" --partial
+  exit "$result"
+fi
 python3 "$helpers/collect.py" "$work/attachments" "$destination"

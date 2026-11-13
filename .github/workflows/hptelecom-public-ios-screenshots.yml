@@ -39,6 +39,7 @@ jobs:
           python3 verify-source.py
       - name: Capture the running public iPhone app
         env:
+          PUBLIC_SIMULATOR_CACHE: ${{ runner.temp }}/hptelecom-simulator-cache
           PUBLIC_APP_SOURCE: ${{ runner.temp }}/hptelecom-public-input/app
           PUBLIC_SCREENSHOT_OUTPUT: ${{ runner.temp }}/hptelecom-public-screenshots
         run: |
@@ -46,6 +47,44 @@ jobs:
           umask 077
           mkdir -p "$PUBLIC_SCREENSHOT_OUTPUT"
           bash "$GITHUB_WORKSPACE/hptelecom-public-ios-screenshots/capture-macos.sh" >"$RUNNER_TEMP/hptelecom-public-screenshots.log" 2>&1
+      - name: Preserve the compiled simulator app for another capture
+        if: always()
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_SCREENSHOT_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          cd hptelecom-public-ios
+          file="$RUNNER_TEMP/hptelecom-simulator-cache/simulator-app.zip"
+          if [[ -s "$file" ]]; then
+            node crypt.cjs encrypt "$file" "$file.enc"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: hptelecom-public-ios-simulator-encrypted
+          path: ${{ runner.temp }}/hptelecom-simulator-cache/simulator-app.zip.enc
+          retention-days: 1
+          if-no-files-found: ignore
+      - name: Keep screenshots already captured if a later step failed
+        if: failure()
+        env:
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_SCREENSHOT_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          cd hptelecom-public-ios
+          mkdir -p "$RUNNER_TEMP/hptelecom-public-screenshots-encrypted"
+          if find "$RUNNER_TEMP/hptelecom-public-screenshots" -maxdepth 1 -name "*.png" -print -quit | grep -q .; then
+            python3 "$GITHUB_WORKSPACE/hptelecom-public-ios-screenshots/verify-screenshots.py" "$RUNNER_TEMP/hptelecom-public-screenshots" release.json --partial >"$RUNNER_TEMP/screenshot-receipt.json"
+            node crypt.cjs encrypt "$RUNNER_TEMP/screenshot-receipt.json" "$RUNNER_TEMP/hptelecom-public-screenshots-encrypted/screenshot-receipt.json.enc"
+          fi
+          for name in 01-home 02-incident 03-cable-materials 04-route-list 05-account-access; do
+            file="$RUNNER_TEMP/hptelecom-public-screenshots/$name.png"
+            if [[ -f "$file" ]]; then
+              node crypt.cjs encrypt "$file" "$RUNNER_TEMP/hptelecom-public-screenshots-encrypted/$name.png.enc"
+            fi
+          done
       - name: Verify and encrypt App Store screenshots
         env:
           PUBLIC_SCREENSHOT_OUTPUT: ${{ runner.temp }}/hptelecom-public-screenshots
@@ -54,7 +93,7 @@ jobs:
           set -euo pipefail
           umask 077
           cd hptelecom-public-ios
-          python3 verify-screenshots.py "$PUBLIC_SCREENSHOT_OUTPUT" release.json >"$RUNNER_TEMP/screenshot-receipt.json"
+          python3 "$GITHUB_WORKSPACE/hptelecom-public-ios-screenshots/verify-screenshots.py" "$PUBLIC_SCREENSHOT_OUTPUT" release.json >"$RUNNER_TEMP/screenshot-receipt.json"
           destination="$RUNNER_TEMP/hptelecom-public-screenshots-encrypted"
           mkdir -p "$destination"
           for file in "$PUBLIC_SCREENSHOT_OUTPUT"/*.png; do

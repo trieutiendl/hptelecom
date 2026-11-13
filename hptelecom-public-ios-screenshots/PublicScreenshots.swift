@@ -56,23 +56,58 @@ final class PublicScreenshots: XCTestCase {
         XCTAssertTrue(app.buttons[name].waitForExistence(timeout: 10))
     }
 
+    private func screenMessages() -> String {
+        // Print visible explanatory messages, never the contents of text inputs.
+        return (app.staticTexts.allElementsBoundByIndex.map { $0.label }
+            + app.alerts.allElementsBoundByIndex.map { $0.label }).joined(separator: " | ")
+    }
+
+    private func fillPassword(_ password: String, in field: XCUIElement) {
+        tap(field)
+        // Numeric input avoids keyboard layout changes and smart punctuation. Wait for
+        // the controlled React Native input before leaving a secure-entry field.
+        field.typeText(password)
+        let filled = NSPredicate { _, _ in
+            (field.value as? String)?.count == password.count
+        }
+        if XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: filled, object: field)],
+                          timeout: 4) != .completed {
+            // Some iOS runtime versions hide even the number of entered characters.
+            print("Secure field accessibility length unavailable or incomplete. Continuing to the app's validation.")
+        }
+        field.typeText("\n")
+    }
+
     func testStoreScreenshots() {
         app.launch()
-        tap(app.buttons["Tạo tài khoản"])
-        let password = UUID().uuidString
-        enter("minh.an", in: app.textFields["Tên đăng nhập"], submitLine: true)
-        enter(password, in: app.secureTextFields["Mật khẩu"], submitLine: true)
-        enter(password, in: app.secureTextFields["Nhập lại mật khẩu"], submitLine: true)
-        tap(app.buttons["Tạo tài khoản"])
         XCTAssertTrue(app.buttons["Đăng nhập"].waitForExistence(timeout: 20))
-        enter(password, in: app.secureTextFields["Mật khẩu"], submitLine: true)
+        capture("05-account-access")
+        tap(app.buttons["Tạo tài khoản"])
+        let password = String(Int64.random(in: 100_000_000_000...999_999_999_999))
+        enter("minhan", in: app.textFields["Tên đăng nhập"], submitLine: true)
+        XCTAssertEqual(app.textFields["Tên đăng nhập"].value as? String, "minhan")
+        fillPassword(password, in: app.secureTextFields["Mật khẩu"])
+        fillPassword(password, in: app.secureTextFields["Nhập lại mật khẩu"])
+        tap(app.buttons["Tạo tài khoản"])
+        XCTAssertTrue(app.buttons["Đăng nhập"].waitForExistence(timeout: 25),
+                      "After registration: \(screenMessages())")
+        fillPassword(password, in: app.secureTextFields["Mật khẩu"])
         tap(app.buttons["Đăng nhập"])
         let incidentTile = app.buttons["Sự cố. Báo cáo và xử lý"]
         let routeTile = app.buttons["Tuyến cáp. Ảnh, GPS, KMZ"]
-        XCTAssertTrue(incidentTile.waitForExistence(timeout: 25))
+        XCTAssertTrue(incidentTile.waitForExistence(timeout: 25), "After sign in: \(screenMessages())")
         XCTAssertTrue(routeTile.exists)
         XCTAssertTrue(app.buttons["Di dời. Theo dõi di dời"].exists)
         capture("01-home")
+
+        // Capture the independent route-list feature before the more complex incident
+        // editor. Attachments before a later failure are exported by the capture script.
+        tap(routeTile)
+        let routes = ["T01 - ODF A2 / MX-01", "T02 - MX-01 / DP-04", "T03 - DP-04 / DP-08"]
+        for route in routes { createRecord(kind: "tuyến cáp", name: route) }
+        for route in routes { XCTAssertTrue(app.buttons[route].isHittable) }
+        capture("04-route-list")
+        tap(app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "‹ Quay lại")).firstMatch)
 
         tap(incidentTile)
         let incident = "SC-07 - ODF A2"
@@ -105,14 +140,5 @@ final class PublicScreenshots: XCTestCase {
         XCTAssertTrue(app.staticTexts["Đã lưu bản nháp"].waitForExistence(timeout: 10))
         capture("03-cable-materials")
 
-        // Both back controls are React Native pressables with their child's text as the label.
-        tap(app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "< Quay lại")).firstMatch)
-        XCTAssertTrue(app.buttons[incident].waitForExistence(timeout: 10))
-        tap(app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "‹ Quay lại")).firstMatch)
-        tap(routeTile)
-        let routes = ["T01 - ODF A2 / MX-01", "T02 - MX-01 / DP-04", "T03 - DP-04 / DP-08"]
-        for route in routes { createRecord(kind: "tuyến cáp", name: route) }
-        for route in routes { XCTAssertTrue(app.buttons[route].isHittable) }
-        capture("04-route-list")
     }
 }
