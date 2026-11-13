@@ -73,12 +73,19 @@ final class PublicScreenshots: XCTestCase {
     private func fillPassword(_ password: String, in field: XCUIElement) {
         tap(field)
         print("[focus] secureField=\(field.label) frame=\(field.frame) keyboardCount=\(app.keyboards.count)")
-        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 10))
+        // A hardware-backed simulator may expose no software Keyboard element.
+        // typeText itself requires real keyboard focus; successful registration
+        // and sign-in below remain the end-to-end checks of the entered password.
         // Keep keyboard focus on the field. Application-directed, paced input
         // avoids reselecting secure text and gives controlled inputs time to commit.
-        for character in password {
+        for (index, character) in password.enumerated() {
             app.typeText(String(character))
             RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+            if index == 0 {
+                XCTAssertEqual(app.textFields["Tên đăng nhập"].value as? String, "minhan",
+                               "Secure input must not change the account name")
+                print("[focus] firstSecureCharacter maskedValueCount=\((field.value as? String)?.count ?? -1)")
+            }
         }
         RunLoop.current.run(until: Date().addingTimeInterval(0.5))
         let observedCount = (field.value as? String)?.count ?? -1

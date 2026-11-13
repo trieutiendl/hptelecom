@@ -3,6 +3,7 @@ set -euo pipefail
 umask 077
 
 [[ "$(uname -s)" == Darwin ]] || { echo 'Cached iPhone capture needs macOS and Xcode.' >&2; exit 1; }
+export DEVELOPER_DIR="${DEVELOPER_DIR:-$(xcode-select -p)}"
 helpers="$(cd "$(dirname "$0")" && pwd)"
 parent="$(cd "$helpers/.." && pwd)"
 source_dir="${PUBLIC_APP_SOURCE:?Set PUBLIC_APP_SOURCE to the verified frozen source directory.}"
@@ -75,7 +76,9 @@ assert prefs['ConnectHardwareKeyboard'] is False
 assert prefs['DevicePreferences'][sys.argv[2]]['ConnectHardwareKeyboard'] is False
 print('[capture] Global and per-device software keyboard verified')
 PY
-open -a Simulator --args -CurrentDeviceUDID "$simulator"
+simulator_app="$DEVELOPER_DIR/Applications/Simulator.app"
+[[ -d "$simulator_app" ]] || { echo 'Selected Xcode Simulator.app is missing.' >&2; exit 1; }
+open -a "$simulator_app" --args -CurrentDeviceUDID "$simulator"
 xcrun simctl status_bar "$simulator" override --time '9:41' --dataNetwork wifi --wifiMode active \
   --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
 xcrun simctl install "$simulator" "$app"
@@ -84,8 +87,29 @@ args=(-project "$work/harness/CaptureHarness.xcodeproj" -scheme PublicScreenshot
   -parallel-testing-enabled NO -jobs 3 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES
   CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=-)
 xcodebuild "${args[@]}" build-for-testing
+# The app and harness must target the same device after compilation. Print only
+# device state, never app data, when checking for a CoreSimulator interruption.
+xcrun simctl bootstatus "$simulator" -b
+xcrun simctl list devices available --json > "$work/pretest-devices.json"
+python3 - "$work/pretest-devices.json" "$simulator" <<'PY'
+import json, sys
+devices = [d for group in json.load(open(sys.argv[1]))['devices'].values() for d in group]
+matches = [d for d in devices if d['udid'] == sys.argv[2]]
+assert len(matches) == 1 and matches[0].get('isAvailable') and matches[0]['state'] == 'Booted', 'Capture device is not available and booted'
+print('[capture] Pre-test device is available and booted')
+PY
+xcrun simctl get_app_container "$simulator" vn.hptelecom.fieldwork app >/dev/null
+xcodebuild -project "$work/harness/CaptureHarness.xcodeproj" -scheme PublicScreenshots \
+  -showdestinations > "$work/pretest-destinations.txt" 2>&1
+if ! grep -F "$simulator" "$work/pretest-destinations.txt" >/dev/null; then
+  echo '[capture] Xcode cannot discover the booted capture device.' >&2
+  cat "$work/pretest-destinations.txt"
+  xcodebuild -version
+  xcrun simctl list runtimes
+  exit 1
+fi
 result=0
-xcodebuild "${args[@]}" -resultBundlePath "$work/public.xcresult" \
+xcodebuild "${args[@]}" -destination-timeout 60 -resultBundlePath "$work/public.xcresult" \
   -only-testing:PublicScreenshots/PublicScreenshots/testStoreScreenshots test-without-building || result=$?
 # Confirm the cached app stayed untouched throughout harness compilation/tests.
 python3 "$parent/verify-simulator.py" "$work/products"
