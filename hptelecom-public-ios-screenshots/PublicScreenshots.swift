@@ -34,7 +34,15 @@ final class PublicScreenshots: XCTestCase {
 
     private func enter(_ text: String, in field: XCUIElement, submitLine: Bool = false) {
         tap(field)
-        field.typeText(text)
+        var expected = ""
+        for character in text {
+            field.typeText(String(character))
+            expected.append(character)
+            let current = expected
+            let changed = NSPredicate { _, _ in (field.value as? String) == current }
+            XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: changed, object: field)],
+                                         timeout: 5), .completed, "Text input did not retain the next character")
+        }
         if submitLine { field.typeText("\n") }
     }
 
@@ -66,14 +74,12 @@ final class PublicScreenshots: XCTestCase {
         tap(field)
         // Numeric input avoids keyboard layout changes and smart punctuation. Wait for
         // the controlled React Native input before leaving a secure-entry field.
-        field.typeText(password)
-        let filled = NSPredicate { _, _ in
-            (field.value as? String)?.count == password.count
-        }
-        if XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: filled, object: field)],
-                          timeout: 4) != .completed {
-            // Some iOS runtime versions hide even the number of entered characters.
-            print("Secure field accessibility length unavailable or incomplete. Continuing to the app's validation.")
+        for (index, character) in password.enumerated() {
+            field.typeText(String(character))
+            let count = index + 1
+            let filled = NSPredicate { _, _ in (field.value as? String)?.count == count }
+            XCTAssertEqual(XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: filled, object: field)],
+                                         timeout: 5), .completed, "Secure input did not retain the next character")
         }
         field.typeText("\n")
     }
@@ -117,6 +123,7 @@ final class PublicScreenshots: XCTestCase {
         enter("ODF A2 - K12", in: location)
         tap(app.buttons["Nguyên nhân sự cố: Chọn ▾"])
         tap(app.buttons["Đứt ODF"])
+        XCTAssertTrue(app.buttons["Nguyên nhân sự cố: Đứt ODF"].waitForExistence(timeout: 10))
         let materials = app.buttons["2. Cáp / vật tư"]
         let information = app.buttons["1. Thông tin"]
         // Changing steps removes the input focus and returns the editor to the top.
@@ -130,6 +137,7 @@ final class PublicScreenshots: XCTestCase {
         tap(materials)
         tap(app.buttons["Chủng loại cáp: Chọn ▾"])
         tap(app.buttons["24FO"])
+        XCTAssertTrue(app.buttons["Chủng loại cáp: 24FO"].waitForExistence(timeout: 10))
         enter("1250", in: app.textFields["Đầu số 1"])
         enter("1430", in: app.textFields["Đầu số 2"])
         tap(information)

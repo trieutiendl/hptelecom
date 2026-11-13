@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: hptelecom-public-ios-screenshots
   cancel-in-progress: false
@@ -37,8 +38,38 @@ jobs:
           unset HP_IOS_BUILD_KEY
           test "$(shasum -a 256 "$BUILD_WORK/source.zip" | cut -d' ' -f1)" = "$(node -p "require('./release.json').sourceSha256")"
           python3 verify-source.py
+      - name: Download and verify the pinned compiled simulator app
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HP_IOS_BUILD_KEY: ${{ secrets.HPTELECOM_PUBLIC_IOS_SCREENSHOT_SOURCE }}
+        run: |
+          set -euo pipefail
+          umask 077
+          cache="$RUNNER_TEMP/hptelecom-pinned-cache"
+          mkdir -p "$cache"
+          gh api repos/trieutiendl/hptelecom/actions/runs/43428673497 > "$cache/run.json"
+          gh api repos/trieutiendl/hptelecom/actions/artifacts/14039033922 > "$cache/artifact.json"
+          gh api repos/trieutiendl/hptelecom/actions/artifacts/14039033922/zip > "$cache/artifact.zip"
+          test "$(shasum -a 256 "$cache/artifact.zip" | cut -d' ' -f1)" = "fbd5a7700571b123ebf9f7849d9b7197bced30c214669fe4bc32965286586bc9"
+          python3 - "$cache" <<'PY'
+          import pathlib, sys, zipfile
+          folder=pathlib.Path(sys.argv[1])
+          with zipfile.ZipFile(folder/"artifact.zip") as archive:
+              assert archive.namelist()==["simulator-app.zip.enc"], "Unexpected cached artifact contents"
+              assert archive.testzip() is None
+              (folder/"simulator-app.zip.enc").write_bytes(archive.read("simulator-app.zip.enc"))
+          PY
+          node hptelecom-public-ios/crypt.cjs decrypt "$cache/simulator-app.zip.enc" "$cache/simulator-app.zip"
+      - name: Prepare the independent UI test harness
+        run: |
+          bash -n hptelecom-public-ios-screenshots/cached-retry/capture-cached.sh
+          ruby -e 'require "xcodeproj"' || gem install --user-install xcodeproj --version 1.27.0 --no-document
       - name: Capture the running public iPhone app
         env:
+          PUBLIC_SIMULATOR_APP_ZIP: ${{ runner.temp }}/hptelecom-pinned-cache/simulator-app.zip
+          PUBLIC_SIMULATOR_RUN_JSON: ${{ runner.temp }}/hptelecom-pinned-cache/run.json
+          PUBLIC_SIMULATOR_ARTIFACT_JSON: ${{ runner.temp }}/hptelecom-pinned-cache/artifact.json
+          PUBLIC_RELEASE_JSON: ${{ github.workspace }}/hptelecom-public-ios/release.json
           PUBLIC_SIMULATOR_CACHE: ${{ runner.temp }}/hptelecom-simulator-cache
           PUBLIC_APP_SOURCE: ${{ runner.temp }}/hptelecom-public-input/app
           PUBLIC_SCREENSHOT_OUTPUT: ${{ runner.temp }}/hptelecom-public-screenshots
@@ -46,7 +77,7 @@ jobs:
           set -euo pipefail
           umask 077
           mkdir -p "$PUBLIC_SCREENSHOT_OUTPUT"
-          bash "$GITHUB_WORKSPACE/hptelecom-public-ios-screenshots/capture-macos.sh" >"$RUNNER_TEMP/hptelecom-public-screenshots.log" 2>&1
+          bash "$GITHUB_WORKSPACE/hptelecom-public-ios-screenshots/cached-retry/capture-cached.sh" >"$RUNNER_TEMP/hptelecom-public-screenshots.log" 2>&1
       - name: Preserve the compiled simulator app for another capture
         if: always()
         env:

@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+
+[[ "$(uname -s)" == Darwin ]] || { echo 'Cached iPhone capture needs macOS and Xcode.' >&2; exit 1; }
+helpers="$(cd "$(dirname "$0")" && pwd)"
+parent="$(cd "$helpers/.." && pwd)"
+source_dir="${PUBLIC_APP_SOURCE:?Set PUBLIC_APP_SOURCE to the verified frozen source directory.}"
+cache="${PUBLIC_SIMULATOR_APP_ZIP:?Set PUBLIC_SIMULATOR_APP_ZIP to the decrypted cache ZIP.}"
+run_json="${PUBLIC_SIMULATOR_RUN_JSON:?Set PUBLIC_SIMULATOR_RUN_JSON to the authenticated GitHub run response.}"
+artifact_json="${PUBLIC_SIMULATOR_ARTIFACT_JSON:?Set PUBLIC_SIMULATOR_ARTIFACT_JSON to the authenticated GitHub artifact response.}"
+release="${PUBLIC_RELEASE_JSON:?Set PUBLIC_RELEASE_JSON to the frozen release manifest.}"
+source_zip="${PUBLIC_SOURCE_ZIP:-$(dirname "$source_dir")/source.zip}"
+destination="${PUBLIC_SCREENSHOT_OUTPUT:?Set PUBLIC_SCREENSHOT_OUTPUT to a new or empty image directory.}"
+test_source="${PUBLIC_UI_TEST_SOURCE:-$parent/PublicScreenshots.swift}"
+mkdir -p "$destination"
+[[ -z "$(find "$destination" -mindepth 1 -maxdepth 1 -print -quit)" ]] || { echo 'Screenshot output must be empty.' >&2; exit 1; }
+destination="$(cd "$destination" && pwd)"
+receipt="${PUBLIC_CACHE_REUSE_RECEIPT:-$(dirname "$destination")/cache-reuse-receipt.json}"
+work="$(mktemp -d "${TMPDIR:-/tmp}/hptelecom-cached-capture.XXXXXXXX")"
+simulator=''
+cleanup() {
+  if [[ -n "$simulator" ]]; then xcrun simctl delete "$simulator" >/dev/null || true; fi
+  rm -rf -- "$work"
+}
+trap cleanup EXIT
+
+app="$(python3 "$helpers/verify-cache.py" --run "$run_json" --artifact "$artifact_json" \
+  --release "$release" --source-zip "$source_zip" --source-directory "$source_dir" \
+  --cache-zip "$cache" --destination "$work/products" --receipt "$receipt")"
+[[ -d "$app" ]]
+deployment="$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$app/Info.plist")"
+# Only the host and XCTest harness are compiled. The verified application is
+# never a target, input build product, re-signing target, or editable source.
+ruby -c "$helpers/make-harness.rb"
+ruby "$helpers/make-harness.rb" "$work/harness" "$test_source" "$deployment"
+xcrun simctl list runtimes --json > "$work/runtimes.json"
+simulator="$(python3 - "$work/runtimes.json" <<'PY'
+import json, re, subprocess, sys
+runtimes = [r for r in json.load(open(sys.argv[1]))['runtimes']
+            if r.get('isAvailable') and '.iOS-' in r['identifier']]
+runtimes.sort(key=lambda r: tuple(map(int, r['version'].split('.'))), reverse=True)
+for runtime in runtimes:
+    for model in ('iPhone 17 Pro Max', 'iPhone 16 Pro Max'):
+        created = subprocess.run(['xcrun', 'simctl', 'create', model,
+            'com.apple.CoreSimulator.SimDeviceType.' + model.replace(' ', '-'), runtime['identifier']],
+            capture_output=True, text=True)
+        if created.returncode == 0 and re.fullmatch(r'[0-9A-Fa-f-]{36}', created.stdout.strip()):
+            print(created.stdout.strip()); sys.exit(0)
+sys.exit('No compatible iPhone Pro Max simulator runtime.')
+PY
+)"
+xcrun simctl boot "$simulator"
+xcrun simctl bootstatus "$simulator" -b
+xcrun simctl status_bar "$simulator" override --time '9:41' --dataNetwork wifi --wifiMode active \
+  --wifiBars 3 --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
+xcrun simctl install "$simulator" "$app"
+args=(-project "$work/harness/CaptureHarness.xcodeproj" -scheme PublicScreenshots -configuration Release
+  -destination "platform=iOS Simulator,id=$simulator" -derivedDataPath "$work/DerivedData"
+  -parallel-testing-enabled NO -jobs 3 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=YES
+  CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=-)
+xcodebuild "${args[@]}" build-for-testing
+result=0
+xcodebuild "${args[@]}" -resultBundlePath "$work/public.xcresult" \
+  -only-testing:PublicScreenshots/PublicScreenshots/testStoreScreenshots test-without-building || result=$?
+# Confirm the cached app stayed untouched throughout harness compilation/tests.
+python3 "$parent/verify-simulator.py" "$work/products"
+xcrun xcresulttool export attachments --path "$work/public.xcresult" --output-path "$work/attachments"
+if [[ "$result" != 0 ]]; then
+  python3 "$parent/collect.py" "$work/attachments" "$destination" --partial
+  exit "$result"
+fi
+python3 "$parent/collect.py" "$work/attachments" "$destination"
