@@ -50,6 +50,9 @@ for runtime in runtimes:
 sys.exit('No compatible iPhone Pro Max simulator runtime.')
 PY
 )"
+# The headless runner has no physical keyboard. Use the iPhone software keyboard
+# so secure-field focus behaves like the device we are testing.
+defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool NO
 xcrun simctl boot "$simulator"
 xcrun simctl bootstatus "$simulator" -b
 xcrun simctl status_bar "$simulator" override --time '9:41' --dataNetwork wifi --wifiMode active \

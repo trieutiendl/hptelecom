@@ -92,7 +92,7 @@ final class PublicScreenshots: XCTestCase {
         capture("05-account-access")
         tap(app.buttons["Tạo tài khoản"])
         let password = String(Int64.random(in: 100_000_000_000...999_999_999_999))
-        enter("minhan", in: app.textFields["Tên đăng nhập"], submitLine: true)
+        enter("minhan", in: app.textFields["Tên đăng nhập"])
         XCTAssertEqual(app.textFields["Tên đăng nhập"].value as? String, "minhan")
         fillPassword(password, in: app.secureTextFields["Mật khẩu"])
         fillPassword(password, in: app.secureTextFields["Nhập lại mật khẩu"])
