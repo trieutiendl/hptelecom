@@ -72,15 +72,12 @@ final class PublicScreenshots: XCTestCase {
 
     private func fillPassword(_ password: String, in field: XCUIElement) {
         tap(field)
-        // Keep focus on the secure field. Accessibility may mask its value differently
-        // from the number of characters entered; successful registration and sign-in
-        // below are the acceptance checks, not the length of that masked value.
-        for (index, character) in password.enumerated() {
-            field.typeText(String(character))
-            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
-            let observedCount = (field.value as? String)?.count ?? -1
-            print("[account-entry] field=\(field.label) typedCount=\(index + 1) maskedValueCount=\(observedCount)")
-        }
+        // One typing operation keeps XCTest from refocusing/selecting secure text
+        // between characters. Registration and sign-in verify the actual value.
+        field.typeText(password)
+        RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+        let observedCount = (field.value as? String)?.count ?? -1
+        print("[account-entry] field=\(field.label) typedCount=\(password.count) maskedValueCount=\(observedCount)")
         field.typeText("\n")
     }
 
