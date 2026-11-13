@@ -170,7 +170,11 @@ final class PublicScreenshots: XCTestCase {
         fillPassword(password, in: app.secureTextFields["account-password-confirmation-register"])
         tap(app.buttons["Tạo tài khoản"])
         let registered = app.buttons["Đăng nhập"].waitForExistence(timeout: 25)
-        XCTAssertTrue(registered, "Account creation did not reach the login screen")
+        guard registered else {
+            emitRegistrationNoticeFlags(in: app)
+            XCTFail("Account creation did not reach the login screen")
+            return
+        }
         fillPassword(password, in: app.secureTextFields["account-password-login"])
         tap(app.buttons["Đăng nhập"])
         let incidentTile = app.buttons["Sự cố. Báo cáo và xử lý"]
@@ -224,4 +228,29 @@ final class PublicScreenshots: XCTestCase {
         capture("03-cable-materials")
 
     }
+}
+
+// Presence-only diagnostic after normal registration fails. No populated form,
+// arbitrary accessibility label, or credential value is captured on this path.
+private func emitRegistrationNoticeFlags(in app: XCUIApplication) {
+    let notices: [(code: String, literal: String)] = [
+        ("REG_CONFIRM", "Hai mật khẩu chưa khớp."),
+        ("REG_LENGTH", "Mật khẩu cần từ 10 đến 128 ký tự."),
+        ("REG_USERNAME", "Tên đăng nhập cần 3–40 ký tự, gồm chữ không dấu, số, dấu chấm, gạch ngang hoặc gạch dưới."),
+        ("REG_DUPLICATE", "Tên đăng nhập này đã được dùng trên iPhone."),
+        ("REG_NATIVE_PASSWORD", "Mật khẩu không hợp lệ."),
+        ("REG_NATIVE_DERIVE", "Không thể kiểm tra mật khẩu."),
+        ("REG_NATIVE_RANDOM", "Không tạo được tài khoản. Vui lòng thử lại."),
+        ("REG_SUCCESS", "Đã tạo tài khoản. Nhập mật khẩu để mở báo cáo."),
+        ("REG_BUSY", "Đang xử lý…")
+    ]
+    var anyKnownNotice = false
+    for notice in notices {
+        let present = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label == %@", notice.literal))
+            .firstMatch.exists
+        anyKnownNotice = anyKnownNotice || present
+        print("[registration-notice] code=\(notice.code) present=\(present)")
+    }
+    print("[registration-notice] code=REG_NO_KNOWN_NOTICE present=\(!anyKnownNotice)")
 }
