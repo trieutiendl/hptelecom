@@ -72,9 +72,13 @@ final class PublicScreenshots: XCTestCase {
 
     private func fillPassword(_ password: String, in field: XCUIElement) {
         tap(field)
-        // One typing operation keeps XCTest from refocusing/selecting secure text
-        // between characters. Registration and sign-in verify the actual value.
-        field.typeText(password)
+        XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 10))
+        // Keep keyboard focus on the field. Application-directed, paced input
+        // avoids reselecting secure text and gives controlled inputs time to commit.
+        for character in password {
+            app.typeText(String(character))
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
         RunLoop.current.run(until: Date().addingTimeInterval(0.5))
         let observedCount = (field.value as? String)?.count ?? -1
         print("[account-entry] field=\(field.label) typedCount=\(password.count) maskedValueCount=\(observedCount)")
