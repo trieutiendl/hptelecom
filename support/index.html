@@ -1,0 +1,588 @@
+<!doctype html>
+<!--
+THESIS: Make support feel like a clear operations console, with issue status expressed as navigation rather than simulated chat.
+OWN-WORLD: Deep telecom navy, layered blue-black surfaces, precise cyan signals, and restrained instrument-panel rules.
+STORY: Find a topic, scan trusted answers, and reach the real support channel without mistaking help content for live chat.
+FIRST VIEWPORT: Dark brand masthead above a full-width help console, topic rail at left, search and issue directory at right.
+FORM: Read-mode dark dashboard; a compact persistent topic rail and searchable categorized knowledge base.
+-->
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#071721" />
+    <title>Hỗ trợ ứng dụng | HP Telecom</title>
+    <meta name="description" content="Hướng dẫn đăng ký tài khoản, xử lý lỗi đồng bộ và liên hệ hỗ trợ ứng dụng HP Telecom Server." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #102a3e;
+        --ink-soft: #29495b;
+        --muted: #526b78;
+        --teal: #006d77;
+        --cyan: #00bfd0;
+        --paper: #f2f7f7;
+        --white: #fff;
+        --line: #d8e4e7;
+        --mint: #e7f3f2;
+        --warning: #735414;
+        --warning-bg: #fff8e8;
+        font-family: "Manrope", "Segoe UI", sans-serif;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { margin: 0; background: var(--paper); color: var(--ink); }
+      a { color: inherit; text-decoration: none; }
+      button, input { font: inherit; }
+      button, summary { cursor: pointer; }
+      :focus-visible { outline: 3px solid #00a5af; outline-offset: 3px; }
+      .skip-link { position: absolute; z-index: 10; top: 10px; left: 10px; padding: 10px 14px; transform: translateY(-160%); border-radius: 6px; background: var(--white); color: var(--ink); font-weight: 800; }
+      .skip-link:focus { transform: none; }
+      .masthead { background: var(--ink); color: var(--white); }
+      .masthead-inner { display: flex; width: min(1160px, calc(100% - 48px)); min-height: 78px; align-items: center; justify-content: space-between; gap: 24px; margin: 0 auto; }
+      .brand { display: inline-flex; align-items: center; }
+      .brand-logo { display: block; width: 194px; max-width: 100%; height: auto; }
+      .masthead-links { display: flex; align-items: center; gap: 26px; color: #d6e3e9; font-size: 12px; font-weight: 700; }
+      .masthead-links a:hover { color: #80e4e8; }
+      .masthead-links .login-link { padding: 10px 14px; border: 1px solid #527183; border-radius: 7px; color: var(--white); }
+      .masthead-links .login-link:hover { border-color: #80e4e8; color: #80e4e8; }
+      .container { width: min(1080px, calc(100% - 48px)); margin-inline: auto; }
+      .hero { padding: 72px 0 38px; }
+      .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 46px; }
+      h1 { max-width: 750px; margin: 0; font-size: clamp(38px, 6.2vw, 68px); font-weight: 800; letter-spacing: -.065em; line-height: 1.02; }
+      .hero-copy { max-width: 590px; margin: 20px 0 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+      .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-bottom: 4px; }
+      .button { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 9px; padding: 0 16px; border: 1px solid var(--teal); border-radius: 7px; background: var(--teal); color: var(--white); font-size: 12px; font-weight: 800; transition: background-color .16s ease, transform .16s ease; }
+      .button:hover { transform: translateY(-1px); background: #005861; }
+      .button-secondary { border-color: #c2d2d7; background: var(--white); color: var(--ink); }
+      .button-secondary:hover { border-color: var(--teal); background: var(--white); color: var(--teal); }
+      .routes { padding: 26px 0 56px; }
+      .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 17px; }
+      h2 { margin: 0; font-size: clamp(21px, 3vw, 28px); font-weight: 800; letter-spacing: -.045em; }
+      .section-heading p { max-width: 390px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+      .route-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #b9cbd0; border-bottom: 1px solid #b9cbd0; }
+      .route-link { display: grid; min-height: 144px; align-content: space-between; gap: 24px; padding: 19px 20px 18px 0; }
+      .route-link + .route-link { padding-inline-start: 20px; border-inline-start: 1px solid var(--line); }
+      .route-topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--teal); }
+      .route-icon { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid #c1d9d9; border-radius: 9px; background: var(--mint); }
+      .route-icon svg { width: 17px; height: 17px; }
+      .route-arrow { font-size: 19px; transition: transform .16s ease; }
+      .route-link:hover .route-arrow { transform: translate(3px, -2px); }
+      .route-link strong { display: block; margin-bottom: 5px; font-size: 15px; font-weight: 800; letter-spacing: -.025em; }
+      .route-link small { display: block; color: var(--muted); font-size: 11px; line-height: 1.55; }
+      .guide { padding: 0 0 74px; }
+      .guide-layout { display: grid; grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr); gap: clamp(32px, 7vw, 90px); align-items: start; }
+      .guide-intro { position: sticky; top: 24px; }
+      .guide-intro h2 { max-width: 340px; font-size: clamp(25px, 3.7vw, 36px); line-height: 1.16; }
+      .guide-intro > p { max-width: 370px; margin: 13px 0 0; color: var(--muted); font-size: 12px; line-height: 1.75; }
+      .search-wrap { position: relative; margin-top: 23px; }
+      .search-wrap svg { position: absolute; top: 13px; left: 13px; width: 17px; height: 17px; color: #637c87; pointer-events: none; }
+      .search-wrap input { width: 100%; min-height: 44px; padding: 0 13px 0 40px; border: 1px solid #cbd9de; border-radius: 7px; background: var(--white); color: var(--ink); font-size: 12px; }
+      .search-wrap input::placeholder { color: #607580; opacity: 1; }
+      .search-status { min-height: 18px; margin: 7px 0 0; color: var(--muted); font-size: 10px; }
+      .guide-group + .guide-group { margin-top: 30px; }
+      .guide-group h3 { margin: 0 0 7px; color: var(--teal); font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+      .guide-item { border-top: 1px solid var(--line); }
+      .guide-item:last-child { border-bottom: 1px solid var(--line); }
+      .guide-item[hidden] { display: none; }
+      .guide-item summary { display: flex; min-height: 56px; align-items: center; justify-content: space-between; gap: 20px; padding: 12px 2px; font-size: 13px; font-weight: 750; line-height: 1.5; list-style: none; }
+      .guide-item summary::-webkit-details-marker { display: none; }
+      .guide-item summary::after { flex: 0 0 auto; color: var(--teal); content: "+"; font-size: 20px; font-weight: 500; }
+      .guide-item[open] summary::after { content: "−"; }
+      .guide-answer { max-width: 660px; padding: 0 30px 18px 2px; color: var(--muted); font-size: 12px; line-height: 1.75; }
+      .guide-answer p { margin: 0 0 10px; }
+      .guide-answer p:last-child { margin-bottom: 0; }
+      .guide-answer ol, .guide-answer ul { display: grid; gap: 7px; margin: 8px 0 0; padding-inline-start: 20px; }
+      .guide-answer a { color: var(--teal); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+      .privacy-note { margin-top: 14px; padding: 13px 15px; border: 1px solid #eadbb1; border-radius: 7px; background: var(--warning-bg); color: var(--warning); font-size: 11px; line-height: 1.65; }
+      .no-results { padding: 22px 0; color: var(--muted); font-size: 12px; }
+      .no-results[hidden] { display: none; }
+      .contact-band { background: var(--ink); color: var(--white); }
+      .contact-inner { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 30px; padding-block: 30px; }
+      .contact-inner h2 { font-size: clamp(22px, 3vw, 30px); }
+      .contact-inner p { margin: 8px 0 0; color: #c6d7df; font-size: 12px; line-height: 1.65; }
+      .contact-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+      .contact-actions .button { border-color: #13bec8; background: #13bec8; color: #092b3a; }
+      .contact-actions .button:hover { background: #7ce2e5; }
+      .contact-actions .button-secondary { border-color: #527183; background: transparent; color: var(--white); }
+      .contact-actions .button-secondary:hover { border-color: #80e4e8; color: #80e4e8; }
+      footer { background: var(--ink); color: #b9cbd3; }
+      .footer-inner { display: flex; min-height: 60px; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #29485a; font-size: 10px; }
+      .footer-inner a { color: #d5e4e9; text-decoration: underline; text-underline-offset: 3px; }
+      @media (max-width: 760px) {
+        .masthead-inner, .container { width: min(100% - 36px, 620px); }
+        .masthead-inner { min-height: 68px; }
+        .brand-logo { width: 170px; }
+        .masthead-links { gap: 14px; font-size: 11px; }
+        .hero { padding-top: 52px; }
+        .hero-grid { grid-template-columns: 1fr; gap: 22px; }
+        .hero-actions { padding: 0; }
+        .section-heading { align-items: start; flex-direction: column; gap: 8px; }
+        .route-list { grid-template-columns: 1fr; }
+        .route-link { min-height: 108px; padding: 16px 2px; }
+        .route-link + .route-link { padding-inline: 2px; border-inline-start: 0; border-top: 1px solid var(--line); }
+        .guide-layout { grid-template-columns: 1fr; gap: 28px; }
+        .guide-intro { position: static; }
+        .guide-intro h2 { max-width: 500px; }
+        .guide-intro > p { max-width: 500px; }
+        .search-wrap { max-width: 520px; }
+        .contact-inner { grid-template-columns: 1fr; gap: 18px; }
+      }
+      @media (max-width: 440px) {
+        .masthead-inner, .container { width: calc(100% - 28px); }
+        .masthead-links { gap: 10px; }
+        .masthead-links > a:first-child { display: none; }
+        .masthead-links .login-link { min-height: 38px; padding: 0 10px; }
+        .hero { padding-top: 40px; }
+        .hero-copy { font-size: 13px; }
+        .button { flex: 1 1 auto; }
+        .guide { padding-bottom: 54px; }
+        .footer-inner { align-items: flex-start; flex-direction: column; justify-content: center; padding-block: 14px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { transition-duration: .01ms !important; }
+      }
+      .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+      body { background: #edf3f5; }
+      .masthead { background: #fff; color: var(--ink); box-shadow: 0 1px 0 #dce5e8; }
+      .masthead-inner { min-height: 70px; }
+      .masthead-links { color: #455d6c; }
+      .masthead-links .login-link { border-color: #d1dfe3; color: var(--ink); }
+      .masthead-links .login-link:hover { border-color: var(--teal); color: var(--teal); }
+      .support-workspace { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 740px; margin-top: 32px; margin-bottom: 64px; overflow: hidden; border: 1px solid #dbe5e8; border-radius: 16px; background: #fff; box-shadow: 0 18px 55px rgba(0, 0, 0, .08); }
+      .assistant-rail { display: flex; flex-direction: column; padding: 25px 18px 20px; background: #102a3e; color: #fff; }
+      .rail-brand { display: flex; align-items: center; gap: 10px; padding: 0 4px 22px; border-bottom: 1px solid #2a4758; }
+      .rail-mark { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border: 1px solid #476575; border-radius: 11px; color: #6ee1e5; font-size: 12px; font-weight: 800; }
+      .rail-brand strong { display: block; font-size: 12px; font-weight: 800; }
+      .rail-brand small { display: block; margin-top: 3px; color: #b5c9d2; font-size: 9px; }
+      .rail-heading { margin: 24px 8px 9px; color: #a8bec8; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+      .topic-nav { display: grid; gap: 5px; }
+      .topic-button { display: flex; min-height: 42px; align-items: center; gap: 10px; padding: 0 10px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: #e0eaee; font-size: 11px; font-weight: 700; text-align: left; }
+      .topic-button:hover, .topic-button[aria-pressed="true"] { border-color: #315366; background: #1a3c50; color: #fff; }
+      .topic-dot { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: #4bc7cd; }
+      .rail-note { margin: 18px 3px 0; color: #c0d0d7; font-size: 10px; line-height: 1.65; }
+      .rail-bottom { margin-top: auto; padding-top: 20px; }
+      .rail-call { display: flex; min-height: 40px; align-items: center; justify-content: center; gap: 8px; border: 1px solid #4a6879; border-radius: 7px; color: #fff; font-size: 10px; font-weight: 800; }
+      .rail-call:hover { border-color: #71dfe2; color: #71dfe2; }
+      .rail-privacy { margin: 12px 4px 0; color: #afc3cc; font-size: 9px; line-height: 1.6; }
+      .conversation { display: grid; min-width: 0; grid-template-rows: auto 1fr auto; }
+      .conversation-head { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 18px; padding: 14px 30px; border-bottom: 1px solid #e4ecee; background: #fff; }
+      .conversation-title { display: flex; align-items: center; gap: 11px; min-width: 0; }
+      .assistant-avatar { display: grid; width: 38px; height: 38px; flex: 0 0 auto; place-items: center; border-radius: 13px; background: #dff3f1; color: #006d77; }
+      .assistant-avatar svg { width: 21px; height: 21px; }
+      .conversation-title strong { display: block; font-size: 12px; font-weight: 800; }
+      .conversation-title small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; }
+      .guide-label { padding: 6px 9px; border: 1px solid #d8e7e5; border-radius: 99px; color: #38636a; font-size: 9px; font-weight: 750; white-space: nowrap; }
+      .chat-scroll { min-width: 0; padding: 28px clamp(18px, 5vw, 56px) 30px; background: #f8fafb; }
+      .assistant-welcome { display: flex; align-items: flex-start; gap: 10px; }
+      .assistant-welcome .assistant-avatar { width: 32px; height: 32px; border-radius: 11px; }
+      .welcome-bubble { max-width: 650px; padding: 15px 17px; border: 1px solid #e0e9eb; border-radius: 3px 14px 14px 14px; background: #fff; }
+      .welcome-bubble h1 { margin: 0; font-size: clamp(21px, 3vw, 28px); letter-spacing: -.045em; line-height: 1.18; }
+      .welcome-bubble p { margin: 8px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+      .quick-prompts { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 23px 42px; }
+      .quick-prompt { min-height: 34px; padding: 0 12px; border: 1px solid #b9d2d4; border-radius: 99px; background: #fff; color: #18545c; font-size: 10px; font-weight: 750; transition: background-color .15s ease, border-color .15s ease; }
+      .quick-prompt:hover, .quick-prompt[aria-pressed="true"] { border-color: #006d77; background: #e6f4f2; }
+      .search-wrap { max-width: 620px; margin: 0 0 17px 42px; }
+      .search-wrap svg { left: 14px; }
+      .search-wrap input { min-height: 44px; padding-left: 42px; border-color: #d5e1e4; border-radius: 9px; box-shadow: 0 2px 6px rgba(16, 42, 62, .025); font-size: 11px; }
+      .search-status { margin-left: 42px; font-size: 10px; }
+      .conversation-results { max-width: 760px; }
+      .guide-group { margin-top: 16px; }
+      .guide-group + .guide-group { margin-top: 24px; }
+      .guide-group h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px 42px; color: #58717b; font-size: 9px; font-weight: 800; letter-spacing: .06em; }
+      .guide-group h2::before { width: 19px; height: 1px; background: #9cb4bc; content: ""; }
+      .guide-item { margin: 0 0 9px 42px; border: 0; }
+      .guide-item summary { position: relative; width: fit-content; max-width: min(100%, 590px); min-height: 0; margin-left: auto; padding: 10px 14px; border: 1px solid #c6dcde; border-radius: 13px 3px 13px 13px; background: #eaf5f4; color: #173b4a; font-size: 11px; font-weight: 750; }
+      .guide-item summary::after { content: "⌄"; font-size: 14px; }
+      .guide-item[open] summary::after { content: "⌃"; }
+      .guide-answer { max-width: min(100%, 620px); margin: 8px auto 0 0; padding: 13px 15px; border: 1px solid #e0e9eb; border-radius: 3px 13px 13px 13px; background: #fff; color: #425d6a; font-size: 11px; line-height: 1.75; }
+      .guide-answer ol, .guide-answer ul { gap: 6px; padding-inline-start: 19px; }
+      .guide-answer a { color: #006d77; }
+      .privacy-note { max-width: 620px; margin: 19px 0 0 42px; padding: 11px 13px; border: 1px solid #eadbb1; border-radius: 8px; background: #fff8e8; color: #735414; font-size: 10px; }
+      .no-results { max-width: 620px; margin: 0 0 0 42px; padding: 16px; border: 1px dashed #c7d8dc; border-radius: 9px; background: #fff; }
+      .conversation-compose { padding: 13px clamp(18px, 5vw, 56px) 17px; border-top: 1px solid #e3ebed; background: #fff; }
+      .compose-field { display: flex; max-width: 760px; min-height: 47px; align-items: center; gap: 10px; margin-left: 42px; padding: 5px 7px 5px 13px; border: 1px solid #d4e0e3; border-radius: 10px; background: #fff; }
+      .compose-field input { width: 100%; min-width: 0; height: 34px; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 11px; }
+      .compose-field input::placeholder { color: #607580; opacity: 1; }
+      .compose-field button { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border: 0; border-radius: 7px; background: #006d77; color: #fff; }
+      .compose-field button:hover { background: #005861; }
+      .compose-field button svg { width: 16px; height: 16px; }
+      .compose-hint { max-width: 760px; margin: 7px 0 0 42px; color: #617781; font-size: 9px; line-height: 1.55; }
+      .contact-strip { display: flex; align-items: center; justify-content: space-between; gap: 18px; max-width: 760px; margin: 16px 0 0 42px; padding-top: 13px; border-top: 1px solid #e5ecee; }
+      .contact-strip p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.6; }
+      .contact-strip a { display: inline-flex; min-height: 34px; flex: 0 0 auto; align-items: center; padding: 0 11px; border: 1px solid #bfd4d8; border-radius: 7px; color: #15555e; font-size: 10px; font-weight: 800; }
+      .contact-strip a:hover { border-color: var(--teal); background: #eff8f7; }
+      .footer-inner { color: #657b84; }
+      .footer-inner a { color: #315c63; }
+      @media (max-width: 760px) {
+        .support-workspace { grid-template-columns: 1fr; min-height: 0; margin-top: 18px; border-radius: 12px; }
+        .assistant-rail { padding: 13px 14px 11px; }
+        .rail-brand { padding: 0 3px 11px; border-bottom: 0; }
+        .rail-mark { width: 32px; height: 32px; border-radius: 9px; }
+        .rail-heading, .rail-note, .rail-bottom { display: none; }
+        .topic-nav { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 1px; scrollbar-width: thin; }
+        .topic-button { min-height: 34px; flex: 0 0 auto; padding: 0 10px; border-color: #315366; font-size: 10px; }
+        .topic-dot { width: 6px; height: 6px; }
+        .conversation-head { min-height: 62px; padding: 10px 15px; }
+        .chat-scroll { padding: 20px 14px 24px; }
+        .quick-prompts, .search-wrap, .search-status, .privacy-note, .no-results, .guide-group h2, .guide-item { margin-left: 0; }
+        .guide-group { margin-top: 14px; }
+        .guide-group + .guide-group { margin-top: 20px; }
+        .guide-group h3 { margin-bottom: 8px; }
+        .guide-item summary { max-width: 94%; }
+        .guide-answer { max-width: 96%; }
+        .conversation-compose { padding: 12px 14px 14px; }
+        .compose-field, .compose-hint, .contact-strip { margin-left: 0; }
+        .contact-strip { align-items: flex-start; flex-direction: column; }
+        .footer-inner { min-height: 54px; }
+      }
+      @media (max-width: 440px) {
+        .masthead-inner, .container { width: calc(100% - 24px); }
+        .masthead-inner { min-height: 60px; }
+        .brand-logo { width: 154px; }
+        .masthead-links { gap: 0; }
+        .masthead-links > a:first-child { display: none; }
+        .masthead-links .login-link { min-height: 34px; padding: 0 9px; font-size: 10px; }
+        .support-workspace { margin-top: 12px; margin-bottom: 42px; }
+        .assistant-rail { padding-inline: 11px; }
+        .conversation-head { gap: 8px; padding-inline: 11px; }
+        .guide-label { padding-inline: 7px; font-size: 8px; }
+        .chat-scroll { padding-inline: 11px; }
+        .welcome-bubble { padding: 12px 13px; }
+        .quick-prompts { gap: 6px; margin-top: 12px; }
+        .quick-prompt { min-height: 32px; padding-inline: 10px; font-size: 9px; }
+        .contact-strip { gap: 10px; }
+      }
+      :root {
+        color-scheme: dark;
+        --ink: #f0f7fa;
+        --ink-soft: #d3e2e8;
+        --muted: #afc3cc;
+        --teal: #5edbe0;
+        --cyan: #70e5e7;
+        --paper: #071721;
+        --white: #102631;
+        --line: #294651;
+        --mint: #143841;
+        --warning: #f4d990;
+        --warning-bg: #352c1a;
+      }
+      body { background: #071721; color: #f0f7fa; }
+      .masthead { background: #0b202b; color: #f0f7fa; box-shadow: 0 1px 0 #28434f; }
+      .masthead-inner { width: min(1400px, calc(100% - 64px)); min-height: 72px; }
+      .masthead-links { color: #c1d3da; }
+      .masthead-links .login-link { border-color: #3d5c68; color: #f0f7fa; }
+      .masthead-links .login-link:hover { border-color: #70e5e7; color: #70e5e7; }
+      .container { width: min(1400px, calc(100% - 64px)); }
+      .support-workspace { grid-template-columns: 252px minmax(0, 1fr); min-height: min(820px, calc(100vh - 160px)); margin-top: 30px; margin-bottom: 50px; border-color: #294651; border-radius: 12px; background: #0c202a; box-shadow: 0 20px 55px rgba(0, 0, 0, .2); }
+      .assistant-rail { padding: 22px 16px 17px; background: #0a1d27; }
+      .rail-brand { border-color: #29444f; }
+      .rail-mark { border-color: #35616b; border-radius: 8px; background: #10343d; color: #7be5e7; }
+      .rail-brand small,.rail-note,.rail-privacy { color: #b5c8d0; }
+      .rail-heading { color: #afc4cc; }
+      .topic-button { border-color: transparent; color: #cfdee4; }
+      .topic-button:hover, .topic-button[aria-pressed="true"] { border-color: #3b646e; background: #15333d; color: #f3fbfc; }
+      .topic-dot { background: #72e0e2; }
+      .rail-call { border-color: #42616d; color: #f1f8fa; }
+      .rail-call:hover { border-color: #73e1e3; color: #73e1e3; }
+      .conversation { background: #0c202a; }
+      .conversation-head { min-height: 70px; border-color: #29434e; background: #102630; }
+      .assistant-avatar { border-radius: 9px; background: #153d46; color: #7be5e7; }
+      .conversation-title strong { color: #f0f7fa; }
+      .conversation-title small { color: #b0c4cd; }
+      .guide-label { border-color: #3b5964; border-radius: 5px; background: #142c36; color: #c9e2e5; }
+      .chat-scroll { background: #0c202a; }
+      .welcome-bubble { max-width: none; padding: 0; border: 0; background: transparent; }
+      .welcome-bubble h1 { color: #f3f8fa; font-size: clamp(25px, 3vw, 34px); letter-spacing: -.045em; }
+      .welcome-bubble p { max-width: 68ch; color: #b6c9d1; font-size: 12px; }
+      .quick-prompts { margin-top: 15px; margin-bottom: 19px; }
+      .quick-prompt { min-height: 32px; border-color: #34525e; border-radius: 6px; background: #112a35; color: #d0e1e6; font-size: 10px; }
+      .quick-prompt:hover, .quick-prompt[aria-pressed="true"] { border-color: #55bfc4; background: #153a43; color: #9cf0f0; }
+      .search-wrap input { border-color: #385660; border-radius: 7px; background: #0a1d27; color: #f0f7fa; box-shadow: none; }
+      .search-wrap input::placeholder,.compose-field input::placeholder { color: #b1c4cc; }
+      .search-wrap svg { color: #bfd1d7; }
+      .search-status { color: #b8ccd3; }
+      .guide-group h2 { color: #9bc0c8; }
+      .guide-group h2::before { background: #4a707a; }
+      .guide-item { margin-bottom: 0; border-top: 1px solid #29454f; }
+      .guide-item:last-child { border-bottom: 1px solid #29454f; }
+      .guide-item summary { width: 100%; max-width: none; min-height: 50px; margin: 0; padding: 12px 13px; border: 0; border-radius: 0; background: transparent; color: #ecf4f7; font-size: 12px; }
+      .guide-item summary:hover { background: #112a34; }
+      .guide-item summary::after { color: #81e2e4; }
+      .guide-answer { max-width: none; margin: 0; padding: 2px 40px 18px 13px; border: 0; border-radius: 0; background: #102731; color: #c3d3d9; font-size: 11px; }
+      .guide-answer a { color: #8ce9ea; }
+      .privacy-note { max-width: none; margin: 20px 0 0; border-color: #66552e; border-radius: 6px; background: #302819; color: #f1dda3; }
+      .no-results { max-width: none; margin: 0; border-color: #38535d; border-radius: 6px; background: #102630; color: #c4d5db; }
+      .conversation-compose { border-color: #29434e; background: #102630; }
+      .compose-field { border-color: #385660; border-radius: 7px; background: #0a1d27; }
+      .compose-field input { color: #f0f7fa; }
+      .compose-field button { border-radius: 5px; background: #087982; color: #fff; }
+      .compose-field button:hover { background: #0b929b; }
+      .compose-hint,.contact-strip p { color: #b3c7cf; }
+      .contact-strip { border-color: #2c4751; }
+      .contact-strip a { border-color: #42636e; border-radius: 5px; color: #a1eff0; }
+      .contact-strip a:hover { border-color: #69d8dc; background: #14343c; }
+      .footer-inner { border-color: #263f4a; color: #b4c7cf; }
+      .footer-inner a { color: #d4e6eb; }
+      :focus-visible { outline-color: #9bf1f1; }
+      @media (max-width: 760px) {
+        .masthead-inner, .container { width: min(100% - 32px, 680px); }
+        .support-workspace { min-height: 0; margin-top: 18px; }
+        .assistant-rail { padding: 13px 14px 11px; }
+        .rail-mark { background: #10343d; }
+        .topic-nav { scrollbar-color: #3b6470 #0a1d27; }
+        .topic-button { border-color: #314f5b; }
+        .conversation-head { background: #102630; }
+        .chat-scroll { background: #0c202a; }
+        .guide-item summary { max-width: none; }
+        .guide-answer { max-width: none; }
+        .conversation-compose { background: #102630; }
+        .contact-strip { align-items: flex-start; }
+        .contact-strip a { background: #0a1d27; }
+      }
+      @media (max-width: 440px) {
+        .masthead-inner, .container { width: calc(100% - 24px); }
+        .support-workspace { margin-top: 12px; margin-bottom: 40px; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Chuyển đến nội dung hỗ trợ</a>
+    <header class="masthead">
+      <div class="masthead-inner">
+        <a class="brand" href="/" aria-label="HP Telecom — về trang chủ">
+          <svg class="brand-logo" viewBox="0 0 303 64" role="img" aria-labelledby="brand-title brand-description">
+            <title id="brand-title">HP Telecom</title>
+            <desc id="brand-description">Điều hành hiện trường</desc>
+            <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
+              <path d="M30 7a23 23 0 0 0-22 16" />
+              <path d="M7 32a23 23 0 0 0 17 22" />
+              <path d="M34 55a23 23 0 0 0 18-19" />
+              <path d="M54 27A23 23 0 0 0 38 9" />
+            </g>
+            <circle cx="21" cy="7" r="3.2" fill="#00bfd0" />
+            <circle cx="53" cy="47" r="3.2" fill="#00bfd0" />
+            <text x="10" y="39" fill="#fff" font-family="Arial, sans-serif" font-size="25" font-weight="800" letter-spacing="-2">HP</text>
+            <text x="76" y="29" fill="#fff" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="-.7">HP Telecom</text>
+            <text x="76" y="50" fill="#a3ebed" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="2.1">ĐIỀU HÀNH HIỆN TRƯỜNG</text>
+          </svg>
+        </a>
+        <nav class="masthead-links" aria-label="Điều hướng chính">
+          <a href="/">Về trang chủ <span aria-hidden="true">↗</span></a>
+          <a class="login-link" href="/dangnhap">Mở ứng dụng</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="support-workspace container">
+      <aside class="assistant-rail" aria-label="Chủ đề trợ giúp">
+        <div class="rail-brand">
+          <span class="rail-mark" aria-hidden="true">HP</span>
+          <span><strong>Hỗ trợ HP Telecom</strong><small>HP Telecom Server</small></span>
+        </div>
+        <p class="rail-heading">Chủ đề thường gặp</p>
+        <nav class="topic-nav" aria-label="Lọc theo chủ đề">
+          <button class="topic-button" type="button" data-query="đăng ký" aria-pressed="false"><span class="topic-dot"></span>Tài khoản mới</button>
+          <button class="topic-button" type="button" data-query="đồng bộ" aria-pressed="false"><span class="topic-dot"></span>Lỗi đồng bộ</button>
+          <button class="topic-button" type="button" data-query="báo cáo chưa đồng bộ" aria-pressed="false"><span class="topic-dot"></span>Báo cáo chưa gửi</button>
+          <button class="topic-button" type="button" data-query="liên hệ hỗ trợ" aria-pressed="false"><span class="topic-dot"></span>Liên hệ hỗ trợ</button>
+        </nav>
+        <p class="rail-note">Chọn một chủ đề để lọc nhanh hướng dẫn có sẵn.</p>
+        <div class="rail-bottom">
+          <a class="rail-call" href="tel:0857570123"><span aria-hidden="true">☎</span> Gọi 0857 570 123</a>
+          <p class="rail-privacy">Không gửi mật khẩu hoặc mã xác minh qua các kênh hỗ trợ.</p>
+        </div>
+      </aside>
+
+      <section class="conversation" aria-label="Tra cứu hướng dẫn hỗ trợ">
+        <header class="conversation-head">
+          <div class="conversation-title">
+            <span class="assistant-avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4.5 13v-1a7.5 7.5 0 0 1 15 0v1"/><path d="M4.5 12H7v5H6a1.5 1.5 0 0 1-1.5-1.5zM19.5 12H17v5h1a1.5 1.5 0 0 0 1.5-1.5zM17 18c-1 1.2-2.5 1.8-5 1.8"/></svg>
+            </span>
+            <span><strong>Trung tâm hỗ trợ</strong><small>Tra cứu hướng dẫn và xử lý vấn đề thường gặp</small></span>
+          </div>
+          <span class="guide-label">Cơ sở kiến thức</span>
+        </header>
+
+        <div class="chat-scroll" id="huong-dan">
+          <div class="assistant-welcome">
+            <span class="assistant-avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4.5 13v-1a7.5 7.5 0 0 1 15 0v1"/><path d="M4.5 12H7v5H6a1.5 1.5 0 0 1-1.5-1.5zM19.5 12H17v5h1a1.5 1.5 0 0 1 1.5-1.5zM17 18c-1 1.2-2.5 1.8-5 1.8"/></svg>
+            </span>
+            <div class="welcome-bubble">
+              <h1>Hướng dẫn hỗ trợ</h1>
+              <p>Chọn chủ đề hoặc nhập từ khóa để tra cứu. Nội dung dưới đây là hướng dẫn có sẵn; nếu cần hỗ trợ trực tiếp, hãy gọi hoặc gửi email cho đội ngũ HP Telecom.</p>
+            </div>
+          </div>
+          <div class="quick-prompts" aria-label="Chủ đề gợi ý">
+            <button class="quick-prompt" type="button" data-query="đăng ký">Tạo tài khoản</button>
+            <button class="quick-prompt" type="button" data-query="đồng bộ">Lỗi đồng bộ</button>
+            <button class="quick-prompt" type="button" data-query="báo cáo chưa đồng bộ">Báo cáo chưa gửi</button>
+            <button class="quick-prompt" type="button" data-query="liên hệ hỗ trợ">Cách liên hệ</button>
+          </div>
+
+          <label class="search-wrap">
+            <span class="visually-hidden">Tìm trong hướng dẫn hỗ trợ</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            <input id="help-search" type="search" placeholder="Nhập câu hỏi, ví dụ: lỗi đồng bộ" autocomplete="off" />
+          </label>
+          <p class="search-status" id="search-status" aria-live="polite"></p>
+
+          <div class="conversation-results" id="guide-content">
+            <section class="guide-group" id="tai-khoan" aria-labelledby="account-title">
+              <h2 id="account-title">TÀI KHOẢN &amp; ĐĂNG NHẬP</h2>
+              <details class="guide-item" data-search="đăng ký tạo tài khoản tên đăng nhập mật khẩu team đội số điện thoại email">
+                <summary>Tôi đăng ký tài khoản mới như thế nào?</summary>
+                <div class="guide-answer">
+                  <p>Tại <a href="/dangnhap">màn hình đăng nhập</a>, chọn <strong>Tạo tài khoản</strong> và điền họ tên, tên đăng nhập, mật khẩu, Team/Đội, số điện thoại và email.</p>
+                  <p>Yêu cầu được chuyển đến quản trị viên xét duyệt. Bạn có thể đăng nhập sau khi tài khoản được duyệt và cấp quyền.</p>
+                </div>
+              </details>
+              <details class="guide-item" data-search="chờ duyệt xét duyệt tài khoản đăng nhập quản trị viên">
+                <summary>Yêu cầu tạo tài khoản đang chờ duyệt?</summary>
+                <div class="guide-answer">
+                  <p>Việc đăng nhập chỉ khả dụng sau khi quản trị viên xét duyệt và cấp quyền. Nếu cần hỏi về yêu cầu đang chờ, hãy liên hệ bộ phận hỗ trợ và cho biết tên đăng nhập cùng thời điểm gửi yêu cầu.</p>
+                  <p>Không gửi mật khẩu hoặc mã xác minh khi liên hệ.</p>
+                </div>
+              </details>
+            </section>
+
+            <section class="guide-group" id="dong-bo" aria-labelledby="sync-title">
+              <h2 id="sync-title">KẾT NỐI &amp; ĐỒNG BỘ</h2>
+              <details class="guide-item" data-search="lỗi đồng bộ kết nối internet wifi mạng máy chủ server trạng thái">
+                <summary>Ứng dụng không kết nối hoặc báo lỗi đồng bộ?</summary>
+                <div class="guide-answer">
+                  <ol>
+                    <li>Kiểm tra Internet hoặc Wi-Fi nội bộ mà tổ chức yêu cầu.</li>
+                    <li>Mở mục <strong>Server</strong> trong ứng dụng và xem trạng thái kết nối/đồng bộ.</li>
+                    <li>Đảm bảo bạn đang đăng nhập đúng tài khoản và dùng máy chủ do quản trị viên cung cấp.</li>
+                    <li>Nếu vẫn lỗi, liên hệ hỗ trợ kèm thời điểm xảy ra và dòng thông báo lỗi.</li>
+                  </ol>
+                  <p>Đừng xóa ứng dụng khi còn dữ liệu chưa đồng bộ.</p>
+                </div>
+              </details>
+              <details class="guide-item" data-search="mất dữ liệu chưa đồng bộ ảnh báo cáo xóa ứng dụng lưu dữ liệu">
+                <summary>Tôi nên làm gì khi báo cáo chưa đồng bộ?</summary>
+                <div class="guide-answer">
+                  <p>Giữ nguyên ứng dụng và dữ liệu trên thiết bị. Kiểm tra kết nối, trạng thái trong mục <strong>Server</strong>, rồi liên hệ hỗ trợ nếu trạng thái không thay đổi.</p>
+                  <p>Không gỡ ứng dụng hoặc xóa dữ liệu khi còn báo cáo chưa đồng bộ.</p>
+                </div>
+              </details>
+            </section>
+
+            <section class="guide-group" id="lien-he" aria-labelledby="contact-guide-title">
+              <h2 id="contact-guide-title">TRƯỚC KHI LIÊN HỆ</h2>
+              <details class="guide-item" data-search="liên hệ hỗ trợ email điện thoại phiên bản ứng dụng loại điện thoại chức năng nội dung lỗi">
+                <summary>Cần cung cấp thông tin gì để được hỗ trợ?</summary>
+                <div class="guide-answer">
+                  <p>Hãy mô tả ngắn gọn vấn đề và ghi lại:</p>
+                  <ul>
+                    <li>Phiên bản ứng dụng và loại điện thoại.</li>
+                    <li>Tên chức năng đang sử dụng.</li>
+                    <li>Thời điểm xảy ra và nội dung thông báo lỗi.</li>
+                  </ul>
+                  <p>Chỉ gửi ảnh hoặc báo cáo nếu bộ phận hỗ trợ yêu cầu và bạn có quyền chia sẻ.</p>
+                </div>
+              </details>
+            </section>
+            <p class="no-results" id="no-results" hidden>Chưa tìm thấy hướng dẫn phù hợp. Thử từ khóa khác hoặc gọi bộ phận hỗ trợ.</p>
+            <p class="privacy-note"><strong>Lưu ý bảo mật:</strong> Không gửi mật khẩu hoặc mã xác minh. Chỉ chia sẻ ảnh/báo cáo khi được yêu cầu và bạn có quyền chia sẻ.</p>
+          </div>
+        </div>
+
+        <div class="conversation-compose">
+          <label class="compose-field">
+            <span class="visually-hidden">Nhập từ khóa để tìm hướng dẫn</span>
+            <input id="help-compose" type="text" placeholder="Bạn muốn tìm hướng dẫn nào?" autocomplete="off" />
+            <button id="search-submit" type="button" aria-label="Tìm hướng dẫn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12h15M13 5l7 7-7 7"/></svg>
+            </button>
+          </label>
+          <p class="compose-hint">Tìm trong hướng dẫn có sẵn — nội dung nhập không được gửi lên máy chủ.</p>
+          <div class="contact-strip">
+            <p>Không thấy câu trả lời? Khi liên hệ, hãy chuẩn bị phiên bản app, loại điện thoại và nội dung lỗi.</p>
+            <a href="/cdn-cgi/l/email-protection#5125233834242538343f353d11363c30383d7f323e3c">Gửi email hỗ trợ</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner container">
+        <span>HP Telecom Server · Hỗ trợ ứng dụng</span>
+        <a href="/privacy">Chính sách quyền riêng tư</a>
+      </div>
+    </footer>
+    <script>
+      const searchInput = document.querySelector("#help-search");
+      const composeInput = document.querySelector("#help-compose");
+      const guideItems = [...document.querySelectorAll(".guide-item")];
+      const guideGroups = [...document.querySelectorAll(".guide-group")];
+      const topicButtons = [...document.querySelectorAll(".topic-button, .quick-prompt")];
+      const searchStatus = document.querySelector("#search-status");
+      const noResults = document.querySelector("#no-results");
+
+      function filterGuides(rawQuery, selectedButton = null) {
+        const query = rawQuery.trim().toLocaleLowerCase("vi");
+        let visibleCount = 0;
+
+        for (const item of guideItems) {
+          const searchableText = `${item.dataset.search} ${item.textContent}`.toLocaleLowerCase("vi");
+          const matches = !query || searchableText.includes(query);
+          item.hidden = !matches;
+          if (matches) visibleCount += 1;
+        }
+
+        for (const group of guideGroups) {
+          group.hidden = !group.querySelector(".guide-item:not([hidden])");
+        }
+
+        noResults.hidden = visibleCount > 0;
+        searchStatus.textContent = query
+          ? `${visibleCount} hướng dẫn phù hợp`
+          : "";
+        for (const button of topicButtons) {
+          button.setAttribute("aria-pressed", String(button === selectedButton));
+        }
+      }
+
+      searchInput.addEventListener("input", () => {
+        composeInput.value = searchInput.value;
+        filterGuides(searchInput.value);
+      });
+      composeInput.addEventListener("input", () => {
+        searchInput.value = composeInput.value;
+        filterGuides(composeInput.value);
+      });
+      composeInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          filterGuides(composeInput.value);
+          document.querySelector(".conversation-results").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+      document.querySelector("#search-submit").addEventListener("click", () => {
+        searchInput.value = composeInput.value;
+        filterGuides(composeInput.value);
+        document.querySelector(".conversation-results").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      for (const button of topicButtons) {
+        button.addEventListener("click", () => {
+          const query = button.dataset.query;
+          searchInput.value = query;
+          composeInput.value = query;
+          filterGuides(query, button);
+          document.querySelector(".conversation-results").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+    </script>
+  </body>
+</html>
