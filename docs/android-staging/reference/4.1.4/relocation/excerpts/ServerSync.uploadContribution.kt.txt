@@ -1,0 +1,70 @@
+ private suspend fun uploadContribution(app:WorkApp,place:Place,progress:(String)->Unit){
+  SharedReports.ensureContributorActive(app,place.id)
+  val account=app.accountScope;val remote=SharedReports.remote(app,place.id)
+  val prefs=app.getSharedPreferences("server-links",Context.MODE_PRIVATE);val cache=app.getSharedPreferences("server-assets",Context.MODE_PRIVATE);val key="folder-${place.id}"
+  suspend fun finish(){
+   val journal=pending(app,place.id)?:return
+   val photoMutation=journal.optString("kind")=="photo-mutations"
+   check((photoMutation||journal.optString("kind")=="contribution")&&journal.getString("remote")==remote){"Còn thao tác báo cáo cũ cần đối chiếu; ảnh trên máy vẫn được giữ."}
+   val endpoint="mobile/folders/$remote/"+if(photoMutation)"photo-mutations"else "contributions"
+   val result=try{ServerSession.api(endpoint,"POST",journal.getJSONObject("request"))}catch(e:ServerSession.Failure){
+    if(e.status==403)SharedReports.markRevoked(app,place.id)
+    if(e.status in listOf(404,405))throw ServerSession.Failure(e.status,"Chưa gửi được ảnh cùng làm: hãy kiểm tra quyền báo cáo và cập nhật server. Ảnh vẫn được giữ trên máy.")
+    if(!photoMutation||e.status!=409)throw e
+    // A 409 definitively rejected this operation. Rebase only photo intent; never a whole stale report.
+    val latest=ServerSession.api("mobile/folders/$remote")
+    check(account==app.accountScope){"Tài khoản đã thay đổi"}
+    if(ReportCompletion.fromServer(latest.getJSONObject("payload")))throw ServerSession.Failure(409,"Báo cáo đã hoàn thành; người lập cần mở lại trước. Thay đổi ảnh vẫn giữ trên máy.")
+    val rebased=try {
+     @Suppress("UNCHECKED_CAST")
+     PhotoMutationDelta.rebase(PhotoMutationDelta.fromWire(plain(journal.getJSONObject("request")) as Map<String,Any?>),plain(latest.getJSONObject("payload")) as Map<String,Any?>)
+    }catch(conflict:IllegalArgumentException){stateFile(app,place.id).delete();throw ServerSession.Failure(409,conflict.message.orEmpty())}
+    if(rebased.empty)latest else {
+     val request=JSONObject(rebased.wire()).put("operation",UUID.randomUUID().toString()).put("revision",latest.getInt("revision"))
+     journal.put("request",request);savePending(app,place.id,journal)
+     ServerSession.api(endpoint,"POST",request)
+    }
+   }
+   check(account==app.accountScope){"Tài khoản đã thay đổi"}
+   val source=journal.getJSONObject("source");val revision=result.getInt("revision")
+   val canonical=if(photoMutation)result.getJSONObject("payload")else source
+   saveBaseline(app,place.id,revision,source,canonical)
+   check(prefs.edit().putInt("$key-revision",revision).putString("$key-signature",journal.getString("signature")).putBoolean("$key-refresh",true).commit()){"Chưa lưu được kết quả gửi ảnh"}
+   stateFile(app,place.id).delete()
+   if(MxPhotoUpload.needsCoordinates(source)){AutoSync.refresh();AutoSync.awaitMx(app,place.id)}
+  }
+  app.flushReport();finish()
+  val payload=snapshot(app,place);val signature=sha(payload.toString())
+  if(signature==prefs.getString("$key-signature",null)){progress("Đã đồng bộ ${place.name}");return}
+  val base=baseline(app,place.id)?:error("Báo cáo chung chưa có mốc đồng bộ. Giữ ảnh trên máy và bấm Đồng bộ để nhận lại thông tin.")
+  val accepted=base.getJSONObject("localWire")
+  val module=ServerSession.module(place.kind)
+  check(module in listOf("incident","relocation")){"Loại báo cáo chưa hỗ trợ cùng làm"}
+  val unknown=mutableSetOf<String>()
+  images(payload){path->cache.getString(folderAssetKey(remote,module,path,File(path)),null)?:path.also{unknown.add(it)}}
+  @Suppress("UNCHECKED_CAST")
+  val delta=PhotoMutationDelta.plan(plain(accepted) as Map<String,Any?>,plain(payload) as Map<String,Any?>,plain(base.getJSONObject("wire")) as Map<String,Any?>)
+  if(delta.empty){
+   // Normalization of local-only draft fields does not warrant another network request.
+   check(prefs.edit().putString("$key-signature",signature).commit())
+   progress("Không có thay đổi ảnh cần gửi: ${place.name}");AutoSync.receiveIfPending(app);return
+  }
+  ServerSession.refresh();check(account==app.accountScope);check(ServerSession.allowed(place.kind)){"Bạn chưa được cấp quyền"}
+  val request=JSONObject(delta.wire()).put("operation",UUID.randomUUID().toString()).put("revision",base.getInt("revision"))
+  val added=request.getJSONArray("images")
+  val replacements=mutableMapOf<String,String>()
+  images(added){path->if(path !in unknown)path else replacements[path]?:run{
+   val file=File(path).canonicalFile;val root=File(app.accountFilesDir,"photos").canonicalFile.toPath()
+   check(file.toPath().startsWith(root)&&file.isFile){"Ảnh chưa sẵn sàng: ${file.name}"};check(file.length()<=10*1024*1024){"Ảnh ${file.name} vượt 10 MB"}
+   progress("Đang gửi ảnh cùng làm ${replacements.size+1} • ${place.name}")
+   val data=withContext(Dispatchers.IO){Base64.encodeToString(file.readBytes(),Base64.NO_WRAP)}
+   val asset=try{ServerSession.api("mobile/assets","POST",JSONObject().put("module",module).put("folderId",remote).put("base64",data)).getString("id")}catch(e:ServerSession.Failure){if(e.status==403)SharedReports.markRevoked(app,place.id);throw e}
+   check(account==app.accountScope);check(cache.edit().putString(folderAssetKey(remote,module,path,file),asset).putString("local-${place.id}-$asset",path).commit())
+   replacements[path]=asset;asset
+  }}
+  images(payload){replacements[it]?:it}
+  val journal=JSONObject().put("kind","photo-mutations").put("remote",remote).put("signature",signature).put("source",payload).put("request",request)
+  savePending(app,place.id,journal);finish()
+  progress("Đã đồng bộ thay đổi ảnh vào báo cáo ${place.name}")
+  AutoSync.receiveIfPending(app)
+ }

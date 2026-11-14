@@ -1,0 +1,6 @@
+ suspend fun snapshot(app:WorkApp,place:Place):JSONObject=app.db.withTransaction {
+  val dao=app.db.dao();val current=dao.place(place.id)?:error("Thư mục đã bị xóa");val photos=JSONArray();val jobs=dao.jobs(place.id)
+  check(jobs.size<=1){"Thư mục cũ có nhiều bộ ảnh. Hãy tách thành thư mục riêng."}
+  for(job in jobs)for(p in dao.photos(job.id)){photos.put(JSONObject().put("seq",p.seq).put("name",p.locationName).put("lat",p.lat).put("lon",p.lon).put("accuracy",p.accuracy.toDouble()).put("note",p.note).put("file",p.path).put("originalFile",p.originalPath).put("date",SimpleDateFormat("dd/MM/yyyy",Locale.US).format(Date(p.capturedAt))).put("capturedAt",p.capturedAt).put("showDate",p.showDate).put("textColor",String.format("#%06X",0xFFFFFF and p.textColor)).put("photographer",p.photographer))}
+  JSONObject().put("version",1).put("module",ServerSession.module(current.kind)).put("name",current.name).put("completed",if(current.kind=="Tuyến cáp")jobs.firstOrNull()?.completed?:false else dao.incident(place.id)?.let{JSONObject(it.value).optBoolean("completed")}?:jobs.firstOrNull()?.completed?:false).put("photos",photos).put("report",dao.incident(place.id)?.let{wireReport(it.value)}?:JSONObject.NULL)
+ }

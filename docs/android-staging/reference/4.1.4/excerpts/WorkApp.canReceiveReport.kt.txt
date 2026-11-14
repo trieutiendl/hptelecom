@@ -1,0 +1,12 @@
+    private val reportEditors=mutableMapOf<Long,Int>()
+    fun reportOpened(id:Long){reportEditors[id]=(reportEditors[id]?:0)+1}
+    fun reportClosed(id:Long){val count=(reportEditors[id]?:0)-1;if(count<=0)reportEditors.remove(id)else reportEditors[id]=count;AutoSync.refresh()}
+    suspend fun canReceiveReport(id:Long):Boolean {
+        if((reportEditors[id]?:0)>0)return false
+        val saved=db.dao().incident(id)?.let{org.json.JSONObject(it.value)}
+        if(saved?.optString("pendingPhoto").orEmpty().isNotBlank()||saved?.optString("pendingOriginal").orEmpty().isNotBlank())return false
+        val draft=DraftStore(this).read()
+        if(draft!=null&&db.dao().jobs(id).any{it.id==draft.jobId})return false
+        val current=activeModel?.state?.value
+        return current==null||((!current.busy||current.screen==Screen.PLACES)&&(current.place?.id!=id||current.screen in listOf(Screen.HOME,Screen.PLACES)))
+    }
