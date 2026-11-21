@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="303" height="64" viewBox="0 0 303 64" role="img" aria-labelledby="title desc">
+  <title id="title">HP Telecom</title>
+  <desc id="desc">Điều hành hiện trường — bản dùng trên nền tối</desc>
+  <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
+    <path d="M30 7a23 23 0 0 0-22 16"/>
+    <path d="M7 32a23 23 0 0 0 17 22"/>
+    <path d="M34 55a23 23 0 0 0 18-19"/>
+    <path d="M54 27A23 23 0 0 0 38 9"/>
+  </g>
+  <circle cx="21" cy="7" r="3.2" fill="#00bfd0"/>
+  <circle cx="53" cy="47" r="3.2" fill="#00bfd0"/>
+  <text x="10" y="39" fill="#ffffff" font-family="Arial, sans-serif" font-size="25" font-weight="800" letter-spacing="-2">HP</text>
+  <text x="76" y="29" fill="#ffffff" font-family="Arial, sans-serif" font-size="23" font-weight="700" letter-spacing="-.7">HP Telecom</text>
+  <text x="76" y="50" fill="#a3ebed" font-family="Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="2.1">ĐIỀU HÀNH HIỆN TRƯỜNG</text>
+</svg>
