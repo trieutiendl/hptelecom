@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1e2a38" />
+    <meta name="color-scheme" content="dark" />
+    <title>Nhóm của tôi | HP Telecom</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root{font-family:Manrope,"Segoe UI",sans-serif;color:#102a3e;background:#f1f5f6;font-synthesis:none;text-rendering:optimizeLegibility}
+      *{box-sizing:border-box}body{margin:0;min-width:320px}.topbar{height:72px;background:#fff;border-bottom:1px solid #d7e5e8;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,5vw,64px);gap:18px}.brand{display:flex;align-items:center;gap:11px;color:#102a3e;text-decoration:none;font-weight:800}.mark{width:36px;height:36px;border-radius:50%;background:#006d77;color:#fff;display:grid;place-items:center;font-size:13px}.topbar-right{display:flex;align-items:center;gap:18px;color:#526b78;font-size:14px}.topbar a.simple-link{color:#006d77;font-weight:700;text-decoration:none}.shell{width:min(1120px,calc(100% - 36px));margin:38px auto 72px}.heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:25px}.eyebrow{margin:0 0 8px;color:#667d8c;font-size:13px}.heading h1{margin:0;font-size:clamp(28px,4vw,38px);letter-spacing:-.045em}.subtitle{margin:9px 0 0;color:#526b78;font-size:15px;line-height:1.7;max-width:690px}.panel{background:#fff;border:1px solid #d5e4e8;border-radius:16px;margin-top:20px;padding:24px}.panel h2{font-size:19px;margin:0}.panel-intro{font-size:14px;color:#607688;line-height:1.65;margin:8px 0 20px}.form-grid{display:grid;grid-template-columns:1.4fr 1fr auto;align-items:end;gap:14px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.field input,.field select{height:44px;width:100%;padding:0 12px;border:1px solid #cddde2;border-radius:8px;background:#fff;color:#102a3e;font:inherit}.field input:focus,.field select:focus{outline:3px solid #00a5af33;border-color:#00828c}.button{min-height:44px;padding:0 18px;border-radius:8px;border:1px solid #cddde2;background:#fff;color:#102a3e;font:700 14px Manrope,"Segoe UI",sans-serif;cursor:pointer}.button:hover{filter:brightness(.97)}.button.primary{background:#006d77;border-color:#006d77;color:#fff}.button.danger{color:#a83232;border-color:#e3babb}.button:disabled{opacity:.55;cursor:wait}.status{padding:11px 14px;border-radius:9px;margin:18px 0 0;background:#fff8e8;color:#77531a;border:1px solid #f3dfb1;font-size:14px;line-height:1.55}.status[hidden]{display:none}.team-list{display:grid;gap:16px}.team-card{border:1px solid #d5e4e8;border-radius:14px;background:#fff;overflow:hidden}.team-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:19px 21px;border-bottom:1px solid #e3ecef}.team-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.team-title h3{font-size:18px;margin:0}.badge{border-radius:999px;padding:5px 10px;background:#e3f3f3;color:#006d77;font-size:12px;font-weight:800}.meta{margin:7px 0 0;color:#687d89;font-size:13px}.members{padding:0 20px 16px}.members-title{font-size:14px;font-weight:800;padding:15px 0 9px}.member-row{display:grid;grid-template-columns:minmax(160px,1fr) minmax(180px,1fr) 100px auto;align-items:center;gap:12px;border-top:1px solid #edf2f3;padding:12px 0;font-size:13px}.member-main{font-weight:700}.member-sub,.member-date{color:#697e8a;font-size:12px;margin-top:3px}.member-role{color:#006d77;font-weight:700}.member-actions{display:flex;gap:8px}.member-actions .button{min-height:34px;font-size:12px;padding:0 11px}.add-member{border-top:1px solid #e5edef;margin-top:8px;padding-top:16px;display:flex;align-items:end;gap:10px}.add-member .field{flex:1}.empty{padding:30px 20px;text-align:center;color:#607688;border:1px dashed #bed0d5;border-radius:12px;background:#fbfdfd}.notice{color:#607688;font-size:13px;line-height:1.6;margin:17px 0 0}.loading{color:#607688;padding:26px 0}.hidden{display:none!important}@media(max-width:720px){.heading{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.form-grid .button{width:100%}.team-head{align-items:flex-start;flex-direction:column}.member-row{grid-template-columns:1fr auto;gap:6px}.member-role,.member-date{grid-column:1}.member-actions{grid-column:2;grid-row:1/4;align-self:center}.add-member{align-items:stretch;flex-direction:column}.add-member .button{width:100%}.topbar-right{font-size:12px;gap:10px}}
+    </style>
+    <style>
+      :root{--ink:#102a3e;--muted:#536b77;--blue:#006d77;--line:#dce6ea;--canvas:#f1f5f6}
+      body{background:var(--canvas);color:var(--ink)}
+      .app{min-height:100vh}
+      .sidebar{position:fixed;inset:0 auto 0 0;z-index:5;display:flex;width:238px;flex-direction:column;padding:22px 14px;border-right:1px solid var(--line);background:var(--ink)}
+      .sidebar{overflow:visible}
+      .brand-header{display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
+      .brand-header .brand{display:block;flex:1;min-width:0;width:auto;padding:2px 0 26px}
+      .brand-logo{display:block;width:100%;height:auto}
+      .sidebar-toggle{display:flex;width:30px;height:30px;flex:0 0 30px;align-items:center;justify-content:center;margin-top:1px;padding:0 8px;border:1px solid #365666;border-radius:7px;background:#183b51;color:#d2dfe5;font-size:19px;line-height:1}
+      .sidebar-toggle:hover{border-color:#6e929e;background:#20495c;color:#fff}
+      .sidebar-toggle-icon{transform:translateX(-1px);transition:transform .16s ease}
+      .sidebar-toggle[aria-pressed=true] .sidebar-toggle-icon{transform:rotate(180deg) translateX(-1px)}
+      .sidebar.is-collapsed{width:76px;align-items:center;padding:18px 8px}
+      .sidebar.is-collapsed+.main-column{margin-left:76px}
+      .sidebar.is-collapsed .brand-header{width:100%;flex-direction:column;align-items:center}
+      .sidebar.is-collapsed .brand{display:grid;width:52px;height:48px;overflow:hidden;place-items:center;padding:0}
+      .sidebar.is-collapsed .brand-logo{display:none}
+      .sidebar.is-collapsed .brand:after{color:#a3ebed;content:"HP";font-size:17px;font-weight:800}
+      .sidebar.is-collapsed .sidebar-toggle{width:42px;flex-basis:42px;padding:0;transform:rotate(180deg)}
+      .sidebar.is-collapsed .nav-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+      .sidebar.is-collapsed .nav{width:100%;gap:9px}
+      .sidebar.is-collapsed .nav-group{gap:4px}
+      .sidebar.is-collapsed .nav-group-trigger,.sidebar.is-collapsed .nav-link,.sidebar.is-collapsed .nav-child-link{min-height:43px;justify-content:center;gap:0;padding:0;font-size:0}
+      .sidebar.is-collapsed .nav-group-trigger>span:not(.nav-icon),.sidebar.is-collapsed .nav-chevron{display:none}
+      .sidebar.is-collapsed .nav-icon{width:29px;height:29px;flex-basis:29px}
+      .sidebar.is-collapsed .nav-group.is-open{z-index:10}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{position:absolute;top:0;left:calc(100% + 8px);z-index:8;width:204px;margin:0;padding:10px;border:1px solid #365666;border-radius:9px;background:var(--ink);box-shadow:0 10px 25px rgba(0,0,0,.2)}
+      .sidebar.is-collapsed .nav-children:before{padding:3px 8px 8px;color:#9bb0bd;content:attr(data-label);font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+      .sidebar.is-collapsed .nav-group.is-open .nav-child-link{min-height:38px;justify-content:flex-start;gap:9px;padding:0 8px;font-size:10px}
+      .sidebar.is-collapsed .nav-group.is-open .nav-child-link .nav-icon{width:25px;height:25px;flex-basis:25px}
+      .sidebar.is-collapsed .nav-standalone{margin-top:5px;padding-top:8px}
+      .sidebar.is-collapsed .nav-standalone .nav-link{font-size:0}
+      .sidebar.is-collapsed .sidebar-bottom{width:100%;padding:12px 0 3px}
+      .sidebar.is-collapsed .sidebar-bottom span{display:none}
+      .nav-label{margin:0 10px 8px;color:#9bb0bd;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+      .nav{display:grid;gap:8px}
+      .nav-group{display:grid;gap:3px}
+      .nav-group-trigger,.nav-link,.nav-child-link{display:flex;min-height:40px;align-items:center;gap:10px;padding:0 10px;border:1px solid transparent;border-radius:8px;background:transparent;color:#d2dfe5;font:700 11px Manrope,"Segoe UI",sans-serif;text-align:left;text-decoration:none;cursor:pointer}
+      .nav-group-trigger{width:100%}
+      .nav-group-trigger:hover,.nav-group-trigger[aria-expanded=true],.nav-link:hover,.nav-child-link:hover{border-color:#335766;background:#183b51;color:#fff}
+      .nav-icon{display:grid;width:27px;height:27px;flex:0 0 27px;place-items:center;border:1px solid #365666;border-radius:7px;background:#183b51;color:#bed1d7}
+      .nav-icon svg{display:block;width:15px;height:15px;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.7}
+      .nav-child-link .nav-icon{width:25px;height:25px;flex-basis:25px}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#28747e;background:#0d5660;color:#a3ebed}
+      .nav-group-trigger .nav-chevron{width:7px;height:7px;margin-left:auto;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .16s ease}
+      .nav-group-trigger[aria-expanded=true] .nav-chevron{transform:translateY(2px) rotate(225deg)}
+      .nav-children{display:grid;gap:3px;margin-left:13px;padding-left:9px;border-left:1px solid #315260}
+      .nav-children[hidden]{display:none}
+      .nav-child-link{min-height:36px;color:#bacbd2;font-size:10px}
+      .nav-child-link[aria-current=page],.nav-link[aria-current=page]{border-color:#23616a;background:#164653;color:#8ce4e4;box-shadow:inset 2px 0 #00bfd0}
+      .nav-standalone{display:grid;gap:3px;margin-top:3px;padding-top:9px;border-top:1px solid #244559}
+      .sidebar-bottom{margin-top:auto;padding:14px 10px 4px;border-top:1px solid #244559;color:#c6d4dc;font-size:10px}
+      .sidebar-bottom span{display:block;margin-top:7px;color:#9bb0bd}
+      .main-column{min-height:100vh;margin-left:238px}
+      .topbar{position:sticky;top:0;z-index:4;display:flex;min-height:64px;align-items:center;justify-content:space-between;gap:20px;padding:0 clamp(22px,3vw,44px);border-bottom:1px solid var(--line);background:#fff}
+      .topbar-title{color:#58687d;font-size:12px}
+      .topbar-right{gap:16px;color:#526b78;font-size:11px}
+      .topbar a.simple-link{color:var(--blue);font-size:11px;font-weight:700}
+      .user-menu{position:relative;display:flex;align-items:center;padding-left:16px;border-left:1px solid var(--line)}
+      .account-trigger{display:flex;align-items:center;gap:9px;padding:6px 8px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--ink);text-align:left;cursor:pointer}
+      .account-trigger:hover,.account-menu[data-open=true] .account-trigger{border-color:var(--line);background:#f6fafa}
+      .account-trigger:focus-visible,.account-dropdown button:focus-visible{outline:3px solid rgba(0,109,119,.28);outline-offset:2px}
+      .account-chevron{width:7px;height:7px;margin-left:5px;border-right:1.5px solid #758298;border-bottom:1.5px solid #758298;transform:translateY(-2px) rotate(45deg);transition:transform .16s ease}
+      .account-menu[data-open=true] .account-chevron{transform:translateY(1px) rotate(225deg)}
+      .account-dropdown{position:absolute;top:calc(100% + 8px);right:0;z-index:8;width:196px;padding:6px;visibility:hidden;transform:translateY(-4px);border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 12px 30px rgba(16,42,62,.16);opacity:0;pointer-events:none;transition:opacity .14s ease,transform .14s ease}
+      .account-dropdown:before{position:absolute;top:-9px;right:0;left:0;height:9px;content:""}
+      .account-menu[data-open=true] .account-dropdown{visibility:visible;transform:translateY(0);opacity:1;pointer-events:auto}
+      .account-dropdown button{display:flex;width:100%;min-height:40px;align-items:center;padding:0 11px;border:0;border-radius:7px;background:transparent;color:#34445b;font-size:11px;font-weight:700;text-align:left;cursor:pointer}
+      .account-dropdown button:hover{background:#f1f7f7;color:var(--ink)}
+      .account-dropdown button[data-account-action=logout]{margin-top:5px;border-top:1px solid var(--line);border-radius:0 0 7px 7px;color:var(--red)}
+      .account-dropdown button[data-account-action=logout]:hover{background:#fff5f4}
+      .account-avatar{display:grid;width:34px;height:34px;place-items:center;border-radius:50%;background:#e3f4f4;color:var(--blue);font-size:10px;font-weight:800}
+      .account-name{display:block;color:var(--ink);font-size:11px;font-weight:800}
+      .account-role{display:block;margin-top:2px;color:var(--muted);font-size:10px}
+      .topbar-right .button{min-height:36px;padding:0 12px;font-size:11px}
+      .shell{width:min(1480px,100%);margin:0 auto;padding:36px clamp(22px,3vw,44px) 52px}
+      .heading{margin-bottom:25px}
+      .eyebrow{margin-bottom:9px;font-size:11px}
+      .heading h1{font-size:30px}
+      .subtitle{font-size:13px;line-height:1.65}
+      .panel{margin-top:16px;padding:20px;border-color:var(--line);border-radius:11px;box-shadow:none}
+      .panel h2{font-size:14px}
+      .panel-intro{margin:6px 0 17px;font-size:11px}
+      .field label{font-size:11px}
+      .field input,.field select{height:40px;border-color:#cddde2;border-radius:7px;font-size:11px}
+      .button{min-height:40px;border-radius:7px;font-size:11px}
+      .team-list{gap:12px}
+      .team-card{border-color:var(--line);border-radius:10px}
+      .team-head{padding:15px 17px}
+      .team-title h3{font-size:13px}
+      .badge{padding:4px 8px;font-size:9px}
+      .meta,.member-sub,.member-date{font-size:10px}
+      .members{padding:0 17px 14px}
+      .members-title{font-size:11px}
+      .member-row{font-size:10px}
+      .member-actions .button{min-height:32px;font-size:9px}
+      .add-member{padding-top:13px}
+      .status,.empty,.notice{font-size:11px}
+      .status{border-radius:8px}
+      .empty{border-radius:9px}
+      .sidebar :focus-visible,.topbar :focus-visible,.shell :focus-visible{outline:3px solid rgba(0,109,119,.45);outline-offset:2px}
+      @media(max-width:1080px){.sidebar{width:204px}.main-column{margin-left:204px}.member-row{grid-template-columns:minmax(120px,1fr) minmax(130px,1fr) 76px auto;gap:8px}.member-actions{flex-wrap:wrap}}
+      @media(max-width:760px){
+        .sidebar,.sidebar.is-collapsed{position:relative;width:auto;align-items:stretch;padding:10px 14px 12px;border-right:0;border-bottom:1px solid #244559}
+        .brand-header,.sidebar.is-collapsed .brand-header{width:auto;flex-direction:row;align-items:center}
+        .sidebar .brand,.sidebar.is-collapsed .brand{display:block;width:auto;height:auto;overflow:visible;padding:0 4px 10px}
+        .brand-logo,.sidebar.is-collapsed .brand-logo{display:block;width:166px;max-width:100%;height:auto}
+        .sidebar .brand:after{display:none}
+        .sidebar-toggle{display:none}
+        .nav-label,.sidebar-bottom{display:none}
+        .nav{width:auto;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 8px}
+        .nav-group{grid-column:1/-1}
+        .nav-group-trigger,.nav-link,.nav-child-link,.sidebar.is-collapsed .nav-group-trigger,.sidebar.is-collapsed .nav-link,.sidebar.is-collapsed .nav-child-link{min-height:40px;justify-content:flex-start;gap:8px;padding:0 8px;font-size:10px}
+        .sidebar.is-collapsed .nav-group-trigger>span:not(.nav-icon),.sidebar.is-collapsed .nav-chevron{display:flex}
+        .nav-children,.sidebar.is-collapsed .nav-group.is-open .nav-children{position:static;width:auto;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;padding:2px 0 0;border:0;background:transparent;box-shadow:none}
+        .nav-children:before{display:none}
+        .sidebar.is-collapsed .nav-group.is-open .nav-child-link{min-height:40px;justify-content:flex-start;gap:8px;padding:0 8px;font-size:10px}
+        .sidebar.is-collapsed .nav-icon{width:25px;height:25px;flex-basis:25px}
+        .nav-standalone{display:contents}
+        .nav-standalone:before{grid-column:1/-1;margin:9px 3px 2px;color:#9bb0bd;content:"QUẢN TRỊ";font-size:9px;font-weight:800;letter-spacing:.1em}
+        .main-column{margin-left:0}
+      }
+      @media(max-width:720px){
+        .topbar{min-height:52px;padding:0 16px}
+        .topbar-right{gap:9px;font-size:10px}
+        .user-menu{padding-left:9px}
+        .account-trigger{gap:4px;padding:4px}
+        .account-details{display:none}
+        .account-chevron{margin-left:4px}
+        .topbar a.simple-link{display:none}
+        .topbar-right .button{min-height:34px;padding:0 9px}
+        .shell{padding:24px 16px 40px}
+        .heading{align-items:flex-start}
+        .heading h1{font-size:24px}
+        .form-grid{grid-template-columns:1fr}
+        .form-grid .button{width:100%}
+        .team-head{align-items:flex-start;flex-direction:row}
+        .member-row{grid-template-columns:minmax(0,1fr) auto;gap:6px}
+        .member-role,.member-date{grid-column:1}
+        .member-actions{grid-column:2;grid-row:1/4;align-self:center}
+        .add-member{align-items:stretch;flex-direction:column}
+        .add-member .button{width:100%}
+      }
+      @media(prefers-reduced-motion:reduce){.nav-group-trigger .nav-chevron{transition-duration:.01ms}}
+      .team-path{display:inline-block;margin-top:8px;color:#006d77;font-size:12px;font-weight:700;text-decoration:none}.team-path:hover{text-decoration:underline}.team-back{display:inline-flex;margin-bottom:14px;color:#006d77;font-size:13px;font-weight:700;text-decoration:none}.team-back:hover{text-decoration:underline}
+    </style>
+    <style id="noc-dark-theme">
+      :root{color-scheme:dark;color:#f3f6fa;background:#1e2a38;--canvas:#1e2a38;--panel:#26364a;--panel-2:#2d3f55;--field:#1a2431;--ink:#f3f6fa;--muted:#b8c5d3;--blue:#5cc7d1;--line:#3d516a;--line-2:#4c627c;--red:#ff8078}
+      body{background:#1e2a38;color:#f3f6fa}
+      ::selection{background:#3b8f98;color:#fff}
+      .sidebar{background:#17212d;color:#d3dde7;border-color:#3d516a}
+      .sidebar.is-collapsed .nav-group.is-open .nav-children{background:#17212d;border-color:#3d516a;box-shadow:0 12px 28px rgba(0,0,0,.4)}
+      .sidebar-toggle{border-color:#3d516a;background:#1f2d3d;color:#d3dde7}
+      .sidebar-toggle:hover{border-color:#4c627c;background:#2b4058;color:#fff}
+      .sidebar.is-collapsed .brand:after{color:#f3f6fa}
+      .nav-label,.sidebar-bottom span,.sidebar.is-collapsed .nav-children:before,.nav-standalone:before{color:#a3b2c1}
+      .nav-group-trigger,.nav-link,.nav-child-link{color:#d3dde7}
+      .nav-child-link{color:#c3cfdb}
+      .nav-group-trigger:hover,.nav-group-trigger[aria-expanded=true],.nav-link:hover,.nav-child-link:hover{border-color:#3d516a;background:#233245;color:#fff}
+      .nav-icon{border-color:#3d516a;background:#1f2d3d;color:#b8c5d3}
+      .nav-link[aria-current=page] .nav-icon,.nav-child-link[aria-current=page] .nav-icon{border-color:#3f8e97;background:#1d4a52;color:#9be6ee}
+      .nav-children{border-left-color:#3d516a}
+      .nav-child-link[aria-current=page],.nav-link[aria-current=page]{border-color:#4c627c;background:#2b4058;color:#fff;box-shadow:inset 2px 0 #5cc7d1}
+      .nav-standalone,.sidebar-bottom{border-top-color:#3d516a}
+      .sidebar-bottom{color:#c3cfdb}
+      .topbar{background:#1e2a38;border-bottom-color:#3d516a}
+      .topbar-title,.topbar-right{color:#b8c5d3}
+      .topbar a.simple-link{color:#86dae1}
+      .user-menu{border-left-color:#3d516a}
+      .account-trigger:hover,.account-menu[data-open=true] .account-trigger{border-color:#3d516a;background:#26364a}
+      .account-chevron{border-color:#b8c5d3}
+      .account-dropdown{border-color:#4c627c;background:#2d3f55;box-shadow:0 14px 32px rgba(0,0,0,.4)}
+      .account-dropdown button{color:#dbe4ed}
+      .account-dropdown button:hover{background:#38506b;color:#fff}
+      .account-dropdown button[data-account-action=logout]{border-top-color:#3d516a;color:#ff8078}
+      .account-dropdown button[data-account-action=logout]:hover{background:#4a2f35}
+      .account-avatar{border:1px solid #3f8e97;background:#1d4a52;color:#a9eaf0}
+      .account-trigger:focus-visible,.account-dropdown button:focus-visible,.sidebar :focus-visible,.topbar :focus-visible,.shell :focus-visible{outline:3px solid rgba(92,199,209,.5);outline-offset:2px}
+      .eyebrow,.subtitle,.panel-intro,.meta,.member-sub,.member-date,.notice,.loading{color:#b8c5d3}
+      .heading h1,.panel h2,.team-title h3,.members-title,.member-main{color:#f3f6fa}
+      .panel{background:#26364a;border-color:#3d516a;border-radius:10px}
+      .field label{color:#d3dde7}
+      .field input,.field select{border-color:#4c627c;background:#1a2431;color:#f3f6fa;border-radius:8px}
+      .field input::placeholder{color:#94a3b3}
+      .field input:focus,.field select:focus{outline:3px solid rgba(92,199,209,.3);border-color:#5cc7d1}
+      .button{border-color:#4c627c;background:transparent;color:#dbe4ed;border-radius:8px}
+      .button:hover{filter:none;border-color:#637b97;background:#38506b;color:#fff}
+      .button.primary{border-color:#5cc7d1;background:#5cc7d1;color:#0b2328;font-weight:800}
+      .button.primary:hover{border-color:#86dae1;background:#86dae1;color:#0b2328}
+      .button.danger{border-color:#8a4a4d;color:#ff8078}
+      .button.danger:hover{border-color:#b56469;background:#4a2f35;color:#ffa59f}
+      .status{background:#4a3a17 !important;color:#f0b955 !important;border:1px solid #8a6a26}
+      .status[style*="255, 241, 240"]{background:#4a2f35 !important;color:#ffa59f !important;border-color:#8a4a4d}
+      .status[style*="234, 246, 239"]{background:#1f4a35 !important;color:#6ad39a !important;border-color:#3f8a62}
+      .team-card{background:#26364a;border-color:#3d516a;border-radius:10px}
+      .team-head{border-bottom-color:#3d516a;background:#2d3f55}
+      .badge{border:1px solid #3f7a82;border-radius:6px;background:#1d4a52;color:#a9eaf0}
+      .member-row{border-top-color:#3d516a}
+      .member-role{color:#86dae1}
+      .add-member{border-top-color:#3d516a}
+      .empty{border-color:#4c627c;background:#2d3f55;color:#b8c5d3}
+      .team-path,.team-back{color:#86dae1}
+      .team-path{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+      @media(max-width:760px){.sidebar,.sidebar.is-collapsed{border-bottom-color:#3d516a}}
+    </style>
+      <style>[data-admin-only][hidden] { display: none !important; }</style>
+    <script src="/staging/staging-access.js?v=github-d-20261012-r2" defer></script>
+      <meta name="hp-ui-release" content="github-d-20261012" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand-header">
+          <a class="brand" href="../" aria-label="HP Telecom, trang chủ">
+            <svg class="brand-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 303 64" role="img" aria-label="HP Telecom — Điều hành hiện trường">
+              <g fill="none" stroke="#00bfd0" stroke-linecap="round" stroke-width="3.5">
+                <path d="M30 7a23 23 0 0 0-22 16" />
+                <path d="M7 32a23 23 0 0 0 17 22" />
+                <path d="M34 55a23 23 0 0 0 18-19" />
+                <path d="M54 27A23 23 0 0 0 38 9" />
+              </g>
+              <circle cx="21" cy="7" r="3.2" fill="#00bfd0" />
+              <circle cx="53" cy="47" r="3.2" fill="#00bfd0" />
+              <text x="10" y="39" fill="#fff" font-family="Arial,sans-serif" font-size="25" font-weight="800" letter-spacing="-2">HP</text>
+              <text x="76" y="29" fill="#fff" font-family="Arial,sans-serif" font-size="23" font-weight="700" letter-spacing="-.7">HP Telecom</text>
+              <text x="76" y="50" fill="#a3ebed" font-family="Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="2.1">ĐIỀU HÀNH HIỆN TRƯỜNG</text>
+            </svg>
+          </a>
+        </div>
+        <p class="nav-label">Không gian quản trị</p>
+        <nav class="nav" aria-label="Điều hướng quản trị">
+          <div class="nav-group">
+            <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="summary-menu" aria-label="Mở thư mục Tổng hợp" title="Tổng hợp" data-nav-toggle><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></span><span>Tổng hợp</span><span class="nav-chevron" aria-hidden="true"></span></button>
+            <div class="nav-children" id="summary-menu" data-label="Tổng hợp" hidden>
+              <a class="nav-child-link" href="/staging/tonghop/tongquan/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Tổng quan</a>
+              <a class="nav-child-link" href="/staging/tonghop/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3.5 19h17L12 3Z"/><path d="M12 9v4m0 3h.01"/></svg></span>Sự cố</a>
+              <a class="nav-child-link" href="/staging/tonghop/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 17 17 4m-8 0h8v8"/><path d="M5 7v12h12"/></svg></span>Di dời</a>
+            </div>
+          </div>
+          <div class="nav-group">
+            <button class="nav-group-trigger" type="button" aria-expanded="false" aria-controls="reports-menu" aria-label="Mở thư mục Báo cáo" title="Báo cáo" data-nav-toggle><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3.5h9l5 5v12H5z"/><path d="M14 3.5v5h5m-10 4h6m-6 4h6"/></svg></span><span>Báo cáo</span><span class="nav-chevron" aria-hidden="true"></span></button>
+            <div class="nav-children" id="reports-menu" data-label="Báo cáo" hidden>
+              <a class="nav-child-link" href="/staging/baocao/suco/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8m-8 4h8m-8 4h5"/></svg></span>Sự cố</a>
+              <a class="nav-child-link" href="/staging/baocao/didoi/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19V5m0 0 4 4m-4-4L1 9m18 10V5m0 14 4-4m-4 4-4-4"/></svg></span>Di dời</a>
+              <a class="nav-child-link" href="/staging/baocao/tuantuyen/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 16l4-5 3 2 5-7"/><path d="M15 6h3v3"/></svg></span>Tuần Tuyến</a>
+            </div>
+          </div>
+          <div class="nav-standalone">
+            <a class="nav-link" href="/staging/thuvien/"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 5-4 3 2 3-3 3 4"/></svg></span>Thư viện ảnh</a>
+            <a class="nav-link" href="/staging/nhom/" title="Team/Đội của tôi" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.4-3.6 2.6-5.5 6-5.5s5.6 1.9 6 5.5m1-5c3.1 0 4.7 1.8 5 5"/></svg></span>Team/Đội của tôi</a>
+            <a class="nav-link" href="/staging/nguoidung/" data-admin-only hidden><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.6-3.4 3.2-5.2 7-5.2s6.4 1.8 7 5.2"/></svg></span>Người dùng</a>
+            
+          </div>
+        </nav>
+        <div class="sidebar-bottom">Quản lý nhóm và thành viên<span>HP Telecom · Không gian làm việc</span></div>
+      </aside>
+      <div class="main-column">
+        <header class="topbar">
+          <span class="topbar-title">Quản lý nhóm</span>
+          <div class="topbar-right">
+            <a class="simple-link" href="/staging/support">Hỗ trợ</a>
+            <div class="user-menu account-menu" id="account-menu">
+              <button class="account-trigger" id="account-trigger" type="button" aria-label="Tài khoản" aria-haspopup="menu" aria-expanded="false">
+                <span class="account-avatar" id="account-avatar" aria-hidden="true">QT</span>
+                <span class="account-details"><span class="account-name" id="account-name">Đang tải tài khoản…</span><span class="account-role" id="account-role">Tài khoản HP Telecom</span></span>
+                <span class="account-chevron" aria-hidden="true"></span>
+              </button>
+              <div class="account-dropdown" id="account-dropdown" role="menu" aria-label="Tùy chọn tài khoản">
+                <button type="button" role="menuitem" data-account-action="info">Thông tin</button>
+                <button type="button" role="menuitem" data-account-action="password">Đổi mật khẩu</button>
+                <button type="button" role="menuitem" data-account-action="logout">Thoát</button>
+              </div>
+            </div>
+          </div>
+        </header>
+    <main class="shell">
+      <div class="heading">
+        <div><p class="eyebrow">Không gian làm việc / Nhóm của tôi</p><h1>Nhóm của tôi</h1><p class="subtitle">Cá nhân hoặc tổ chức có thể tự tạo nhóm bằng tên riêng, sau đó thêm tài khoản HP Telecom đã được duyệt vào nhóm.</p></div>
+      </div>
+      <section class="panel" aria-labelledby="create-title">
+        <h2 id="create-title">Tạo Team/Đội</h2>
+        <p class="panel-intro">Tên nhóm giữ nguyên dấu, khoảng trắng và cách viết bạn nhập. Chỉ đường dẫn viết liền, không dấu: Đắk Lắk → /nhom/daklak. Không cần chọn tỉnh/thành.</p>
+        <form id="create-form" class="form-grid">
+          <div class="field"><label for="team-name">Tên Team/Đội</label><input id="team-name" name="name" maxlength="100" placeholder="Ví dụ: Đắk Lắk" required /></div>
+          <div class="field"><label for="team-kind">Loại nhóm</label><select id="team-kind" name="kind"><option value="individual">Nhóm cá nhân</option><option value="organization">Nhóm tổ chức</option></select></div>
+          <button class="button primary" type="submit">+ Tạo nhóm</button>
+        </form>
+      </section>
+      <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+      <section class="panel" aria-labelledby="groups-title">
+        <h2 id="groups-title">Team/Đội đã tham gia</h2>
+        <p class="panel-intro">Người tạo nhóm là Điều phối viên. Thành viên mới mặc định là Kỹ thuật viên. Chủ nhóm có thể cấp hoặc thu hồi quyền Điều phối viên. Thành viên cần đăng ký và được quản trị viên duyệt trước.</p>
+        <div id="team-list" class="team-list"><p class="loading">Đang tải nhóm…</p></div>
+      </section>
+      <p class="notice">Vai trò Điều phối viên/Kỹ thuật viên ở đây áp dụng trong Team/Đội này. Quyền truy cập các chức năng hệ thống vẫn do quản trị viên cấp riêng.</p>
+    </main>
+      </div>
+    </div>
+    <script>
+      (() => {
+        "use strict";
+        const sidebar = document.querySelector(".sidebar");
+        const nav = sidebar && sidebar.querySelector(".nav");
+        const compactNavigation = window.matchMedia("(max-width: 760px)");
+        if (sidebar && nav) {
+          const brand = sidebar.querySelector(".brand");
+          const toggle = document.createElement("button");
+          toggle.className = "sidebar-toggle";
+          toggle.type = "button";
+          toggle.setAttribute("aria-pressed", "false");
+          toggle.setAttribute("aria-label", "Thu gọn menu");
+          toggle.title = "Thu gọn menu";
+          toggle.innerHTML = '<span class="sidebar-toggle-icon" aria-hidden="true">‹</span>';
+          if (brand) brand.insertAdjacentElement("afterend", toggle);
+          const setSidebarCollapsed = (collapsed, persist = true) => {
+            const shouldCollapse = !compactNavigation.matches && collapsed;
+            sidebar.classList.toggle("is-collapsed", shouldCollapse);
+            toggle.setAttribute("aria-pressed", String(shouldCollapse));
+            toggle.setAttribute("aria-label", shouldCollapse ? "Mở rộng menu" : "Thu gọn menu");
+            toggle.title = shouldCollapse ? "Mở rộng menu" : "Thu gọn menu";
+            if (persist) {
+              try { window.localStorage.setItem("hp-staging-sidebar-collapsed", String(shouldCollapse)); }
+              catch (error) { console.warn("Không lưu được tùy chọn menu trên thiết bị này.", error); }
+            }
+          };
+          try { setSidebarCollapsed(window.localStorage.getItem("hp-staging-sidebar-collapsed") === "true", false); }
+          catch (error) {
+            console.warn("Không đọc được tùy chọn menu trên thiết bị này.", error);
+            setSidebarCollapsed(false, false);
+          }
+          toggle.addEventListener("click", () => setSidebarCollapsed(!sidebar.classList.contains("is-collapsed")));
+          compactNavigation.addEventListener("change", (event) => {
+            if (event.matches && sidebar.classList.contains("is-collapsed")) setSidebarCollapsed(false);
+          });
+          nav.querySelectorAll("a").forEach((link) => { if (!link.title) link.title = link.textContent.trim(); });
+        }
+        nav.querySelectorAll("[data-nav-toggle]").forEach((button) => {
+          const group = button.closest(".nav-group");
+          const submenu = document.getElementById(button.getAttribute("aria-controls"));
+          if (!group || !submenu) return;
+          group.classList.toggle("has-current", Boolean(submenu.querySelector('[aria-current="page"]')));
+          let closeTimer;
+          let pointerPress = false;
+          let lastPointer = "";
+          function setOpen(open) {
+            clearTimeout(closeTimer);
+            button.setAttribute("aria-expanded", String(open));
+            button.setAttribute("aria-label", `${open ? "Đóng" : "Mở"} thư mục ${submenu.dataset.label}`);
+            submenu.hidden = !open;
+            group.classList.toggle("is-open", open);
+          }
+          setOpen(group.matches(":hover"));
+          group.addEventListener("pointerenter", (event) => {
+            if (event.pointerType === "mouse") setOpen(true);
+          });
+          group.addEventListener("pointerleave", (event) => {
+            if (event.pointerType !== "mouse") return;
+            // Mouse focus must not keep the current page's menu pinned open.
+            clearTimeout(closeTimer);
+            closeTimer = setTimeout(() => setOpen(false), 140);
+          });
+          group.addEventListener("pointerdown", (event) => {
+            lastPointer = event.pointerType;
+            pointerPress = true;
+          });
+          group.addEventListener("pointerup", () => { pointerPress = false; });
+          group.addEventListener("pointercancel", () => { pointerPress = false; });
+          group.addEventListener("focusin", () => { if (!pointerPress) setOpen(true); });
+          group.addEventListener("focusout", (event) => {
+            if (!group.contains(event.relatedTarget) && !group.matches(":hover")) setOpen(false);
+          });
+          button.addEventListener("click", (event) => {
+            if (event.detail > 0 && lastPointer === "mouse") setOpen(true);
+            else setOpen(submenu.hidden);
+          });
+          group.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              button.focus();
+              setOpen(false);
+            }
+          });
+          new MutationObserver(() => setOpen(false)).observe(sidebar, {
+            attributes: true, attributeFilter: ["class"]
+          });
+        });
+        const apiRoot = new URL("/staging/api/", location.origin);
+        const list = document.querySelector("#team-list");
+        const status = document.querySelector("#status");
+        const slugFromLocation = () => {
+          const match = location.pathname.match(/^\/staging\/nhom\/([^/]+)\/?$/);
+          if (!match) return "";
+          try { return decodeURIComponent(match[1]); }
+          catch { return match[1]; }
+        };
+        let requestedSlug = slugFromLocation();
+        let teamsCache = [];
+        let me = null;
+        const api = async (path, method = "GET", data) => {
+          const response = await fetch(new URL(path, apiRoot), {
+            method,
+            credentials: "same-origin",
+            cache: "no-store",
+            headers: { "Content-Type": "application/json" },
+            ...(data === undefined ? {} : { body: JSON.stringify(data) })
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(body.error?.message || "Không kết nối được máy chủ.");
+          return body;
+        };
+        const message = (text, error = false) => {
+          status.hidden = !text;
+          status.textContent = text || "";
+          status.style.background = error ? "#fff1f0" : "#fff8e8";
+          status.style.color = error ? "#8b2828" : "#77531a";
+        };
+        const el = (tag, className, text) => {
+          const node = document.createElement(tag);
+          if (className) node.className = className;
+          if (text !== undefined) node.textContent = text;
+          return node;
+        };
+        const button = (label, className, action) => {
+          const node = el("button", "button " + (className || ""), label);
+          node.type = "button";
+          node.addEventListener("click", action);
+          return node;
+        };
+        const render = (teams) => {
+          list.replaceChildren();
+          let visibleTeams = teams;
+          if (requestedSlug) {
+            visibleTeams = teams.filter((team) => team.slug === requestedSlug);
+            const back = el("a", "team-back", "← Tất cả Team/Đội");
+            back.href = "/staging/nhom/";
+            back.addEventListener("click", (event) => {
+              if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+              event.preventDefault();
+              history.pushState({}, "", "/staging/nhom/");
+              requestedSlug = "";
+              render(teamsCache);
+            });
+            list.append(back);
+            if (!visibleTeams.length) {
+              list.append(el("div", "empty", "Không tìm thấy nhóm này hoặc bạn chưa được thêm vào nhóm."));
+              return;
+            }
+          }
+          if (!visibleTeams.length) {
+            list.append(el("div", "empty", "Bạn chưa tham gia nhóm nào. Hãy tạo nhóm mới ở phía trên."));
+            return;
+          }
+          for (const team of visibleTeams) {
+            const card = el("article", "team-card");
+            const head = el("div", "team-head");
+            const details = el("div");
+            const title = el("div", "team-title");
+            title.append(el("h3", "", team.name), el("span", "badge", team.kind === "organization" ? "Tổ chức" : "Cá nhân"));
+            details.append(title, el("p", "meta", "Chủ nhóm: " + (team.ownerName || "—") + " · " + team.members.length + " thành viên"));
+            if (team.slug) {
+              const teamPath = el("a", "team-path", "/staging/nhom/" + team.slug);
+              teamPath.href = "/staging/nhom/" + encodeURIComponent(team.slug);
+              teamPath.setAttribute("aria-label", "Mở Team/Đội " + team.name);
+              teamPath.addEventListener("click", (event) => {
+                if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault();
+                history.pushState({}, "", teamPath.href);
+                requestedSlug = team.slug;
+                render(teamsCache);
+              });
+              details.append(teamPath);
+            }
+            head.append(details);
+            const canManage = me.role === "admin" || team.ownerId === me.id || team.membershipRole === "coordinator";
+            const canPromote = me.role === "admin" || team.ownerId === me.id;
+            if (me.role === "admin" || team.ownerId === me.id) head.append(button("Đổi tên", "", async () => {
+              const entered = window.prompt("Tên Team/Đội (giữ nguyên dấu và khoảng trắng):", team.name);
+              if (entered === null || entered.trim() === team.name) return;
+              const name = entered.trim();
+              if (name.length < 2 || name.length > 100) { message("Tên Team/Đội phải có từ 2 đến 100 ký tự.", true); return; }
+              try {
+                await api("teams/" + encodeURIComponent(team.id), "PATCH", { name });
+                message("Đã đổi tên Team/Đội. Đường dẫn và thành viên được giữ nguyên.");
+                await load();
+              } catch (error) { message(error.message, true); }
+            }));
+            if (me.role === "admin" || team.ownerId === me.id) head.append(button("Xóa nhóm", "danger", async () => {
+              if (!window.confirm("Xóa nhóm “" + team.name + "” và danh sách thành viên?")) return;
+              try { await api("teams/" + encodeURIComponent(team.id), "DELETE", {}); message("Đã xóa nhóm."); await load(); }
+              catch (error) { message(error.message, true); }
+            }));
+            const members = el("div", "members");
+            members.append(el("div", "members-title", "Thành viên"));
+            for (const member of team.members) {
+              const row = el("div", "member-row");
+              const person = el("div");
+              person.append(el("div", "member-main", member.fullName || member.username), el("div", "member-sub", "@" + member.username + " · " + member.email));
+              const memberRole = member.role === "owner" ? "Điều phối viên · Chủ nhóm" : member.role === "coordinator" ? "Điều phối viên" : "Kỹ thuật viên";
+              row.append(person, el("div", "member-role", memberRole), el("div", "member-date", new Date(member.joinedAt).toLocaleDateString("vi-VN")));
+              if ((canManage && member.role !== "owner") || (member.id === me.id && member.role !== "owner")) {
+                const actions = el("div", "member-actions");
+                if (canPromote && member.role !== "owner") {
+                  const nextRole = member.role === "coordinator" ? "technician" : "coordinator";
+                  const roleButton = button(nextRole === "coordinator" ? "Cấp Điều phối viên" : "Chuyển thành Kỹ thuật viên", "", async () => {
+                    try {
+                      await api("teams/" + encodeURIComponent(team.id) + "/members/" + encodeURIComponent(member.id), "PATCH", { role: nextRole });
+                      message(nextRole === "coordinator" ? "Đã cấp quyền Điều phối viên trong nhóm." : "Đã chuyển thành Kỹ thuật viên.");
+                      await load();
+                    } catch (error) { message(error.message, true); }
+                  });
+                  actions.append(roleButton);
+                }
+                if (member.role !== "owner" && (canManage || member.id === me.id)) {
+                  actions.append(button(member.id === me.id ? "Rời nhóm" : "Xóa", "danger", async () => {
+                    if (!window.confirm(member.id === me.id ? "Rời nhóm này?" : "Xóa " + member.fullName + " khỏi nhóm?")) return;
+                    try { await api("teams/" + encodeURIComponent(team.id) + "/members/" + encodeURIComponent(member.id), "DELETE", {}); message("Đã cập nhật thành viên."); await load(); }
+                    catch (error) { message(error.message, true); }
+                  }));
+                }
+                row.append(actions);
+              } else row.append(el("div", "member-actions"));
+              members.append(row);
+            }
+            if (canManage) {
+              const form = el("form", "add-member");
+              const field = el("div", "field");
+              const label = el("label", "", "Thêm tài khoản đã duyệt");
+              label.htmlFor = "member-" + team.id;
+              const input = el("input");
+              input.id = label.htmlFor;
+              input.name = "identity";
+              input.placeholder = "Tên đăng nhập hoặc email";
+              input.required = true;
+              field.append(label, input);
+              const submit = el("button", "button primary", "+ Thêm thành viên");
+              submit.type = "submit";
+              form.append(field, submit);
+              form.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                submit.disabled = true;
+                try {
+                  await api("teams/" + encodeURIComponent(team.id) + "/members", "POST", { username: input.value.trim() });
+                  message("Đã thêm thành viên vào nhóm.");
+                  await load();
+                } catch (error) { message(error.message, true); submit.disabled = false; }
+              });
+              members.append(form);
+            }
+            card.append(head, members);
+            list.append(card);
+          }
+        };
+        const load = async () => {
+          const result = await api("teams");
+          teamsCache = result.teams || [];
+          render(teamsCache);
+        };
+        window.addEventListener("popstate", () => {
+          requestedSlug = slugFromLocation();
+          render(teamsCache);
+        });
+        document.querySelector("#create-form").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+          const submit = form.querySelector("button[type=submit]");
+          submit.disabled = true;
+          try {
+            const teamName = form.elements.name.value.trim();
+            if (!teamName) { message("Vui lòng nhập tên nhóm có chữ hoặc số.", true); return; }
+            form.elements.name.value = teamName;
+            await api("teams", "POST", { name: teamName, kind: form.elements.kind.value });
+            form.reset();
+            message("Đã tạo Team/Đội trên máy chủ.");
+            await load();
+          } catch (error) { message(error.message, true); }
+          finally { submit.disabled = false; }
+        });
+        const accountMenu = document.querySelector("#account-menu");
+        const accountTrigger = document.querySelector("#account-trigger");
+        let accountToastTimer;
+        const setAccountMenuOpen = (open) => {
+          accountMenu.dataset.open = String(open);
+          accountTrigger.setAttribute("aria-expanded", String(open));
+        };
+        accountMenu.addEventListener("pointerenter", (event) => {
+          if (event.pointerType === "mouse") setAccountMenuOpen(true);
+        });
+        accountMenu.addEventListener("pointerleave", (event) => {
+          if (event.pointerType === "mouse" && !accountMenu.contains(document.activeElement)) setAccountMenuOpen(false);
+        });
+        accountMenu.addEventListener("focusin", () => setAccountMenuOpen(true));
+        accountMenu.addEventListener("focusout", (event) => {
+          if (!accountMenu.contains(event.relatedTarget) && !accountMenu.matches(":hover")) setAccountMenuOpen(false);
+        });
+        accountTrigger.addEventListener("click", (event) => {
+          if (event.detail > 0 && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            setAccountMenuOpen(true);
+            return;
+          }
+          const open = accountTrigger.getAttribute("aria-expanded") !== "true";
+          setAccountMenuOpen(open);
+          if (open) accountMenu.querySelector('[role="menuitem"]')?.focus();
+        });
+        accountTrigger.addEventListener("keydown", (event) => {
+          if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+          event.preventDefault();
+          event.stopPropagation();
+          setAccountMenuOpen(true);
+          const items = [...accountMenu.querySelectorAll('[role="menuitem"]')];
+          items[event.key === "ArrowDown" ? 0 : items.length - 1]?.focus();
+        });
+        document.addEventListener("pointerdown", (event) => {
+          if (!accountMenu.contains(event.target)) setAccountMenuOpen(false);
+        });
+        accountMenu.addEventListener("click", async (event) => {
+          const action = event.target.closest("[data-account-action]")?.dataset.accountAction;
+          if (!action) return;
+          if (action === "logout") {
+            try { await api("auth/logout", "POST", {}); } finally { location.assign("/staging/dangnhap"); }
+            return;
+          }
+          setAccountMenuOpen(false);
+          message(action === "info"
+            ? "Thông tin tài khoản HP Telecom."
+            : "Đổi mật khẩu sẽ khả dụng khi chức năng được kết nối với hệ thống.");
+          status.style.background = "#eaf6ef";
+          status.style.color = "#16774e";
+          window.clearTimeout(accountToastTimer);
+          accountToastTimer = window.setTimeout(() => { status.hidden = true; }, 3200);
+        });
+        accountMenu.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            setAccountMenuOpen(false);
+            accountTrigger.focus();
+            setAccountMenuOpen(false);
+            return;
+          }
+          if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+          const items = [...accountMenu.querySelectorAll('[role="menuitem"]')];
+          const current = items.indexOf(document.activeElement);
+          const next = event.key === "Home" ? 0
+            : event.key === "End" ? items.length - 1
+              : (current + (event.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+          event.preventDefault();
+          items[next]?.focus();
+        });
+        (async () => {
+          if (!/^https?:$/.test(location.protocol)) {
+            list.replaceChildren(el("div", "empty", "Bản file demo không kết nối máy chủ. Hãy mở /nhom/ trên website HP Telecom."));
+            document.querySelector("#create-form").hidden = true;
+            return;
+          }
+          try {
+            const result = await api("auth/me");
+            me = result.user;
+            document.querySelector("#account-name").textContent = me.fullName || me.username;
+            document.querySelector("#account-role").textContent = ({ admin: "Quản trị viên", coordinator: "Điều phối viên", operator: "Kỹ thuật viên" })[me.role] || me.role;
+            document.querySelector("#account-avatar").textContent = (me.fullName || me.username).trim().split(/\s+/).slice(-2).map((part) => part[0]).join("").toLocaleUpperCase("vi");
+            await load();
+          } catch {
+            location.replace("/staging/dangnhap?next=" + encodeURIComponent("/staging/nhom/"));
+          }
+        })();
+      })();
+    </script>
+  </body>
+</html>

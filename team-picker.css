@@ -1,0 +1,9 @@
+.hp-team-picker{position:fixed;z-index:1200;box-sizing:border-box;overflow:auto;border:1px solid #6c849b;border-radius:10px;background:#1b2a3c;color:#f2f7fc;box-shadow:0 12px 32px #0006;font:14px/1.45 system-ui,sans-serif;padding:5px}
+.hp-team-picker[hidden],.hp-team-retry[hidden]{display:none!important}
+.hp-team-option{padding:10px 12px;border-radius:6px;cursor:pointer;overflow-wrap:anywhere}
+.hp-team-option strong{display:block;color:#f2f7fc;font-weight:600}
+.hp-team-option small{display:block;color:#b7cadd;margin-top:3px}
+.hp-team-option:hover,.hp-team-option[aria-selected=true]{background:#294c62;outline:1px solid #58bdcc}
+.hp-team-picker-status{margin:5px 8px;padding:8px 4px;border-top:1px solid #425a6d;color:#bdd0df;font-size:12px}
+.hp-team-retry{margin:0 8px 8px;padding:8px 12px;border:1px solid #58bdcc;border-radius:6px;background:#294c62;color:#fff;cursor:pointer;font:inherit}
+.hp-team-retry:focus-visible{outline:2px solid #75dfef;outline-offset:2px}
