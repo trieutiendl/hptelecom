@@ -1,0 +1,230 @@
+{
+  "baseline": {
+    "app": "HP Telecom Android",
+    "version_name": "4.1.4",
+    "version_code": 136,
+    "source_root": "HP-Telecom-Android-Server",
+    "purpose": "Read-only patrol reference for staging redesign; not a standalone Android build",
+    "review_date": "2026-10-12"
+  },
+  "files": [
+    {
+      "path": "patrol/MainActivity.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/MainActivity.kt",
+      "source_sha256": "96482475b34ab339023cb093f71a719267fd411c90268b41604028fb179c7382",
+      "form": "complete source file",
+      "lines": 423
+    },
+    {
+      "path": "patrol/WorkModel.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/WorkModel.kt",
+      "source_sha256": "f4f17aa6e9a677bee3d879c682a8abc78a2ad89b5e836038c0925cae8a0f0c49",
+      "form": "complete source file",
+      "lines": 324
+    },
+    {
+      "path": "patrol/CableRepairActivity.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/CableRepairActivity.kt",
+      "source_sha256": "03d13d38682dc93a330bad43619e71e317dedc5bb67e763c46ae655a9a636b80",
+      "form": "complete source file",
+      "lines": 98
+    },
+    {
+      "path": "patrol/CaptureActivity.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/CaptureActivity.kt",
+      "source_sha256": "db1966f6473cd7a82f235f0c929a2123cc6086973753dd4436fd969f00982585",
+      "form": "complete source file",
+      "lines": 505
+    },
+    {
+      "path": "patrol/Data.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/Data.kt",
+      "source_sha256": "cf9a10f466c6a3096070f7f4327465c6a0f4364927ceed783fb017d886a7a8c3",
+      "form": "complete source file",
+      "lines": 39
+    },
+    {
+      "path": "patrol/Draft.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/Draft.kt",
+      "source_sha256": "ed1747bb1d9f0664a3a1371f1daeb5d2e45f3d17360e69edba3ef7ad58271e16",
+      "form": "complete source file",
+      "lines": 18
+    },
+    {
+      "path": "patrol/Rules.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/Rules.kt",
+      "source_sha256": "035748b03fbf5e68ace445ca49f84b0ed86328cfff670ed75dc7d18598718791",
+      "form": "complete source file",
+      "lines": 21
+    },
+    {
+      "path": "patrol/RouteSequence.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/RouteSequence.kt",
+      "source_sha256": "c2568039bc86e9e2052d1e0bb4fcb0baba75b1fe350a5f79c8815dd12b9c17d2",
+      "form": "complete source file",
+      "lines": 16
+    },
+    {
+      "path": "patrol/RouteMoveNumbers.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/RouteMoveNumbers.kt",
+      "source_sha256": "0f510e00df91bbacddb9b057e9d905c346004bfd4d79da72a00d57513634fc15",
+      "form": "complete source file",
+      "lines": 9
+    },
+    {
+      "path": "patrol/RouteMonth.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/RouteMonth.kt",
+      "source_sha256": "ad8dfe94576db993ea08df35bd368afeb6465bf35246cced5c866c3b83f1bf5f",
+      "form": "complete source file",
+      "lines": 26
+    },
+    {
+      "path": "patrol/RoutePhotoMove.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/RoutePhotoMove.kt",
+      "source_sha256": "c9d4f2ee02dde7f652302403ce8cd3eb94d44b44cb80c0ef9b67686bee34032b",
+      "form": "complete source file",
+      "lines": 48
+    },
+    {
+      "path": "patrol/RoutePhotoTitles.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/RoutePhotoTitles.kt",
+      "source_sha256": "346bf1b7526a6784f4006ecca897d62b1cf41cfa1806d942e181d23ef4f671c4",
+      "form": "complete source file",
+      "lines": 40
+    },
+    {
+      "path": "patrol/CableHeader.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/CableHeader.kt",
+      "source_sha256": "55553d8391df26a6f3a95413d660b2409ee63ff5974253a29707b188d9595272",
+      "form": "complete source file",
+      "lines": 82
+    },
+    {
+      "path": "patrol/CablePoints.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/CablePoints.kt",
+      "source_sha256": "c5b159f3ce1229f6a5d707322232a6db14fe445b1ae98520c4d664389cf74d94",
+      "form": "complete source file",
+      "lines": 7
+    },
+    {
+      "path": "patrol/Exports.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/Exports.kt",
+      "source_sha256": "3ec5ec9e00d2fbc6e81226943902b40ae9cb0b278ad845e00368b18d53ed51bd",
+      "form": "complete source file",
+      "lines": 54
+    },
+    {
+      "path": "patrol/CableArchiveCheck.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/CableArchiveCheck.kt",
+      "source_sha256": "1f3debe3e9f72e3bde4124eeff1babcecd41819832c0011fc96c4738efdc8034",
+      "form": "complete source file",
+      "lines": 17
+    },
+    {
+      "path": "patrol/CableSyncCheck.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/CableSyncCheck.kt",
+      "source_sha256": "eb0b70c83d0e9b3b5136dc5231762848be6bd6df6cbb850c441a30ba924fa7f9",
+      "form": "complete source file",
+      "lines": 11
+    },
+    {
+      "path": "patrol/PhotoRenderer.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/PhotoRenderer.kt",
+      "source_sha256": "08274d6f9e715ce5d823498ca0c937940d09fbdf2a6accf5cf741f29735d800a",
+      "form": "complete source file",
+      "lines": 58
+    },
+    {
+      "path": "patrol/PhotoTextEncoding.kt",
+      "source_path": "app/src/main/java/vn/vltelecom/PhotoTextEncoding.kt",
+      "source_sha256": "20bc87273ee6e0d7ff32817af5feea1b49ee8ac3deb852ee6fedf695c8b9b74f",
+      "form": "complete source file",
+      "lines": 16
+    },
+    {
+      "path": "tests/RulesTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/RulesTest.kt",
+      "source_sha256": "030aa869f7f421cf7633c4872dfa2d6a7b6be06f57a4c981537b51bb92c7ce73",
+      "form": "complete source file",
+      "lines": 14
+    },
+    {
+      "path": "tests/RouteSequenceTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/RouteSequenceTest.kt",
+      "source_sha256": "44319e340cb58252f4ce2c15a87fb4ea530225d81b40d46663db8394175482b6",
+      "form": "complete source file",
+      "lines": 11
+    },
+    {
+      "path": "tests/RouteMoveNumbersTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/RouteMoveNumbersTest.kt",
+      "source_sha256": "ca46a96b350d5a47f9b9803ed184635bfe695a7712c56ff2f3749f87587c2f57",
+      "form": "complete source file",
+      "lines": 8
+    },
+    {
+      "path": "tests/RouteMonthTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/RouteMonthTest.kt",
+      "source_sha256": "659e4316401f53834638c988f27e312ef56a9e64a5edb8a9b503e0c5c5cd9f53",
+      "form": "complete source file",
+      "lines": 21
+    },
+    {
+      "path": "tests/ExportsTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/ExportsTest.kt",
+      "source_sha256": "e1532056ecc5ae02cc946f3edb5a33e2645d552af080b0c52f14a2ecb031c55c",
+      "form": "complete source file",
+      "lines": 61
+    },
+    {
+      "path": "tests/CableArchiveCheckTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/CableArchiveCheckTest.kt",
+      "source_sha256": "1c3ef59e222c86cccc9710692792686931df68aad60e68f5b0b40ea3327f8d05",
+      "form": "complete source file",
+      "lines": 18
+    },
+    {
+      "path": "tests/CableSyncCheckTest.kt",
+      "source_path": "app/src/test/java/vn/vltelecom/CableSyncCheckTest.kt",
+      "source_sha256": "8ee3635c221dc953fa06fed624707c90b75c2ca3acb717e40073909501c42952",
+      "form": "complete source file",
+      "lines": 10
+    },
+    {
+      "path": "excerpts/ServerSync.snapshot.kt.txt",
+      "source_path": "app/src/main/java/vn/vltelecom/ServerSync.kt",
+      "source_sha256": "24e129b39c5fa9caa4703049812b9af6fcab519bda6e05131f91d767e8dfdefe",
+      "source_start_line": 55,
+      "source_end_line": 60,
+      "form": "excerpt",
+      "lines": 6
+    },
+    {
+      "path": "excerpts/ServerSync.uploadLocked.kt.txt",
+      "source_path": "app/src/main/java/vn/vltelecom/ServerSync.kt",
+      "source_sha256": "24e129b39c5fa9caa4703049812b9af6fcab519bda6e05131f91d767e8dfdefe",
+      "source_start_line": 133,
+      "source_end_line": 187,
+      "form": "excerpt",
+      "lines": 55
+    },
+    {
+      "path": "excerpts/ServerSync.receiveCableTasks.kt.txt",
+      "source_path": "app/src/main/java/vn/vltelecom/ServerSync.kt",
+      "source_sha256": "24e129b39c5fa9caa4703049812b9af6fcab519bda6e05131f91d767e8dfdefe",
+      "source_start_line": 431,
+      "source_end_line": 490,
+      "form": "excerpt",
+      "lines": 60
+    },
+    {
+      "path": "excerpts/WorkApp.canReceiveReport.kt.txt",
+      "source_path": "app/src/main/java/vn/vltelecom/WorkApp.kt",
+      "source_sha256": "3ee815378c4f0123b6165abbe5ff6526950f797b8ce3549f39e606243e528808",
+      "source_start_line": 36,
+      "source_end_line": 47,
+      "form": "excerpt",
+      "lines": 12
+    }
+  ]
+}

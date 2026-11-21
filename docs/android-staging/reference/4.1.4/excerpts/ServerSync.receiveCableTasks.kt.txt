@@ -1,0 +1,59 @@
+ suspend fun receiveCableTasks(app:WorkApp,progress:(String)->Unit)=mutex.withLock{
+  if(!ServerSession.allowed("Tuyến cáp"))return@withLock
+  val scope=app.accountScope;val prefs=app.getSharedPreferences("server-links",Context.MODE_PRIVATE);val cursorKey="cable-task-sync-cursor";val oldCursor=prefs.getLong(cursorKey,0L)
+  val response=if(oldCursor>0L)try{ServerSession.api("mobile/cable-tasks/since/$oldCursor")}catch(e:ServerSession.Failure){if(e.status==404||e.status==405)ServerSession.api("mobile/cable-tasks")else throw e}else ServerSession.api("mobile/cable-tasks")
+  val tasks=response.getJSONArray("tasks");assignmentSchema(app)
+  for(i in 0 until tasks.length()){val task=tasks.getJSONObject(i);val members=task.getJSONArray("members")
+   for(j in 0 until members.length()){val member=members.getJSONObject(j);if(member.optString("user")!=ServerSession.user?.optString("id")||!member.optBoolean("active"))continue
+    check(scope==app.accountScope){"Tài khoản đã thay đổi"};val fid=member.getString("folder")
+    val linked=withContext(Dispatchers.IO){app.db.openHelper.readableDatabase.query("SELECT placeId,revision FROM cable_assignment_links WHERE remote=?",arrayOf(fid)).use{if(it.moveToFirst())it.getLong(0) to it.getInt(1) else null}}
+    val existing=linked?.let{app.db.dao().place(it.first)}
+    val prefs=app.getSharedPreferences("server-links",Context.MODE_PRIVATE);val archivedKey="cable-archived-$fid"
+    if(prefs.getBoolean(archivedKey,false)){
+     if(member.optBoolean("completed")){if(existing!=null)FolderStore(app).delete(listOf(existing.id));continue}
+     check(prefs.edit().remove(archivedKey).commit()){"Chưa lưu được trạng thái giao lại tuyến"}
+    }
+    if(existing==null&&member.optBoolean("completed")){
+     check(prefs.edit().putBoolean(archivedKey,true).commit()){"Chưa lưu được trạng thái tuyến hoàn thành"};continue
+    }
+    if(existing!=null){
+     val key="folder-${existing.id}"
+     if(!prefs.contains(key))check(prefs.edit().putString(key,fid).putInt("$key-revision",linked.second).commit())
+     refreshLinked(app,existing,fid,member.getInt("revision"),progress)
+     if(archiveCompletedCable(app,existing,fid,member.optBoolean("completed"),member.getInt("revision")))continue
+     val local=snapshot(app,existing)
+     if(pending(app,existing.id)==null&&prefs.getString("$key-signature",null)==sha(local.toString())){
+      when(reconcileCableSync(prefs.getInt("$key-revision",0),member.getInt("revision"),local.getJSONArray("photos").length(),member.getInt("points"),local.optBoolean("completed"),member.optBoolean("completed"))){
+       CableSyncCheck.CONFLICT->continue // Defer an open report; clean closed reports were refreshed above.
+       CableSyncCheck.RESEND->check(prefs.edit().remove("$key-signature").commit()){"Chưa đánh dấu được báo cáo cần gửi lại"}
+       CableSyncCheck.MATCH->Unit
+      }
+     }
+     saveCableMetadata(app,existing.id,task);app.getSharedPreferences("server-links",Context.MODE_PRIVATE).edit().putString("assignment-note-${existing.id}",task.optString("note")).apply();app.db.withTransaction{app.db.dao().renamePlace(existing.id,task.getString("name"));app.db.dao().renameLinkedJobs(existing.id,existing.name,task.getString("name"))};RoutePhotoTitles.refresh(app,existing.id);if(!prefs.contains("folder-${existing.id}"))check(prefs.edit().putString("folder-${existing.id}",fid).putInt("folder-${existing.id}-revision",linked.second).commit());continue}
+    progress("Đang nhận tuyến được giao: "+task.getString("name"));downloadLocked(app,fid,progress,true);val newPlace=withContext(Dispatchers.IO){app.db.openHelper.readableDatabase.query("SELECT placeId FROM cable_assignment_links WHERE remote=?",arrayOf(fid)).use{if(it.moveToFirst())it.getLong(0)else 0L}};if(newPlace>0){saveCableMetadata(app,newPlace,task);app.getSharedPreferences("server-links",Context.MODE_PRIVATE).edit().putString("assignment-note-$newPlace",task.optString("note")).apply()}
+   }
+  }
+  check(scope==app.accountScope){"Tài khoản đã thay đổi"}
+  val newCursor=response.optLong("sync_cursor",0L)
+  if(newCursor>0L)check(prefs.edit().putLong(cursorKey,newCursor).commit()){"Chưa lưu được mốc đồng bộ tuyến"}
+ }
+
+ private suspend fun saveCableMetadata(app:WorkApp,placeId:Long,task:JSONObject){
+  val report=app.db.dao().incident(placeId)?.let{JSONObject(it.value)}?:JSONObject()
+  report.put("cableWork",true).put("workType",task.optString("work_type")).put("routeName",task.optString("name"))
+   .put("lengthKm",task.optString("length_km")).put("team",task.optString("team"))
+  app.db.dao().saveIncident(IncidentRecord(placeId,report.toString()))
+  check(app.getSharedPreferences("server-links",Context.MODE_PRIVATE).edit().putLong("assignment-created-$placeId",task.optLong("created")).commit()){"Chưa lưu được tháng giao tuyến"}
+ }
+
+ private suspend fun archiveCompletedCable(app:WorkApp,place:Place,remote:String?,serverCompleted:Boolean,serverRevision:Int):Boolean{
+  if(remote.isNullOrBlank()||place.kind!="Tuyến cáp"||!app.canReceiveReport(place.id))return false
+  val prefs=app.getSharedPreferences("server-links",Context.MODE_PRIVATE);val key="folder-${place.id}"
+  val signature=sha(snapshot(app,place).toString());val pending=pending(app,place.id)!=null
+  val safe=CableArchiveCheck.allowed(snapshot(app,place).optBoolean("completed"),serverCompleted,pending,
+   prefs.getInt("$key-revision",0),serverRevision,signature,prefs.getString("$key-signature",null),prefs.getBoolean("$key-refresh",false))
+  if(!safe)return false
+  check(prefs.edit().putBoolean("cable-archived-$remote",true).commit()){"Chưa lưu được trạng thái tuyến hoàn thành"}
+  try{FolderStore(app).delete(listOf(place.id))}catch(e:Exception){prefs.edit().remove("cable-archived-$remote").commit();throw e}
+  return true
+ }

@@ -1,0 +1,146 @@
+{
+  "notice": "MINH HỌA — mọi ID, tên, tọa độ và ngày trong fixture là giả; không gửi server thật",
+  "user": {
+    "id": "demo-user",
+    "display_name": "Người dùng minh họa",
+    "role": "operator",
+    "modules": [
+      "cable"
+    ]
+  },
+  "assignmentResponse": {
+    "tasks": [
+      {
+        "name": "TUYEN-DEMO-A-B",
+        "work_type": "inspection",
+        "length_km": "12.5",
+        "team": "Nhóm minh họa",
+        "note": "Kiểm tra các vị trí được giao — dữ liệu minh họa",
+        "created": 1790816400,
+        "members": [
+          {
+            "user": "demo-user",
+            "active": true,
+            "folder": "demo-folder",
+            "completed": false,
+            "revision": 3,
+            "points": 2
+          }
+        ]
+      }
+    ],
+    "sync_cursor": 10
+  },
+  "wirePayloadSubset": {
+    "version": 1,
+    "module": "cable",
+    "name": "TUYEN-DEMO-A-B",
+    "completed": false,
+    "photos": [
+      {
+        "seq": 1,
+        "name": "Điểm đầu minh họa",
+        "lat": 12.0001,
+        "lon": 108.0001,
+        "accuracy": 8,
+        "note": "MX MINH HỌA",
+        "file": "demo-asset-stamped-1",
+        "originalFile": "demo-asset-original-1",
+        "date": "12/10/2026",
+        "capturedAt": 1791770400000,
+        "showDate": true,
+        "textColor": "#FFFFFF",
+        "photographer": "Người dùng minh họa"
+      },
+      {
+        "seq": 2,
+        "name": "Điểm cuối minh họa",
+        "lat": 12.0002,
+        "lon": 108.0002,
+        "accuracy": 12,
+        "note": "DP MINH HỌA",
+        "file": "demo-asset-stamped-2",
+        "originalFile": "demo-asset-original-2",
+        "date": "12/10/2026",
+        "capturedAt": 1791771000000,
+        "showDate": true,
+        "textColor": "#FFFFFF",
+        "photographer": "Người dùng minh họa"
+      }
+    ],
+    "report": {
+      "cableWork": true,
+      "workType": "inspection",
+      "routeName": "TUYEN-DEMO-A-B",
+      "lengthKm": "12.5",
+      "team": "Nhóm minh họa",
+      "points": {
+        "1": {
+          "address": "Địa chỉ minh họa A",
+          "description": "Vị trí đạt — minh họa",
+          "proposal": "",
+          "assessment": "OK"
+        },
+        "2": {
+          "address": "Địa chỉ minh họa B",
+          "description": "Vị trí cần sửa — minh họa",
+          "proposal": "Phương án minh họa",
+          "assessment": "NOK",
+          "before": {
+            "file": "demo-before-2",
+            "photographer": "Người dùng minh họa"
+          },
+          "after": {
+            "file": "demo-after-2",
+            "photographer": "Người dùng minh họa"
+          }
+        }
+      }
+    }
+  },
+  "scenarioExamples": {
+    "insertNewAt2": {
+      "existing": [
+        1,
+        2,
+        3
+      ],
+      "shiftOld": {
+        "2": 3,
+        "3": 4
+      },
+      "newSeq": 2
+    },
+    "moveToOtherRoute": {
+      "occupied": [
+        1,
+        4,
+        9
+      ],
+      "count": 2,
+      "allocated": [
+        10,
+        11
+      ]
+    },
+    "missingGps": {
+      "lat": null,
+      "lon": null,
+      "expected": "Giữ bản nháp; chưa lưu ảnh thành vị trí"
+    },
+    "weakGps": {
+      "accuracy": 65,
+      "expected": "Hỏi Chờ thêm / Vẫn chụp"
+    },
+    "archiveNotYetAcked": {
+      "localCompleted": true,
+      "serverCompleted": false,
+      "expected": "Giữ dữ liệu trên máy; chờ đồng bộ"
+    }
+  },
+  "notes": [
+    "Asset ID là chuỗi giả, không có ảnh kèm theo.",
+    "Payload chỉ là tập trường Tuần tuyến minh họa, không phải response server đầy đủ.",
+    "Team là tên tương thích bản chính; staging cần thêm định danh nhóm theo adapter."
+  ]
+}
