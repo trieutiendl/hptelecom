@@ -1,0 +1,8 @@
+.gradle/
+.build-temp/
+.build/
+.aapt2-probe/
+.android-user/
+**/build/
+*.keystore
+local.properties

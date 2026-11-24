@@ -1,0 +1,38 @@
+name: Deploy HP Map demo
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'android-map/demo/**'
+      - '.github/workflows/deploy-hp-map-demo.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: hp-map-demo-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload the demo site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: android-map/demo
+      - name: Publish the demo
+        id: deployment
+        uses: actions/deploy-pages@v4
