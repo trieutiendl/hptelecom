@@ -34,6 +34,24 @@ check(!MapSecurity.allowedAPI(url(api + "/api/login"), method:"GET"), "login GET
 check(MapSecurity.allowedAPI(url(api + "/api/map-session"), method:"POST"), "HP Map persistent session exchange")
 check(MapSecurity.allowedAPI(url(api + "/api/map-mbf"), method:"GET"), "approved MBF read")
 check(MapSecurity.allowedAPI(url(api + "/api/map-mbf"), method:"PUT"), "approved MBF revision publication")
+check(MapSecurity.allowedAPI(url(api + "/api/map-mbf"), method:"DELETE"), "approved MBF revision deletion")
+let scope = "?id=mbf-01&revision=3"
+for path in ["/api/map-mbf/source-changes", "/api/map-mbf/otdr-totals", "/api/map-mbf/otdr-marks"] {
+    check(MapSecurity.allowedAPI(url(api + path + scope), method:"GET"), "scoped read " + path)
+    check(!MapSecurity.allowedAPI(url(api + path + "?id=a&id=b"), method:"GET"), "repeated keys " + path)
+    check(!MapSecurity.allowedAPI(url(api + path + "?id=a&revision=0"), method:"GET"), "unpublished revision " + path)
+    let write = path.hasSuffix("source-changes") ? "POST" : "PUT"
+    check(MapSecurity.allowedAPI(url(api + path), method:write), "allowed write " + path)
+    check(!MapSecurity.allowedAPI(url(api + path + scope), method:write), "write with query " + path)
+    check(MapSecurity.allowedAPI(url(api + path), method:"GET") == path.hasSuffix("source-changes"), "unscoped read " + path)
+}
+let history = api + "/api/mobile/incident-history?"
+for query in ["mbf_id=A&point_id=mx1", "route=DLEK01-DLEK10&team=", "route=A+B&team=Team+B"] {
+    check(MapSecurity.allowedAPI(url(history + query), method:"GET"), "permitted history scope")
+}
+for query in ["", "team=Team", "mbf_id=A&route=B&team=C", "mbf_id=A&mbf_id=B", "mbf_id=A&token=B"] {
+    check(!MapSecurity.allowedAPI(url(history + query), method:"GET"), "malformed history scope")
+}
 check(!MapSecurity.allowedAPI(url(api + "/api/map-mbf"), method:"POST"), "unsupported MBF write rejected")
 check(!MapSecurity.allowedAPI(url(api + "/api/map-mbf?id=other"), method:"PUT"), "unapproved MBF query rejected")
 check(MapSecurity.allowedAPI(url(api + "/api/mobile/route-catalog"), method:"GET"), "classification reads")

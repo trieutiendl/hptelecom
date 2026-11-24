@@ -21,7 +21,9 @@ with zipfile.ZipFile(ipas[0]) as archive:
     bundle = infos[0].removesuffix('Info.plist') + 'Web/hpmap/'
     for name in ('index.html', 'app.js', 'ios-page.js', 'ios-native.js', 'ios-api.js', 'mobile-gestures.js',
                  'mbf-catalog.js', 'mbf-catalog.css', 'mbf-panel.js', 'mbf-transfer.js', 'mbf-transfer-raw.js',
-                 'mbf-transfer-source.js', 'mbf-report-proposal.js', 'mbf-digest.js', 'mobile-mbf.css'):
+                 'mbf-transfer-source.js', 'mbf-report-proposal.js', 'mbf-digest.js', 'mobile-mbf.css',
+                 'mbf-kml.js', 'mbf-source-review.js', 'ruler.js', 'ruler.css', 'fault-location.js',
+                 'fault-location-ui.js', 'fault-location.css'):
         assert archive.read(bundle + name) == (root / name).read_bytes(), 'Signed app has the wrong asset ' + name
 verify=work/'verify-export'
 subprocess.run(['ditto','-xk',str(ipas[0]),str(verify)],check=True)
